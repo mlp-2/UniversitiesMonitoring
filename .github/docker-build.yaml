@@ -1,0 +1,10 @@
+name: Building Docker images
+
+on:
+  push:
+    branches: [ 'master' ]    
+env:
+  REGISTRY: ghcr.io
+jobs:
+  git-checkout:
+    

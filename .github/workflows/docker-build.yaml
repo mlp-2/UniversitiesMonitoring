@@ -16,7 +16,7 @@ jobs:
         uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
         with:
           registry: ${{ env.REGISTRY }}
-          username: 'DenVot'
+          username: ${{ github.actor }}
           password: ${{ secrets.PAT }}
       - name: "Build and Push Container With UniversitiesMonitoring.Api to GHCR"
         uses: "docker/build-push-action@v3.0.0"

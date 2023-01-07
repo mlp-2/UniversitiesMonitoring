@@ -18,6 +18,20 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: "denvot"
           password: ${{ secrets.PAT }}
+      - name: "Build and Push Container With UniversitiesMonitoring.MonitoringService to GHCR"
+        uses: "docker/build-push-action@v3.0.0"
+        with:
+          context: "."
+          file: "./UniversitiesMonitoring.MonitoringService/Dockerfile"
+          tags: ghcr.io/denvot/universities-monitoring-monitoring-service:latest
+          push: true           
+      - name: "Build and Push Container With UniversitiesMonitoring.NotifyService to GHCR"
+        uses: "docker/build-push-action@v3.0.0"
+        with:
+          context: "."
+          file: "./UniversitiesMonitoring.NotifyService/Dockerfile"
+          tags: ghcr.io/denvot/universities-monitoring-notify-service:latest
+          push: true           
       - name: "Build and Push Container With UniversitiesMonitoring.Api to GHCR"
         uses: "docker/build-push-action@v3.0.0"
         with:
@@ -25,3 +39,4 @@ jobs:
           file: "./UniversitiesMonitoring.Api/Dockerfile"
           tags: ghcr.io/denvot/universities-monitoring-api:latest
           push: true
+         

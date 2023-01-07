@@ -6,5 +6,22 @@ on:
 env:
   REGISTRY: ghcr.io
 jobs:
-  git-checkout:
+  building-containers:
+    runs-on: ubuntu-latest
     
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3.3.
+      - name: Login to ghcr.io
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: 'DenVot'
+          password: ${{ secrets.PAT }}
+      - name: "Build and Push Container With UniversitiesMonitoring.Api to GHCR"
+        uses: "docker/build-push-action@v3.0.0"
+        with:
+          context: "."
+          file: "./UniversitiesMonitoring.Api/Dockerfile"
+          tags: ghcr.io/predrpof-1551/universities-monitoring-api:latest
+          push: true

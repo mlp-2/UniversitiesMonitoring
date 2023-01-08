@@ -1,4 +1,3 @@
-using Microsoft.EntityFrameworkCore;
 using UniversityMonitoring.Data.Models;
 
 namespace UniversityMonitoring.Data.Repositories;
@@ -25,4 +24,9 @@ public class DataProvider : IDataProvider
     public IRepository<UniversityServiceReport, ulong> Reports { get; }
     
     public Task SaveChangesAsync() => _context.SaveChangesAsync();
+
+    public void Dispose()
+    {
+        _context.Dispose();
+    }
 }

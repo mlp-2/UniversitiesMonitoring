@@ -2,7 +2,7 @@ using UniversityMonitoring.Data.Models;
 
 namespace UniversityMonitoring.Data.Repositories;
 
-public interface IDataProvider
+public interface IDataProvider : IDisposable
 {
     IRepository<University, ulong> Universities { get; }
     IRepository<UniversityService, ulong> UniversityServices { get; }

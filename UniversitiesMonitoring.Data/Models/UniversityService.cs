@@ -13,6 +13,7 @@
         public long Id { get; set; }
         public byte[] Ipaddress { get; set; } = null!;
         public long UniversityId { get; set; }
+        public string Name { get; set; } = null!;
 
         public University University { get; set; } = null!;
         public ICollection<UniversityServiceReport> UniversityServiceReports { get; set; }

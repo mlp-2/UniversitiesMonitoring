@@ -1,6 +1,6 @@
 ﻿namespace UniversityMonitoring.Data.Models
 {
-    public partial class University
+    public class University
     {
         public University()
         {

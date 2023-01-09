@@ -1,11 +1,11 @@
-create table universities_monitoring.Moderator
+create table if not exists Moderator
 (
     Id bigint auto_increment
         primary key,
     PasswordSHA256Hash tinyblob not null
 );
 
-create table universities_monitoring.University
+create table if not exists University
 (
     Id bigint auto_increment
         primary key,
@@ -14,29 +14,31 @@ create table universities_monitoring.University
         unique (Name)
 );
 
-create table universities_monitoring.UniversityService
+create table if not exists UniversityService
 (
     Id bigint auto_increment
         primary key,
     IPAddress tinyblob not null,
     UniversityId bigint not null,
+    Name varchar(128) charset utf8mb3 not null,
     constraint UniversityService_University_Id_fk
-        foreign key (UniversityId) references universities_monitoring.University (Id)
+        foreign key (UniversityId) references University (Id)
             on delete cascade
 );
 
-create table universities_monitoring.UniversityServiceStateChange
+create table if not exists UniversityServiceStateChange
 (
     Id bigint auto_increment
         primary key,
     ServiceId bigint not null,
     IsOnline tinyint(1) not null,
+    ChangedAt timestamp default CURRENT_TIMESTAMP not null,
     constraint UniversityServiceStateChange_UniversityService_Id_fk
-        foreign key (ServiceId) references universities_monitoring.UniversityService (Id)
+        foreign key (ServiceId) references UniversityService (Id)
             on delete cascade
 );
 
-create table universities_monitoring.User
+create table if not exists User
 (
     Id bigint auto_increment
         primary key,
@@ -54,7 +56,7 @@ create table universities_monitoring.User
         unique (Username)
 );
 
-create table universities_monitoring.UniversityServiceReport
+create table if not exists UniversityServiceReport
 (
     Id bigint auto_increment
         primary key,
@@ -63,14 +65,14 @@ create table universities_monitoring.UniversityServiceReport
     IssuerId bigint not null,
     IsOnline tinyint(1) not null,
     constraint UniversityServiceReport_UniversityService_Id_fk
-        foreign key (ServiceId) references universities_monitoring.UniversityService (Id)
+        foreign key (ServiceId) references UniversityService (Id)
             on delete cascade,
     constraint UniversityServiceReport_User_Id_fk
-        foreign key (IssuerId) references universities_monitoring.User (Id)
+        foreign key (IssuerId) references User (Id)
             on delete cascade
 );
 
-create table universities_monitoring.UserRateOfService
+create table if not exists UserRateOfService
 (
     Id bigint auto_increment
         primary key,
@@ -79,24 +81,24 @@ create table universities_monitoring.UserRateOfService
     AuthorId bigint not null,
     ServiceId bigint not null,
     constraint UserRateOfService_UniversityService_Id_fk
-        foreign key (ServiceId) references universities_monitoring.UniversityService (Id)
+        foreign key (ServiceId) references UniversityService (Id)
             on delete cascade,
     constraint UserRateOfService_User_Id_fk
-        foreign key (AuthorId) references universities_monitoring.User (Id)
+        foreign key (AuthorId) references User (Id)
             on delete cascade
 );
 
-create table universities_monitoring.UserSubscribeToService
+create table if not exists UserSubscribeToService
 (
     Id bigint auto_increment
         primary key,
     UserId bigint not null,
     ServiceId bigint not null,
     constraint UserSubscribeToService_UniversityService_Id_fk
-        foreign key (ServiceId) references universities_monitoring.UniversityService (Id)
+        foreign key (ServiceId) references UniversityService (Id)
             on delete cascade,
     constraint UserSubscribeToService_User_Id_fk
-        foreign key (UserId) references universities_monitoring.User (Id)
+        foreign key (UserId) references User (Id)
             on delete cascade
 );
 

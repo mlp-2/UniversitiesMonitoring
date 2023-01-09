@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace UniversityMonitoring.Data.Models
 {
@@ -59,6 +62,11 @@ namespace UniversityMonitoring.Data.Models
                     .HasColumnType("tinyblob")
                     .HasColumnName("IPAddress");
 
+                entity.Property(e => e.Name)
+                    .HasMaxLength(128)
+                    .UseCollation("utf8mb3_general_ci")
+                    .HasCharSet("utf8mb3");
+
                 entity.HasOne(d => d.University)
                     .WithMany(p => p.UniversityServices)
                     .HasForeignKey(d => d.UniversityId)
@@ -94,6 +102,10 @@ namespace UniversityMonitoring.Data.Models
                 entity.ToTable("UniversityServiceStateChange");
 
                 entity.HasIndex(e => e.ServiceId, "UniversityServiceStateChange_UniversityService_Id_fk");
+
+                entity.Property(e => e.ChangedAt)
+                    .HasColumnType("timestamp")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                 entity.HasOne(d => d.Service)
                     .WithMany(p => p.UniversityServiceStateChanges)

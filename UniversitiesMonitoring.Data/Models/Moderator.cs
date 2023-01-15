@@ -2,7 +2,7 @@
 {
     public class Moderator
     {
-        public long Id { get; set; }
+        public ulong Id { get; set; }
         public byte[] PasswordSha256hash { get; set; } = null!;
     }
 }

@@ -1,13 +1,13 @@
 create table if not exists Moderator
 (
-    Id bigint auto_increment
+    Id bigint unsigned auto_increment
         primary key,
     PasswordSHA256Hash tinyblob not null
 );
 
 create table if not exists University
 (
-    Id bigint auto_increment
+    Id bigint unsigned auto_increment
         primary key,
     Name varchar(128) charset utf8mb3 not null,
     constraint University_Name_uindex
@@ -16,10 +16,10 @@ create table if not exists University
 
 create table if not exists UniversityService
 (
-    Id bigint auto_increment
+    Id bigint unsigned auto_increment
         primary key,
     IPAddress tinyblob not null,
-    UniversityId bigint not null,
+    UniversityId bigint unsigned not null,
     Name varchar(128) charset utf8mb3 not null,
     constraint UniversityService_University_Id_fk
         foreign key (UniversityId) references University (Id)
@@ -28,9 +28,9 @@ create table if not exists UniversityService
 
 create table if not exists UniversityServiceStateChange
 (
-    Id bigint auto_increment
+    Id bigint unsigned auto_increment
         primary key,
-    ServiceId bigint not null,
+    ServiceId bigint unsigned not null,
     IsOnline tinyint(1) not null,
     ChangedAt timestamp default CURRENT_TIMESTAMP not null,
     constraint UniversityServiceStateChange_UniversityService_Id_fk
@@ -40,7 +40,7 @@ create table if not exists UniversityServiceStateChange
 
 create table if not exists User
 (
-    Id bigint auto_increment
+    Id bigint unsigned auto_increment
         primary key,
     Username varchar(64) not null,
     PasswordSHA256Hash tinyblob not null,
@@ -58,11 +58,11 @@ create table if not exists User
 
 create table if not exists UniversityServiceReport
 (
-    Id bigint auto_increment
+    Id bigint unsigned auto_increment
         primary key,
     Content varchar(4096) charset utf8mb3 null,
-    ServiceId bigint not null,
-    IssuerId bigint not null,
+    ServiceId bigint unsigned not null,
+    IssuerId bigint unsigned not null,
     IsOnline tinyint(1) not null,
     constraint UniversityServiceReport_UniversityService_Id_fk
         foreign key (ServiceId) references UniversityService (Id)
@@ -74,12 +74,12 @@ create table if not exists UniversityServiceReport
 
 create table if not exists UserRateOfService
 (
-    Id bigint auto_increment
+    Id bigint unsigned auto_increment
         primary key,
     Rate tinyint not null,
     Comment varchar(4096) charset utf8mb3 null,
-    AuthorId bigint not null,
-    ServiceId bigint not null,
+    AuthorId bigint unsigned not null,
+    ServiceId bigint unsigned not null,
     constraint UserRateOfService_UniversityService_Id_fk
         foreign key (ServiceId) references UniversityService (Id)
             on delete cascade,
@@ -90,10 +90,10 @@ create table if not exists UserRateOfService
 
 create table if not exists UserSubscribeToService
 (
-    Id bigint auto_increment
+    Id bigint unsigned auto_increment
         primary key,
-    UserId bigint not null,
-    ServiceId bigint not null,
+    UserId bigint unsigned not null,
+    ServiceId bigint unsigned not null,
     constraint UserSubscribeToService_UniversityService_Id_fk
         foreign key (ServiceId) references UniversityService (Id)
             on delete cascade,

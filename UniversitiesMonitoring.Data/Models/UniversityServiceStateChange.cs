@@ -2,8 +2,8 @@
 {
     public class UniversityServiceStateChange
     {
-        public long Id { get; set; }
-        public long ServiceId { get; set; }
+        public ulong Id { get; set; }
+        public ulong ServiceId { get; set; }
         public bool IsOnline { get; set; }
         public DateTime ChangedAt { get; set; }
 

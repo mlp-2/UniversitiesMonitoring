@@ -1,7 +1,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using UniversitiesMonitoring.Api.Entities;
+using UniversityMonitoring.Data.Entities;
 using UniversityMonitoring.Data.Models;
 using UniversityMonitoring.Data.Repositories;
 using WS = System.Net.WebSockets.WebSocket;

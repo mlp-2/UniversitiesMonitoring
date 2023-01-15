@@ -1,4 +1,4 @@
-using UniversityServiceChangeState = UniversitiesMonitoring.Api.Entities.UniversityServiceChangeStateEntity;
+using UniversityServiceChangeState = UniversityMonitoring.Data.Entities.UniversityServiceChangeStateEntity;
 
 namespace UniversitiesMonitoring.NotifyService.WebSocket;
 

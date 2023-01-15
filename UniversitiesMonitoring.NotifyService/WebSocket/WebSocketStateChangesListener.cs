@@ -1,6 +1,6 @@
 using System.Net.WebSockets;
 using System.Text.Json;
-using UniversitiesMonitoring.Api.Entities;
+using UniversityMonitoring.Data.Entities;
 
 namespace UniversitiesMonitoring.NotifyService.WebSocket;
 

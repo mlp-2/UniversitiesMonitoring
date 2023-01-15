@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace UniversitiesMonitoring.Api.Entities;
+namespace UniversityMonitoring.Data.Entities;
 
 public class UniversityServiceChangeStateEntity
 {

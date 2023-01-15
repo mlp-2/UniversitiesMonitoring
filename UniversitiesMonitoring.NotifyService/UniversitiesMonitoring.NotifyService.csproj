@@ -13,6 +13,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\UniversitiesMonitoring.Api\UniversitiesMonitoring.Api.csproj" />
+      <ProjectReference Include="..\UniversitiesMonitoring.Data\UniversitiesMonitoring.Data.csproj" />
     </ItemGroup>
 </Project>

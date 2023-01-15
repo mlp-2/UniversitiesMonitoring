@@ -10,9 +10,9 @@
             UserSubscribeToServices = new HashSet<UserSubscribeToService>();
         }
 
-        public long Id { get; set; }
+        public ulong Id { get; set; }
         public byte[] Ipaddress { get; set; } = null!;
-        public long UniversityId { get; set; }
+        public ulong UniversityId { get; set; }
         public string Name { get; set; } = null!;
 
         public University University { get; set; } = null!;

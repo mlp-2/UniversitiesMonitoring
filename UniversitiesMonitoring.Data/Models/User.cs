@@ -9,7 +9,7 @@
             UserSubscribeToServices = new HashSet<UserSubscribeToService>();
         }
 
-        public long Id { get; set; }
+        public ulong Id { get; set; }
         public string Username { get; set; } = null!;
         public byte[] PasswordSha256hash { get; set; } = null!;
         public string? Email { get; set; }

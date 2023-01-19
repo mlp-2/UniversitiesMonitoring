@@ -1,8 +1,7 @@
 name: Building Docker images
 
 on:
-  push:
-    branches: [ 'master' ]    
+  create
 env:
   REGISTRY: ghcr.io
 jobs:

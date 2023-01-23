@@ -34,7 +34,7 @@ internal class JwtGenerator
     /// <returns>JWT токен</returns>
     public string GenerateTokenForUser(ulong userId, bool isRegularUser, int lifeTime, DateTime? initializingTime = null)
     {
-        var now = initializingTime ?? DateTime.Now;
+        var now = initializingTime ?? DateTime.UtcNow;
         var claims = GenerateIdentity(userId, isRegularUser);
         
         var jwt = new JwtSecurityToken(

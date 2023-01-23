@@ -21,7 +21,7 @@ public class JwtGeneratorTests
 
         var jwtGenerator = new JwtGenerator(configurationMock.Object);
 
-        var token = jwtGenerator.GenerateTokenForUser(userId, isRegularUser, 8192, new DateTime(2005, 8, 5, 18, 0, 0));
+        var token = jwtGenerator.GenerateTokenForUser(userId, isRegularUser, 8192, new DateTime(2005, 8, 5, 18, 0, 0, DateTimeKind.Utc));
         
         Assert.Equal(expectedJwt, token);
     }

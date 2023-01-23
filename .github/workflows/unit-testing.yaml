@@ -1,0 +1,20 @@
+name: Unit Testing
+
+on:
+  pull_request
+  push
+jobs:
+  unit-testing:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: '6.0.x'
+      - Build API:
+          run: dotnet build ./UniversitiesMonitoring.Api/UniversitiesMonitoring.Api.csproj --configuration Debug
+      - Run API tests:
+          run: dotnet test ./UniversitiesMonitoring.Api.Tests/UniversitiesMonitoring.Api.Tests.csproj

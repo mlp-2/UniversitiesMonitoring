@@ -1,8 +1,7 @@
 name: Unit Testing
 
 on:
-  pull_request
-  push
+  [pull_request, push]
 jobs:
   unit-testing:
     runs-on: ubuntu-latest
@@ -14,7 +13,7 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: '6.0.x'
-      - Build API:
-          run: dotnet build ./UniversitiesMonitoring.Api/UniversitiesMonitoring.Api.csproj --configuration Debug
-      - Run API tests:
-          run: dotnet test ./UniversitiesMonitoring.Api.Tests/UniversitiesMonitoring.Api.Tests.csproj
+      - name: Build API
+        run: dotnet build ./UniversitiesMonitoring.Api/UniversitiesMonitoring.Api.csproj --configuration Debug
+      - name: Run API tests
+        run: dotnet test ./UniversitiesMonitoring.Api.Tests/UniversitiesMonitoring.Api.Tests.csproj

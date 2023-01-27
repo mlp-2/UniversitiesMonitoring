@@ -15,14 +15,20 @@ public class DataProvider : IDataProvider
         Users = new Repository<User, ulong>(context);
         Moderators = new Repository<Moderator, ulong>(context);
         Reports = new Repository<UniversityServiceReport, ulong>(context);
+        Subscribes = new Repository<UserSubscribeToService, ulong>(context);
+        UniversityServiceStateChange = new Repository<UniversityServiceStateChange, ulong>(context);
+        Rates = new Repository<UserRateOfService, ulong>(context);
     }
 
     public IRepository<University, ulong> Universities { get; }
     public IRepository<UniversityService, ulong> UniversityServices { get; }
+    public IRepository<UniversityServiceStateChange, ulong> UniversityServiceStateChange { get; }
+    public IRepository<UserSubscribeToService, ulong> Subscribes { get; }
     public IRepository<User, ulong> Users { get; }
     public IRepository<Moderator, ulong> Moderators { get; }
     public IRepository<UniversityServiceReport, ulong> Reports { get; }
-    
+    public IRepository<UserRateOfService, ulong> Rates { get; }
+
     public Task SaveChangesAsync() => _context.SaveChangesAsync();
 
     public void Dispose()

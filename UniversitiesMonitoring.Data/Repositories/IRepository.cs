@@ -18,4 +18,9 @@ public interface IRepository<TEntity, in TKey> where TEntity : class
     /// </summary>
     /// <param name="entity">Запись, которую нужно убрать</param>
     void Remove(TEntity entity);
+    /// <summary>
+    /// Выполняет SQL запрос
+    /// </summary>
+    /// <param name="sql">SQL</param>
+    IEnumerable<TEntity> ExecuteSql(string sql);
 }

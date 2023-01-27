@@ -16,4 +16,5 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntit
     public Task<TEntity?> FindAsync(TKey key) => _dbSet.FindAsync(key).AsTask();
 
     public void Remove(TEntity entity) => _dbSet.Remove(entity);
+    public IEnumerable<TEntity> ExecuteSql(string sql) => _dbSet.FromSqlRaw(sql);
 }

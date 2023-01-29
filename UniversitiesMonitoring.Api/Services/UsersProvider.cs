@@ -6,7 +6,7 @@ using UniversityMonitoring.Data.Repositories;
 
 namespace UniversitiesMonitoring.Api.Services
 {
-    public class UsersProvider : IUsersProvider
+    internal class UsersProvider : IUsersProvider
     {
         private readonly IDataProvider _dataProvider;
         

@@ -1,30 +1,28 @@
 ﻿using System.Net;
-using UniversityMonitoring.Data.Models;
-
+using UniversityMonitoring.Data.Entities;
 namespace UniversitiesMonitoring.MonitoringService.Services.Inspecting;
 
 internal class UniversityServiceInspector
 {
     private readonly IServicesInspector _servicesInspector;
-    private readonly UniversityService _universityServiceEntity;
+    private readonly UniversityServiceEntity _universityServiceEntity;
     private bool _isOnline;
 
     
-    public UniversityServiceInspector(IServicesInspector inspector, UniversityService serviceEntity)
+    public UniversityServiceInspector(IServicesInspector inspector, UniversityServiceEntity serviceEntity)
     {
         _servicesInspector = inspector;
         _universityServiceEntity = serviceEntity;
-        _isOnline = serviceEntity.UniversityServiceStateChanges.Last().IsOnline;
+        _isOnline = _universityServiceEntity.IsOnline;
     }
 
     public async Task UpdateStateAsync(UpdateBuilder reportBuilder)
     {
-        bool nowStatus = await _servicesInspector.InspectServiceAsync(
-            new IPAddress(_universityServiceEntity.Ipaddress));
+        bool nowStatus = await _servicesInspector.InspectServiceAsync(IPAddress.Parse(_universityServiceEntity.IpAddress));
         
         if (nowStatus != _isOnline)
         {
-            reportBuilder.AddChangeState(_universityServiceEntity.Id, nowStatus);
+            reportBuilder.AddChangeState(_universityServiceEntity.ServiceId, nowStatus);
             _isOnline = nowStatus;
         }
     }

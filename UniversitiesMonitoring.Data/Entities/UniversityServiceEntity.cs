@@ -14,16 +14,18 @@ public class UniversityServiceEntity
     }
 
     [JsonConstructor]
-    public UniversityServiceEntity(ulong serviceId, string serviceName, bool isOnline, UserEntity[] subscribers)
+    public UniversityServiceEntity(ulong serviceId, string serviceName, bool isOnline, string ipAddress, UserEntity[] subscribers)
     {
         ServiceId = serviceId;
         ServiceName = serviceName;
         IsOnline = isOnline;
+        IpAddress = ipAddress;
         Subscribers = subscribers;
     }
     
     public ulong ServiceId { get; }
     public string ServiceName { get; }
     public bool IsOnline { get; }
+    public string IpAddress { get; }
     public IEnumerable<UserEntity> Subscribers { get; }
 }

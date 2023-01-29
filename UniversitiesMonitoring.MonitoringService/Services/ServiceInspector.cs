@@ -3,7 +3,7 @@ using UniversitiesMonitoring.MonitoringService.Services.InspectingStrategies;
 
 namespace UniversitiesMonitoring.MonitoringService.Services;
 
-public class ServiceInspector : IServicesInspector
+internal class ServiceInspector : IServicesInspector
 {
     private IEnumerable<IInspectingStrategy> _inspectingStrategies;
     

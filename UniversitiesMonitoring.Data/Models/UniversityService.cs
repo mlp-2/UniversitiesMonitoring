@@ -11,7 +11,7 @@
         }
 
         public ulong Id { get; set; }
-        public byte[] Ipaddress { get; set; } = null!;
+        public byte[] IpAddress { get; set; } = null!;
         public ulong UniversityId { get; set; }
         public string Name { get; set; } = null!;
 

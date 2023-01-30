@@ -2,7 +2,7 @@
 
 namespace UniversityMonitoring.Data.Models
 {
-    public class UniversitiesMonitoringContext : DbContext
+    public partial class UniversitiesMonitoringContext : DbContext
     {
         public UniversitiesMonitoringContext()
         {
@@ -55,9 +55,7 @@ namespace UniversityMonitoring.Data.Models
 
                 entity.HasIndex(e => e.UniversityId, "UniversityService_University_Id_fk");
 
-                entity.Property(e => e.Ipaddress)
-                    .HasColumnType("tinyblob")
-                    .HasColumnName("IPAddress");
+                entity.Property(e => e.IpAddress).HasColumnType("tinyblob");
 
                 entity.Property(e => e.Name)
                     .HasMaxLength(128)

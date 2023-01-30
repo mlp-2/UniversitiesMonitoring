@@ -6,11 +6,17 @@ namespace UniversityMonitoring.Data.Entities;
 public class UniversityServiceEntity
 {
     public UniversityServiceEntity(UniversityService universityServiceModel)
-    {
+    { 
         ServiceId = universityServiceModel.Id;
         ServiceName = universityServiceModel.Name;
         IsOnline = universityServiceModel.UniversityServiceStateChanges.FirstOrDefault()?.IsOnline ?? false;
         Subscribers = universityServiceModel.UserSubscribeToServices.Select(x => new UserEntity(x.User));
+        IpAddress = $"{universityServiceModel.IpAddress[0]}:" +
+                    $"{universityServiceModel.IpAddress[1]}:" +
+                    $"{universityServiceModel.IpAddress[2]}:" +
+                    $"{universityServiceModel.IpAddress[3]}:" +
+                    $"{universityServiceModel.IpAddress[4]}:" +
+                    $"{universityServiceModel.IpAddress[5]}";
     }
 
     [JsonConstructor]

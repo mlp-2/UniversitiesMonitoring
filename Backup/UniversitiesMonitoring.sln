@@ -1,8 +1,5 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.31605.320
-MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitiesMonitoring.MonitoringService", "UniversitiesMonitoring.MonitoringService\UniversitiesMonitoring.MonitoringService.csproj", "{E0A64DAA-2663-4BF1-92BA-9BA331D73E88}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitiesMonitoring.NotifyService", "UniversitiesMonitoring.NotifyService\UniversitiesMonitoring.NotifyService.csproj", "{EB1C018E-3606-4A2E-A2A7-94EB0F291AC6}"
@@ -39,11 +36,5 @@ Global
 		{F3545A41-DBBC-439F-A525-DE2F28F15A69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3545A41-DBBC-439F-A525-DE2F28F15A69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3545A41-DBBC-439F-A525-DE2F28F15A69}.Release|Any CPU.Build.0 = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {ABEB1B70-DA43-40A4-83B9-663BB2A6C0DC}
 	EndGlobalSection
 EndGlobal

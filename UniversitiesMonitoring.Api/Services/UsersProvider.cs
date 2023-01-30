@@ -1,5 +1,4 @@
-﻿using System.Runtime.Intrinsics.Arm;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using UniversityMonitoring.Data.Models;
 using UniversityMonitoring.Data.Repositories;
@@ -16,28 +15,23 @@ namespace UniversitiesMonitoring.Api.Services
         }
         
         /// <summary>
-        /// Сам такой
+        /// Получает пользователя
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<User?> GetUserAsync(ulong userId)
-        {
-            return await _dataProvider.Users.FindAsync(userId);
-        }
-        
+        /// <param name="userId">ID пользователя</param>
+        /// <returns>Пользователя. Null, если пользователь не найден</returns>
+        public async Task<User?> GetUserAsync(ulong userId) => await _dataProvider.Users.FindAsync(userId);
+
         /// <summary>
-        /// Получает пользователя по айди, а потом полученный инстанс прогоняет через модифэй экшен (юзер), мы можем поменять айди, юзернейм, вот этот метод должэен это делать
+        /// Изменяет пользователя по ID и методу
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="modifyAction"></param>
-        /// <returns>возвращает тру, если удачно всё сделал, если удачно изменился объект.</returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <param name="userId">ID пользователя</param>
+        /// <param name="modifyAction">Метод, который изменяет пользователя</param>
+        /// <returns>Если удачно, то true</returns>
         public async Task<bool> ModifyUserAsync(ulong userId, Action<User> modifyAction)
         {
             var user = await _dataProvider.Users.FindAsync(userId);
             
-            if (user == null)
-                return false;
+            if (user == null) return false;
 
             modifyAction(user);
             await _dataProvider.SaveChangesAsync();
@@ -45,17 +39,15 @@ namespace UniversitiesMonitoring.Api.Services
             return true;
         }
         
-        
-        
         /// <summary>
-        /// Просто тупо создёет нового пользователя, прям по-тупому
+        /// Создает нового пользователя
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
+        /// <param name="username">Имя пользоваетя</param>
+        /// <param name="password">Пароль пользователя</param>
         /// <returns></returns>
         public async Task<User> CreateUserAsync(string username, string password)
         {
-            User user = new User()
+            var user = new User()
             {
                 Username = username,
                 PasswordSha256hash = ComputeSha256(password)
@@ -69,11 +61,9 @@ namespace UniversitiesMonitoring.Api.Services
         
         private static byte[] ComputeSha256(string s)
         {
-            using (SHA256 sha256 = SHA256.Create())
-            {
-                byte[] hashValue = sha256.ComputeHash(Encoding.UTF8.GetBytes(s));
-                return hashValue;
-            }
+            using var sha256 = SHA256.Create();
+            var hashValue = sha256.ComputeHash(Encoding.UTF8.GetBytes(s));
+            return hashValue;
         }
     }
 }

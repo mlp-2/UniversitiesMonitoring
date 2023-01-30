@@ -5,5 +5,7 @@
     &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.JwtGeneratorTests.Test&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.ServicesProviderTests.User_Subscribe_To_Service&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.ServicesProviderTests&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.ModeratorsProviderTests.Get_Moderator&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.UsersProviderTests.Modify_User_Must_Be_Success&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

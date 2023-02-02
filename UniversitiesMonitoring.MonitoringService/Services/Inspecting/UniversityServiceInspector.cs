@@ -18,7 +18,7 @@ internal class UniversityServiceInspector
 
     public async Task UpdateStateAsync(UpdateBuilder reportBuilder)
     {
-        bool nowStatus = await _servicesInspector.InspectServiceAsync(IPAddress.Parse(_universityServiceEntity.IpAddress));
+        var nowStatus = await _servicesInspector.InspectServiceAsync(IPAddress.Parse(_universityServiceEntity.IpAddress));
         
         if (nowStatus != _isOnline)
         {

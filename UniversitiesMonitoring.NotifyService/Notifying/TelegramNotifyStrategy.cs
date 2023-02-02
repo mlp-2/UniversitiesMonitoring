@@ -3,7 +3,7 @@ using UniversityMonitoring.Data.Entities;
 
 namespace UniversitiesMonitoring.NotifyService.Notifying;
 
-public class TelegramNotifyStrategy : INotifyStrategy
+internal class TelegramNotifyStrategy : INotifyStrategy
 {
     private readonly TelegramBotClient _tgClient;
 

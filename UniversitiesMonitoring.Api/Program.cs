@@ -1,9 +1,16 @@
+using UniversitiesMonitoring.Api.Services;
+using UniversitiesMonitoring.Api.WebSocket;
 using UniversityMonitoring.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddDataContext(builder.Configuration);
+
+builder.Services.AddScoped<IUsersProvider, UsersProvider>()
+    .AddScoped<IServicesProvider, ServicesProvider>()
+    .AddScoped<IModeratorsProvider, ModeratorsProvider>()
+    .AddSingleton<IWebSocketUpdateStateNotifier, WebSocketUpdateStateNotifier>();
 
 var app = builder.Build();
 

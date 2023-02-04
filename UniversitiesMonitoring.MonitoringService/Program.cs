@@ -1,6 +1,6 @@
 using UniversitiesMonitoring.MonitoringService;
 
-IHost host = Host.CreateDefaultBuilder(args)
+var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services => services.AddHostedService<Worker>())
     .Build();
 

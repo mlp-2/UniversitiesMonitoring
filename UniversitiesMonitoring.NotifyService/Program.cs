@@ -1,7 +1,16 @@
 using UniversitiesMonitoring.NotifyService;
+using UniversitiesMonitoring.NotifyService.Notifying;
+using UniversitiesMonitoring.NotifyService.WebSocket;
 
-IHost host = Host.CreateDefaultBuilder(args)
-    .ConfigureServices(services => { services.AddHostedService<Worker>(); })
+var host = Host.CreateDefaultBuilder(args)
+    .ConfigureServices(services =>
+    {
+        services.AddSingleton<TelegramNotifyStrategy>()
+            .AddSingleton<EmailNotifyStrategy>()
+            .AddSingleton<EverywhereNotifyStrategy>()
+            .AddSingleton<IStateChangesListener, WebSocketStateChangesListener>()
+            .AddHostedService<Worker>();
+    })
     .Build();
 
 host.Run();

@@ -4,25 +4,28 @@ namespace UniversitiesMonitoring.MonitoringService.Services.Inspecting;
 
 internal class UniversityServiceInspector
 {
-    private readonly IServicesInspector _servicesInspector;
+    private readonly IServiceInspector _serviceInspector;
     private readonly UniversityServiceEntity _universityServiceEntity;
     private bool _isOnline;
 
-    
-    public UniversityServiceInspector(IServicesInspector inspector, UniversityServiceEntity serviceEntity)
+    public UniversityServiceInspector(IServiceInspector inspector, UniversityServiceEntity serviceEntity)
     {
-        _servicesInspector = inspector;
+        _serviceInspector = inspector;
         _universityServiceEntity = serviceEntity;
         _isOnline = _universityServiceEntity.IsOnline;
     }
 
     public async Task UpdateStateAsync(UpdateBuilder reportBuilder)
     {
-        var nowStatus = await _servicesInspector.InspectServiceAsync(IPAddress.Parse(_universityServiceEntity.IpAddress));
+        var nowStatus = await _serviceInspector.InspectServiceAsync(IPAddress.Parse(_universityServiceEntity.IpAddress));
+        var lockObj = new object();
         
         if (nowStatus != _isOnline)
         {
-            reportBuilder.AddChangeState(_universityServiceEntity.ServiceId, nowStatus);
+            lock (lockObj)
+            {
+                reportBuilder.AddChangeState(_universityServiceEntity.ServiceId, nowStatus);    
+            }
             _isOnline = nowStatus;
         }
     }

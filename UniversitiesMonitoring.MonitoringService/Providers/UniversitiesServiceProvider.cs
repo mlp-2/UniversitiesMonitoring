@@ -11,7 +11,7 @@ internal class UniversitiesServiceProvider : IUniversitiesServiceProvider
     {
         _client = new HttpClient()
         {
-            BaseAddress = new Uri("http://localhost:" + configuration["ApiPort"])
+            BaseAddress = new Uri(configuration["ApiUrl"])
         };
     }
     

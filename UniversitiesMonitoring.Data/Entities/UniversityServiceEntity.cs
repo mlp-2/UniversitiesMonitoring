@@ -20,7 +20,7 @@ public class UniversityServiceEntity
     }
 
     [JsonConstructor]
-    public UniversityServiceEntity(ulong serviceId, string serviceName, bool isOnline, string ipAddress, UserEntity[] subscribers)
+    public UniversityServiceEntity(ulong serviceId, string serviceName, bool isOnline, string ipAddress, IEnumerable<UserEntity> subscribers)
     {
         ServiceId = serviceId;
         ServiceName = serviceName;

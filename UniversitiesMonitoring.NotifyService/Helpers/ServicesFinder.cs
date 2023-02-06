@@ -3,19 +3,19 @@ using UniversityMonitoring.Data.Entities;
 
 namespace UniversitiesMonitoring.NotifyService.Helpers;
 
-public class UsersFinder
+public class ServicesFinder
 {
     private readonly HttpClient _client;
     
-    public UsersFinder(IConfiguration configuration)
+    public ServicesFinder(IConfiguration configuration)
     {
         _client = new HttpClient()
         {
-            BaseAddress = new Uri("http://localhost:" + configuration["ApiPort"])
+            BaseAddress = new Uri(configuration["ApiUrl"])
         };
     }
 
-    public async Task<IEnumerable<UniversityServiceEntity>> GetServicesEntity(IEnumerable<ulong> servicesIds)
+    public async Task<IEnumerable<UniversityServiceEntity>> GetServicesEntityAsync(IEnumerable<ulong> servicesIds)
     {
         var servicesIdsQuery = "";
         foreach (var id in servicesIds) servicesIdsQuery += $"ids={id}*";

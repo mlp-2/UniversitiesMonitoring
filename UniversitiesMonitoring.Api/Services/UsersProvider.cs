@@ -1,6 +1,4 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using UniversityMonitoring.Data.Models;
+﻿using UniversityMonitoring.Data.Models;
 using UniversityMonitoring.Data.Repositories;
 
 namespace UniversitiesMonitoring.Api.Services
@@ -20,6 +18,20 @@ namespace UniversitiesMonitoring.Api.Services
         /// <param name="userId">ID пользователя</param>
         /// <returns>Пользователя. Null, если пользователь не найден</returns>
         public async Task<User?> GetUserAsync(ulong userId) => await _dataProvider.Users.FindAsync(userId);
+
+        /// <summary>
+        /// Получает пользователя
+        /// </summary>
+        /// <param name="userId">ID пользователя</param>
+        /// <returns>Пользователя. Null, если пользователь не найден</returns>
+        public Task<User?> GetUserAsync(string userId) => GetUserAsync(ulong.Parse(userId));
+
+        /// <summary>
+        /// Получает пользователя
+        /// </summary>
+        /// <param name="username">Имя пользователя</param>
+        /// <returns>Полbьзователя. Null, если пользователь не найден</returns>
+        public User? GetUser(string username) => _dataProvider.Users.ExecuteSql($"SELECT * FROM universities_monitoring.User WHERE Username = {username}").FirstOrDefault();
 
         /// <summary>
         /// Изменяет пользователя по ID и методу
@@ -45,25 +57,25 @@ namespace UniversitiesMonitoring.Api.Services
         /// <param name="username">Имя пользоваетя</param>
         /// <param name="password">Пароль пользователя</param>
         /// <returns></returns>
-        public async Task<User> CreateUserAsync(string username, string password)
+        public async Task<User?> CreateUserAsync(string username, string password)
         {
-            var user = new User()
+            try
             {
-                Username = username,
-                PasswordSha256hash = ComputeSha256(password)
-            };
+                var user = new User()
+                {
+                    Username = username,
+                    PasswordSha256hash = Sha256Computing.ComputeSha256(password)
+                };
 
-            await _dataProvider.Users.AddAsync(user);
-            await _dataProvider.SaveChangesAsync();
+                await _dataProvider.Users.AddAsync(user);
+                await _dataProvider.SaveChangesAsync();
 
-            return user;
-        }
-        
-        private static byte[] ComputeSha256(string s)
-        {
-            using var sha256 = SHA256.Create();
-            var hashValue = sha256.ComputeHash(Encoding.UTF8.GetBytes(s));
-            return hashValue;
+                return user;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

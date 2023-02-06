@@ -32,7 +32,7 @@ internal class JwtGenerator
     /// <param name="isRegularUser">True, если пользователь - не администратор</param>
     /// <param name="lifeTime">Время жизни токена в секундах</param>
     /// <returns>JWT токен</returns>
-    public string GenerateTokenForUser(ulong userId, bool isRegularUser, int lifeTime, DateTime? initializingTime = null)
+    public string GenerateTokenForUser(ulong userId, bool isRegularUser, int lifeTime = 604800, DateTime? initializingTime = null)
     {
         var now = initializingTime ?? DateTime.UtcNow;
         var claims = GenerateIdentity(userId, isRegularUser);

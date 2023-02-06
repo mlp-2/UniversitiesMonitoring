@@ -174,7 +174,7 @@ public class ServicesProviderTests
             } : null); 
         
         var servicesProvider = CreateServicesProvider(dataProvider);
-        var test = Task.Run(() => servicesProvider.GetAllReportsAsync(0x0));
+        var test = Task.Run(() => servicesProvider.GetAllReports(0x0));
 
         if (containsSomething) Assert.NotEmpty((await test)!);
         else Assert.Null(await test);

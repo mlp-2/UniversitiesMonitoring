@@ -5,12 +5,13 @@ namespace UniversityMonitoring.Data.Entities;
 
 public class UniversityServiceEntity
 {
-    public UniversityServiceEntity(UniversityService universityServiceModel)
+    public UniversityServiceEntity(UniversityService universityServiceModel, bool loadUsers = true, bool loadComments = true)
     { 
         ServiceId = universityServiceModel.Id;
         ServiceName = universityServiceModel.Name;
         IsOnline = universityServiceModel.UniversityServiceStateChanges.FirstOrDefault()?.IsOnline ?? false;
-        Subscribers = universityServiceModel.UserSubscribeToServices.Select(x => new UserEntity(x.User));
+        Subscribers = loadUsers ? universityServiceModel.UserSubscribeToServices.Select(x => new UserEntity(x.User)) : Array.Empty<UserEntity>();
+        Comments = loadComments ? universityServiceModel.UserRateOfServices.Select(x => new CommentEntity(x)) : Array.Empty<CommentEntity>();
         IpAddress = $"{universityServiceModel.IpAddress[0]}:" +
                     $"{universityServiceModel.IpAddress[1]}:" +
                     $"{universityServiceModel.IpAddress[2]}:" +
@@ -34,4 +35,5 @@ public class UniversityServiceEntity
     public bool IsOnline { get; }
     public string IpAddress { get; }
     public IEnumerable<UserEntity> Subscribers { get; }
+    public IEnumerable<CommentEntity> Comments { get; }
 }

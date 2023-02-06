@@ -16,6 +16,8 @@ public class ServicesProvider : IServicesProvider
     public Task<UniversityService?> GetServiceAsync(ulong serviceId) =>
         _dataProvider.UniversityServices.FindAsync(serviceId);
 
+    public IEnumerable<UniversityService> GetAllServices() => _dataProvider.UniversityServices.GetlAll(); 
+
     public async Task SubscribeUserAsync(User user, UniversityService service)
     {
         var subscribe = new UserSubscribeToService()
@@ -83,14 +85,7 @@ public class ServicesProvider : IServicesProvider
 
     public Task<UniversityServiceReport?> GetReportAsync(ulong reportId) => _dataProvider.Reports.FindAsync(reportId);
 
-    public async Task<IEnumerable<UniversityServiceReport>?> GetAllReportsAsync(ulong serviceId)
-    {
-        var service = await _dataProvider.UniversityServices.FindAsync(serviceId);
-
-        if (service == null) return null;
-
-        return service.UniversityServiceReports;
-    }
+    public IEnumerable<UniversityServiceReport> GetAllReports() => _dataProvider.Reports.GetlAll();
 
     public Task DeleteReportAsync(UniversityServiceReport report)
     {

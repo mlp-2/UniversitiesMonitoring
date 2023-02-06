@@ -1,3 +1,4 @@
+using UniversitiesMonitoring.Api;
 using UniversitiesMonitoring.Api.Services;
 using UniversitiesMonitoring.Api.WebSocket;
 using UniversityMonitoring.Data;
@@ -19,6 +20,7 @@ if (!app.Environment.IsDevelopment()) app.UseHsts();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseMiddleware<HandlingExceptionsMiddleware>();
 
 
 app.MapControllerRoute(

@@ -26,5 +26,7 @@ internal class UpdatesSocketController : ControllerBase
         {
             HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
         }
+
+        return Ok();
     }
 }

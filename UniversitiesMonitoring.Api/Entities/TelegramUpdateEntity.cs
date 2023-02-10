@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace UniversitiesMonitoring.Api.Entities;
 
-internal class TelegramUpdateEntity
+public class TelegramUpdateEntity
 {
     [JsonConstructor]
     public TelegramUpdateEntity(string? telegramTag, bool canSend)

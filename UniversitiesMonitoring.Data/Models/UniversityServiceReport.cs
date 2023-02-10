@@ -8,7 +8,7 @@
         public ulong IssuerId { get; set; }
         public bool IsOnline { get; set; }
 
-        public User Issuer { get; set; } = null!;
-        public UniversityService Service { get; set; } = null!;
+        public virtual User Issuer { get; set; } = null!;
+        public virtual UniversityService Service { get; set; } = null!;
     }
 }

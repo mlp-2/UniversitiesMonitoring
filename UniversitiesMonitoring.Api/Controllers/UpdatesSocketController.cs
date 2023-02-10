@@ -2,7 +2,8 @@ using UniversitiesMonitoring.Api.WebSocket;
 
 namespace UniversitiesMonitoring.Api.Controllers;
 
-internal class UpdatesSocketController : ControllerBase
+[ApiController]
+public class UpdatesSocketController : ControllerBase
 {
     private readonly IWebSocketUpdateStateNotifier _webSocketUpdateStateNotifier;
 
@@ -11,7 +12,8 @@ internal class UpdatesSocketController : ControllerBase
         _webSocketUpdateStateNotifier = webSocketUpdateStateNotifier;
     }
     
-    [Route("/updates-socket")]
+    [HttpGet]
+    [Route("api/updates-socket")]
     public async Task<IActionResult> UpdatesSocket()
     {
         if (HttpContext.WebSockets.IsWebSocketRequest)

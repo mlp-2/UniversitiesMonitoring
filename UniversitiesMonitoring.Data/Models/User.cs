@@ -17,8 +17,8 @@
         public bool SendEmailNotification { get; set; }
         public bool SendTelegramNotification { get; set; }
 
-        public ICollection<UniversityServiceReport> UniversityServiceReports { get; set; }
-        public ICollection<UserRateOfService> UserRateOfServices { get; set; }
-        public ICollection<UserSubscribeToService> UserSubscribeToServices { get; set; }
+        public virtual ICollection<UniversityServiceReport> UniversityServiceReports { get; set; }
+        public virtual ICollection<UserRateOfService> UserRateOfServices { get; set; }
+        public virtual ICollection<UserSubscribeToService> UserSubscribeToServices { get; set; }
     }
 }

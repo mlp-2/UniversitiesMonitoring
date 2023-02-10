@@ -4,8 +4,9 @@ using UniversitiesMonitoring.Api.Services;
 
 namespace UniversitiesMonitoring.Api.Controllers;
 
-[Route("/moderator/")]
-internal class ModeratorController : ControllerBase
+[ApiController]
+[Route("api/moderator")]
+public class ModeratorController : ControllerBase
 {
     private readonly IModeratorsProvider _moderatorsProvider;
     private readonly IServicesProvider _servicesProvider;

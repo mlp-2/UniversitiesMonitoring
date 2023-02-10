@@ -61,6 +61,8 @@ public class ServicesProvider : IServicesProvider
     {
         var rate = new UserRateOfService()
         {
+            Service = service,
+            Author = author,
             Rate = comment.Rate,
             Comment = comment.Content
         };

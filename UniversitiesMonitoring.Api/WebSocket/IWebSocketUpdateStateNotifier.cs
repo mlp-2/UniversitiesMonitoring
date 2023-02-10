@@ -2,7 +2,7 @@ using WS = System.Net.WebSockets.WebSocket;
 
 namespace UniversitiesMonitoring.Api.WebSocket;
 
-internal interface IWebSocketUpdateStateNotifier
+public interface IWebSocketUpdateStateNotifier
 {
     /// <summary>
     /// Добавляет WS к прослушиванию обновлений

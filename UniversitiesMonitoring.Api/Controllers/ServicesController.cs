@@ -3,12 +3,12 @@ using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
 using UniversitiesMonitoring.Api.WebSocket;
 using UniversityMonitoring.Data.Entities;
-using UniversityMonitoring.Data.Models;
 
 namespace UniversitiesMonitoring.Api.Controllers;
 
-[Route("/services/")]
-internal class ServicesController : ControllerBase
+[ApiController]
+[Route("api/services")]
+public class ServicesController : ControllerBase
 {
     private readonly IServicesProvider _servicesProvider;
     private readonly IUsersProvider _usersProvider;
@@ -101,7 +101,7 @@ internal class ServicesController : ControllerBase
         loadUsers = loadUsers && IsLocalHostRequest;
         loadComments = loadComments && IsLocalHostRequest;
         
-        var services = _servicesProvider.GetAllServices();
+        var services = _servicesProvider.GetAllServices().ToArray();
 
         return Ok(from service in services select new UniversityServiceEntity(service, loadUsers, loadComments));
     }

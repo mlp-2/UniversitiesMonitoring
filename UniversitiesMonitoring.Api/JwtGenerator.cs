@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 [assembly: InternalsVisibleTo("UniversitiesMonitoring.Api.Tests")]
 namespace UniversitiesMonitoring.Api;
 
-internal class JwtGenerator
+public class JwtGenerator
 {
     private readonly SymmetricSecurityKey _jwtSecret;
 

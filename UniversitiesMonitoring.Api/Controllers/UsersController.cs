@@ -6,8 +6,8 @@ using UniversityMonitoring.Data.Models;
 namespace UniversitiesMonitoring.Api.Controllers;
 
 [ApiController]
-[Route("/user/")]
-internal class UsersController : ControllerBase
+[Route("api/user")]
+public class UsersController : ControllerBase
 {
     private readonly IUsersProvider _usersProvider;
     private readonly JwtGenerator _jwtGenerator;
@@ -30,9 +30,12 @@ internal class UsersController : ControllerBase
         
         var passwordHash = Sha256Computing.ComputeSha256(auth.Password);
 
-        if (user.PasswordSha256hash != passwordHash)
+        for (var i = 0; i < passwordHash.Length; i++)
         {
-            return BadRequest("Некорректное имя пользователя или пароль");
+            if (user.PasswordSha256hash[i] != passwordHash[i])
+            {
+                return BadRequest("Некорректное имя пользователя или пароль");
+            }
         }
 
         var token = _jwtGenerator.GenerateTokenForUser(user.Id, true);

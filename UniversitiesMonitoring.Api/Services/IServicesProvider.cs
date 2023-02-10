@@ -3,7 +3,7 @@ using UniversityMonitoring.Data.Models;
 
 namespace UniversitiesMonitoring.Api.Services;
 
-internal interface IServicesProvider
+public interface IServicesProvider
 {
     Task<UniversityService?> GetServiceAsync(ulong serviceId);
     IEnumerable<UniversityService> GetAllServices();

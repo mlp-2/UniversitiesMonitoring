@@ -4,7 +4,7 @@ using UniversityMonitoring.Data.Models;
 
 namespace UniversitiesMonitoring.Api.Services;
 
-internal interface IUsersProvider
+public interface IUsersProvider
 {
     Task<User?> GetUserAsync(ulong userId);
     Task<User?> GetUserAsync(string userId);

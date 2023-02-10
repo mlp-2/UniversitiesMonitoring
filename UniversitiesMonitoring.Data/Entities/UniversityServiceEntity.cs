@@ -9,7 +9,7 @@ public class UniversityServiceEntity
     { 
         ServiceId = universityServiceModel.Id;
         ServiceName = universityServiceModel.Name;
-        IsOnline = universityServiceModel.UniversityServiceStateChanges.FirstOrDefault()?.IsOnline ?? false;
+        IsOnline = universityServiceModel.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false;
         Subscribers = loadUsers ? universityServiceModel.UserSubscribeToServices.Select(x => new UserEntity(x.User)) : Array.Empty<UserEntity>();
         Comments = loadComments ? universityServiceModel.UserRateOfServices.Select(x => new CommentEntity(x)) : Array.Empty<CommentEntity>();
         IpAddress = $"{universityServiceModel.IpAddress[0]}:" +

@@ -49,11 +49,11 @@ else
 }
 
 app.UseHttpsRedirection();
+app.UseWebSockets();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllerRoute(
     "default",
     "/{controller}/{action}");

@@ -13,22 +13,19 @@ public class UpdatesSocketController : ControllerBase
     }
     
     [HttpGet]
-    [Route("api/updates-socket")]
-    public async Task<IActionResult> UpdatesSocket()
+    [Route("/api/updates-socket")]
+    public async Task UpdatesSocket()
     {
-        if (HttpContext.WebSockets.IsWebSocketRequest)
-        {
-            using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
-            var socketFinishedTcs = new TaskCompletionSource<object>();
-            _webSocketUpdateStateNotifier.AppendWebSocket(webSocket, socketFinishedTcs);
-
-            await socketFinishedTcs.Task;
+        if (!HttpContext.WebSockets.IsWebSocketRequest)
+        {              
+            HttpContext.Response.StatusCode = 400;
+            return;    
         }
-        else
-        {
-            HttpContext.Response.StatusCode = StatusCodes.Status400BadRequest;
-        }
+        
+        using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+        var socketFinishedTcs = new TaskCompletionSource<object>();
+        _webSocketUpdateStateNotifier.AppendWebSocket(webSocket, socketFinishedTcs);
 
-        return Ok();
+        await socketFinishedTcs.Task;
     }
 }

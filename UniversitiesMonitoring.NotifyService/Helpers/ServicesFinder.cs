@@ -3,7 +3,7 @@ using UniversityMonitoring.Data.Entities;
 
 namespace UniversitiesMonitoring.NotifyService.Helpers;
 
-public class ServicesFinder
+internal class ServicesFinder
 {
     private readonly HttpClient _client;
     
@@ -20,7 +20,7 @@ public class ServicesFinder
         var servicesIdsQuery = "";
         foreach (var id in servicesIds) servicesIdsQuery += $"ids={id}*";
 
-        var response = await _client.GetAsync("/services?loadUsers=true&" + servicesIdsQuery);
+        var response = await _client.GetAsync("/api/services?loadUsers=true&" + servicesIdsQuery);
 
         response.EnsureSuccessStatusCode();
 

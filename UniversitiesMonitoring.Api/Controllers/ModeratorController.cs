@@ -31,7 +31,7 @@ public class ModeratorController : ControllerBase
         
         var passwordHash = Sha256Computing.ComputeSha256(auth.Password);
 
-        if (moderator.PasswordSha256hash != passwordHash)
+        if (!moderator.PasswordSha256hash.IsSequenceEquals(passwordHash))
         {
             return BadRequest("Некорректное имя пользователя или пароль");
         }
@@ -46,12 +46,12 @@ public class ModeratorController : ControllerBase
         });
     }
 
-    [Authorize(JwtGenerator.AdminRole)]
+    [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpGet("reports")]
     public IActionResult GetReports() => Ok(from report in _servicesProvider.GetAllReports() 
-        select new Report(report.Content, report.IsOnline, report.ServiceId));
+        select new Report(report.Id, report.Content, report.IsOnline, report.ServiceId));
 
-    [Authorize(JwtGenerator.AdminRole)]
+    [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpPost("reports/{id:long}/accept")]
     public async Task<IActionResult> AcceptReport([FromRoute] ulong id)
     {
@@ -65,11 +65,11 @@ public class ModeratorController : ControllerBase
         var service = await _servicesProvider.GetServiceAsync(report.ServiceId);
 
         await _servicesProvider.UpdateServiceStateAsync(service!, report.IsOnline, true);
-        await _servicesProvider.DeleteReportAsync(report);
+        await _servicesProvider.SolveReportAsync(report);
         return Ok();
     }
 
-    [Authorize(JwtGenerator.AdminRole)]
+    [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpPost("reports/{id:long}/deny")]
     public async Task<IActionResult> DenyReport([FromRoute] ulong id)
     {
@@ -80,7 +80,7 @@ public class ModeratorController : ControllerBase
             return BadRequest("Репорт не найден");
         }
         
-        await _servicesProvider.DeleteReportAsync(report);
+        await _servicesProvider.SolveReportAsync(report);
         return Ok();
     }
 }

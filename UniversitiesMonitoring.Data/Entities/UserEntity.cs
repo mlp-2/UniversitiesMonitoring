@@ -10,20 +10,17 @@ public class UserEntity
         Id = userModel.Id;
         Username = userModel.Username;
         Email = userModel.SendEmailNotification ? userModel.Email ?? null : null;
-        TelegramTag = userModel.SendTelegramNotification ? userModel.TelegramTag ?? null : null;
     }
 
     [JsonConstructor]
-    public UserEntity(ulong id, string username, string? email, string? telegramTag)
+    public UserEntity(ulong id, string username, string? email)
     {
         Id = id;
         Username = username;
         Email = email;
-        TelegramTag = telegramTag;
     }
     
     public ulong Id { get; }
     public string Username { get; }
     public string? Email { get; }
-    public string? TelegramTag { get; }
 }

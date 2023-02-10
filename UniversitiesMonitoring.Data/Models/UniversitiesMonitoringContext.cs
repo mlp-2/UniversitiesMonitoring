@@ -76,6 +76,10 @@ namespace UniversityMonitoring.Data.Models
 
                 entity.HasIndex(e => e.IssuerId, "UniversityServiceReport_User_Id_fk");
 
+                entity.Property(e => e.AddedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
                 entity.Property(e => e.Content)
                     .HasMaxLength(4096)
                     .UseCollation("utf8mb3_general_ci")
@@ -115,9 +119,6 @@ namespace UniversityMonitoring.Data.Models
                 entity.HasIndex(e => e.Email, "User_Email_uindex")
                     .IsUnique();
 
-                entity.HasIndex(e => e.TelegramTag, "User_TelegramTag_uindex")
-                    .IsUnique();
-
                 entity.HasIndex(e => e.Username, "User_Username_uindex")
                     .IsUnique();
 
@@ -126,8 +127,6 @@ namespace UniversityMonitoring.Data.Models
                 entity.Property(e => e.PasswordSha256hash)
                     .HasColumnType("tinyblob")
                     .HasColumnName("PasswordSHA256Hash");
-
-                entity.Property(e => e.TelegramTag).HasMaxLength(128);
 
                 entity.Property(e => e.Username).HasMaxLength(64);
             });

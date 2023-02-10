@@ -1,4 +1,5 @@
 using System.Net.WebSockets;
+using System.Text;
 using System.Text.Json;
 using UniversityMonitoring.Data.Entities;
 
@@ -13,8 +14,8 @@ internal class WebSocketStateChangesListener : IStateChangesListener, IDisposabl
     
     public WebSocketStateChangesListener(IConfiguration configuration)
     {
-        var localhostPort = configuration.GetValue<int>("LocalHostWsPort");
-        _wsRoute = new Uri($"ws://127.0.0.1:{localhostPort}");
+        var localhostUrl = configuration["LocalHostWsUrl"];
+        _wsRoute = new Uri(localhostUrl);
     }
 
     public Task ConnectAsync() => _wsClient.ConnectAsync(_wsRoute, CancellationToken.None);
@@ -42,7 +43,9 @@ internal class WebSocketStateChangesListener : IStateChangesListener, IDisposabl
         }
 
         await outputStream.WriteAsync(buffer, 0, receiveResult.Count, cancellationToken);
-        return await JsonSerializer.DeserializeAsync<UniversityServiceChangeStateEntity[]>(outputStream, cancellationToken: cancellationToken) ?? Array.Empty<UniversityServiceChangeStateEntity>();
+
+        return JsonSerializer.Deserialize<UniversityServiceChangeStateEntity[]>(
+            Encoding.UTF8.GetString(outputStream.ToArray())) ?? Array.Empty<UniversityServiceChangeStateEntity>();
     }
 
     public void Dispose()

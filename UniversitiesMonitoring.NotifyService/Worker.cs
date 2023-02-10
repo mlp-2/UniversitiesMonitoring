@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Caching.Memory;
 using UniversitiesMonitoring.NotifyService.Helpers;
 using UniversitiesMonitoring.NotifyService.Notifying;
 using UniversitiesMonitoring.NotifyService.WebSocket;
@@ -12,29 +11,38 @@ internal class Worker : BackgroundService
     private readonly IStateChangesListener _stateChangesListener;
     private readonly IServiceProvider _serviceProvider;
     private readonly ServicesFinder _servicesFinder;
-    private readonly MemoryCacheEntryOptions _cacheOptions = new MemoryCacheEntryOptions().SetSlidingExpiration(TimeSpan.FromDays(1));
+    private readonly EmailNotifier _emailNotifier;
     
     public Worker(ILogger<Worker> logger,
         IStateChangesListener stateChangesListener,
         IServiceProvider serviceProvider,
-        ServicesFinder servicesFinder)
+        ServicesFinder servicesFinder,
+        EmailNotifier emailNotifier)
     {
         _logger = logger;
         _stateChangesListener = stateChangesListener;
         _serviceProvider = serviceProvider;
         _servicesFinder = servicesFinder;
+        _emailNotifier = emailNotifier;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        try
+        var connected = false;
+
+        while (!connected)
         {
-            await _stateChangesListener.ConnectAsync();
-        }
-        catch
-        {
-            _logger.LogCritical("Can't connect to WS");
-            return;
+            try
+            {
+                await _stateChangesListener.ConnectAsync();
+                connected = true;
+                _logger.LogInformation("Connected to WS");
+            }
+            catch
+            {
+                _logger.LogWarning("Can't connect to the WS. Retry in 10 seconds");
+                await Task.Delay(10000, stoppingToken);
+            }
         }
         
         using var scope = _serviceProvider.CreateScope();
@@ -51,8 +59,7 @@ internal class Worker : BackgroundService
             {
                 foreach (var serviceSubscriber in service.Subscribers)
                 {
-                    var notifyContext = new NotifyContext(serviceSubscriber, scope.ServiceProvider);
-                    await notifyContext.NotifyAsync(service);
+                    await _emailNotifier.NotifyAsync(serviceSubscriber, service);
                 }
             }
         }

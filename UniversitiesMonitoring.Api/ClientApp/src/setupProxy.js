@@ -7,7 +7,8 @@ const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_H
 const context = [
   "/api/",
   "/index.html",
-  "/swagger"
+  "/swagger",
+  //"/ws",
 ];
 
 const onError = (err, req, resp, target) => {
@@ -21,7 +22,8 @@ module.exports = function (app) {
     secure: false,
     headers: {
       Connection: 'Keep-Alive'
-    }
+    },
+    //ws: true
   });
 
   app.use(appProxy);

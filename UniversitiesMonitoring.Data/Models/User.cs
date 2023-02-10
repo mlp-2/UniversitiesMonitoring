@@ -13,9 +13,7 @@
         public string Username { get; set; } = null!;
         public byte[] PasswordSha256hash { get; set; } = null!;
         public string? Email { get; set; }
-        public string? TelegramTag { get; set; }
         public bool SendEmailNotification { get; set; }
-        public bool SendTelegramNotification { get; set; }
 
         public virtual ICollection<UniversityServiceReport> UniversityServiceReports { get; set; }
         public virtual ICollection<UserRateOfService> UserRateOfServices { get; set; }

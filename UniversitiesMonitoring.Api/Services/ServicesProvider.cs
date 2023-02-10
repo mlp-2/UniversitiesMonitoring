@@ -78,22 +78,46 @@ public class ServicesProvider : IServicesProvider
             Content = report.Content,
             IsOnline = report.IsOnline,
             Issuer = issuer,
-            Service = service
+            Service = service,
+            IsSolved = service.UniversityServiceStateChanges.LastOrDefault()?.IsOnline == report.IsOnline
         };
 
         await _dataProvider.Reports.AddAsync(reportEntity);
         await SaveChangesAsync();
     }
 
+    public async Task SolveReportAsync(UniversityServiceReport report)
+    {
+        report.IsSolved = true;
+        await SaveChangesAsync();
+    }
+    
     public Task<UniversityServiceReport?> GetReportAsync(ulong reportId) => _dataProvider.Reports.FindAsync(reportId);
 
-    public IEnumerable<UniversityServiceReport> GetAllReports() => _dataProvider.Reports.GetlAll();
+    public IEnumerable<UniversityServiceReport> GetAllReports() => _dataProvider.Reports.GetlAll().Where(x => !x.IsSolved);
 
     public Task DeleteReportAsync(UniversityServiceReport report)
     {
         _dataProvider.Reports.Remove(report);
         return SaveChangesAsync();
     }
-    
+
+    public IEnumerable<Report> GetReportsByOffline(UniversityService service)
+    {
+        var lastStatus = service.UniversityServiceStateChanges.LastOrDefault();
+        if (lastStatus == null || lastStatus.IsOnline) return Array.Empty<Report>();
+
+        var lastSeenOffline = GetSqlTime(lastStatus.ChangedAt);
+//        var lastSeenOnline = GetSqlTime(service.UniversityServiceStateChanges.LastOrDefault(x => x.IsOnline)?.ChangedAt ?? new DateTime(1970, 1, 1, 0, 0, 0, 0));
+
+        return from report in  _dataProvider.Reports.ExecuteSql(
+            $"SELECT * FROM universities_monitoring.UniversityServiceReport WHERE ServiceId = {service.Id} AND " +
+            $"AddedAt > {lastSeenOffline}")
+            select new Report(report);
+    }
+
+
+    private string GetSqlTime(DateTime dateTime) => 
+        $"STR_TO_DATE('{dateTime.Year}-{dateTime.Month}-{dateTime.Day} {dateTime.Hour}:{dateTime.Minute}:{dateTime.Second}', '%Y-%m-%d %H:%i:%s')";
     private async Task SaveChangesAsync() => await _dataProvider.SaveChangesAsync();
 }

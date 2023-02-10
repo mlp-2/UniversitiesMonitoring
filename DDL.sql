@@ -40,18 +40,14 @@ create table UniversityServiceStateChange
 
 create table User
 (
-    Id                       bigint unsigned auto_increment
+    Id                    bigint unsigned auto_increment
         primary key,
-    Username                 varchar(64)          not null,
-    PasswordSHA256Hash       tinyblob             not null,
-    Email                    varchar(256)         null,
-    TelegramTag              varchar(128)         null,
-    SendEmailNotification    tinyint(1) default 0 not null,
-    SendTelegramNotification tinyint(1) default 0 not null,
+    Username              varchar(64)          not null,
+    PasswordSHA256Hash    tinyblob             not null,
+    Email                 varchar(256)         null,
+    SendEmailNotification tinyint(1) default 0 not null,
     constraint User_Email_uindex
         unique (Email),
-    constraint User_TelegramTag_uindex
-        unique (TelegramTag),
     constraint User_Username_uindex
         unique (Username)
 );
@@ -60,10 +56,12 @@ create table UniversityServiceReport
 (
     Id        bigint unsigned auto_increment
         primary key,
-    Content   varchar(4096) charset utf8mb3 null,
-    ServiceId bigint unsigned               not null,
-    IssuerId  bigint unsigned               not null,
-    IsOnline  tinyint(1)                    not null,
+    Content   varchar(4096) charset utf8mb3        null,
+    ServiceId bigint unsigned                      not null,
+    IssuerId  bigint unsigned                      not null,
+    IsOnline  tinyint(1)                           not null,
+    AddedAt   datetime   default CURRENT_TIMESTAMP null,
+    IsSolved  tinyint(1) default 0                 not null,
     constraint UniversityServiceReport_UniversityService_Id_fk
         foreign key (ServiceId) references UniversityService (Id)
             on delete cascade,

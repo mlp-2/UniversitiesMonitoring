@@ -84,7 +84,7 @@ public class ServicesController : ControllerBase
         
         if (service == null || user == null)
         {
-            return BadRequest("Сервис или пользователь не найден");
+            return BadRequest("Сервис или пользователь не найдены");
         }
 
         await _servicesProvider.CreateReportAsync(service, user, report);
@@ -92,6 +92,20 @@ public class ServicesController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = JwtGenerator.UserRole)]
+    [HttpGet("{id:long}/reports-by-offline")]
+    public async Task<ActionResult> GetAllReportsByOffline([FromRoute] ulong id)
+    {
+        var service = await _servicesProvider.GetServiceAsync(id);
+
+        if (service == null)
+        {
+            return BadRequest("Сервис не найден");
+        }
+
+        return Ok(_servicesProvider.GetReportsByOffline(service));
+    }
+    
     [HttpGet]
     public IActionResult GetAllServices(
         [FromQuery] bool loadUsers,
@@ -127,7 +141,7 @@ public class ServicesController : ControllerBase
                 continue;
             }
 
-            await _servicesProvider.UpdateServiceStateAsync(service, update.IsOnline, false);
+            await _servicesProvider.UpdateServiceStateAsync(service, update.IsOnline, i == updates.Length - 1);
         }
 
         await _webSocketUpdateStateNotifier.NotifyAsync(servicesId);

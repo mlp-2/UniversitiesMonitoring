@@ -9,6 +9,7 @@ public class UniversityServiceEntity
     { 
         ServiceId = universityServiceModel.Id;
         ServiceName = universityServiceModel.Name;
+        UniversityName = universityServiceModel.University.Name;
         IsOnline = universityServiceModel.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false;
         Subscribers = loadUsers ? universityServiceModel.UserSubscribeToServices.Select(x => new UserEntity(x.User)) : Array.Empty<UserEntity>();
         Comments = loadComments ? universityServiceModel.UserRateOfServices.Select(x => new CommentEntity(x)) : Array.Empty<CommentEntity>();
@@ -21,19 +22,45 @@ public class UniversityServiceEntity
     }
 
     [JsonConstructor]
-    public UniversityServiceEntity(ulong serviceId, string serviceName, bool isOnline, string ipAddress, IEnumerable<UserEntity> subscribers)
+    public UniversityServiceEntity(ulong serviceId,
+        string serviceName,
+        string universityName,
+        bool isOnline,
+        string ipAddress,
+        IEnumerable<UserEntity> subscribers,
+        IEnumerable<CommentEntity> comments)
     {
         ServiceId = serviceId;
         ServiceName = serviceName;
+        UniversityName = universityName;
         IsOnline = isOnline;
         IpAddress = ipAddress;
         Subscribers = subscribers;
+        Comments = comments;
     }
     
+    [JsonPropertyName("serviceId")]
     public ulong ServiceId { get; }
+    
+    [JsonPropertyName("serviceName")]
     public string ServiceName { get; }
+    
+    [JsonPropertyName("universityName")]
+    public string UniversityName { get; }
+    
+    [JsonPropertyName("isOnline")]
     public bool IsOnline { get; }
+    
+    [JsonPropertyName("ipAddress")]
     public string IpAddress { get; }
+    
+    [JsonPropertyName("subscribers")]
     public IEnumerable<UserEntity> Subscribers { get; }
+    
+    [JsonPropertyName("comments")]
     public IEnumerable<CommentEntity> Comments { get; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    [JsonPropertyName("isSubscribed")]
+    public bool? IsSubscribed { get; set; }
 }

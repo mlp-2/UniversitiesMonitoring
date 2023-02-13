@@ -22,7 +22,26 @@ public class ServicesController : ControllerBase
         _usersProvider = usersProvider;
         _webSocketUpdateStateNotifier = webSocketUpdateStateNotifier;
     }
-    
+
+    [Authorize(Roles = JwtGenerator.UserRole)]
+    [HttpPost("{id:long}")]
+    public async Task<IActionResult> GetService([FromRoute] ulong id)
+    {
+        var service = await _servicesProvider.GetServiceAsync(id);
+
+        if (service == null)
+        {
+            return BadRequest("Сервис не найден");
+        }
+
+        var serviceEntity = new UniversityServiceEntity(service)
+        {
+            IsSubscribed = service.UserSubscribeToServices.Any(x => x.UserId.ToString() == User.Identity!.Name)
+        };
+
+        return Ok(serviceEntity);
+    }
+
     [Authorize(Roles = JwtGenerator.UserRole)]
     [HttpPost("{id:long}/subscribe")]
     public async Task<IActionResult> SubscribeService([FromRoute] ulong id)
@@ -107,18 +126,44 @@ public class ServicesController : ControllerBase
     }
     
     [HttpGet]
-    public IActionResult GetAllServices(
-        [FromQuery] bool loadUsers,
-        [FromQuery] bool loadComments)
+    public async Task<IActionResult> GetAllServices(
+        [FromQuery] bool loadUsers = false,
+        [FromQuery] bool loadComments = false,
+        [FromQuery] ulong? universityId = null)
     {
         // Нужно, чтобы не сливать инфу
         loadUsers = loadUsers && IsLocalHostRequest;
         loadComments = loadComments && IsLocalHostRequest;
         
-        var services = _servicesProvider.GetAllServices().ToArray();
+        var services = (await _servicesProvider.GetAllServicesAsync(universityId)).ToArray();
 
         return Ok(from service in services select new UniversityServiceEntity(service, loadUsers, loadComments));
     }
+
+    [HttpGet("universities/{id:long}")]
+    public async Task<IActionResult> GetUniversity([FromRoute] ulong id)
+    {
+        var university = await _servicesProvider.GetUniversityAsync(id);
+
+        if (university == null)
+        {
+            return BadRequest("Университет не найден");
+        }
+
+        var universityEntity = new UniversityEntity(university)
+        {
+            IsSubscribed = university.UniversityServices.All(service => 
+                service.UserSubscribeToServices.Any(subscribe =>
+                    subscribe.UserId.ToString() == User.Identity!.Name!))
+        };
+
+        return Ok(universityEntity);
+    }
+
+    [HttpGet("universities")]
+    public IActionResult GetAllUniversities() => Ok(
+        from university in _servicesProvider.GetAllUniversities().ToArray()
+        select new UniversityEntity(university));
 
     [HttpPut("update")]
     public async Task<IActionResult> UpdateService([FromBody] ChangeStateEntity[] updates)

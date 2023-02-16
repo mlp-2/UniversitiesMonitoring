@@ -1,5 +1,5 @@
 import useGlobalStyles from "../GlobalStyle";
-import PreviewImage from "../assets/images/Preview.png";
+import PreviewImage from "../assets/images/preview.png";
 import {createUseStyles} from "react-jss";
 
 const useStyles = createUseStyles({

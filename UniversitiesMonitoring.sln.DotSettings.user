@@ -1,12 +1,12 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	
 	
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5a328c21_002D1b90_002D456c_002Db848_002D6079542dd3e5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Test" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.JwtGeneratorTests.Test&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.ServicesProviderTests.User_Subscribe_To_Service&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.ServicesProviderTests&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.ModeratorsProviderTests.Get_Moderator&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.UsersProviderTests.Modify_User_Must_Be_Success&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5a328c21_002D1b90_002D456c_002Db848_002D6079542dd3e5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Test" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
+  &lt;TestAncestor&gt;
+    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.JwtGeneratorTests.Test&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.ServicesProviderTests.User_Subscribe_To_Service&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.ServicesProviderTests&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.ModeratorsProviderTests.Get_Moderator&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::F3545A41-DBBC-439F-A525-DE2F28F15A69::net6.0::UniversitiesMonitoring.Api.Tests.UsersProviderTests.Modify_User_Must_Be_Success&lt;/TestId&gt;
+  &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

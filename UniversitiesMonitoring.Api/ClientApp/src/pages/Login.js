@@ -9,6 +9,8 @@ import {useEffect, useState} from "react";
 import {Button} from "../components/Button";
 import useGlobalStyles from "../GlobalStyle";
 import {Container} from "reactstrap";
+import Swal from "sweetalert2";
+import {GetUser} from "../ApiMethods";
 
 const useStyles = createUseStyles({
     formStyle: {
@@ -61,8 +63,7 @@ const useStyles = createUseStyles({
 
 export function Login() {
     const style = useStyles();
-    const [formError, setFormError] = useState(null)
-    const [defaultAuthAccepted, setDefAuthAccepted] = useState(null);
+    const [authAccepted, setDefAuthAccepted] = useState(null);
     const [user, setUser] = useState(null);
     const globalStyle = useGlobalStyles();
     
@@ -78,8 +79,8 @@ export function Login() {
     }, []);
     
     
-    if (defaultAuthAccepted !== null) {
-        if (defaultAuthAccepted) {
+    if (authAccepted !== null) {
+        if (authAccepted) {
             return <Navigate to="/universities-list"/>;
         } 
         
@@ -94,19 +95,24 @@ export function Login() {
         const form = e.target;
         const formData = new FormData(form);
         
-        const response = await axios.post("/api/user/auth", Object.fromEntries(formData.entries()));
-        
-        if(response.status !== 200) {
-            setFormError("Неверный логин или пароль");
-            return;
+        try {
+            const response = await axios.post("/api/user/auth", Object.fromEntries(formData.entries()));
+
+            localStorage.setItem("token", response.data.jwt)
+            setUser(await GetUser());
+
+            setDefAuthAccepted(true);
+        } catch (axiosError) {
+            const response = axiosError.response;
+            
+            await Swal.fire({
+                icon: "error",
+                title: response.status !== 500 ? "Неверный логин или пароль" :
+                    "Что-то пошло не так...",
+                showConfirmButton: false,
+                timer: 2000
+            });
         }
-        
-        localStorage.setItem("token", response.data.jwt)
-        setUser(await GetUser());
-    }
-    
-    if (formError !== null) {
-        alert("Сам проблемс")
     }
     
     return <WelcomePage>
@@ -134,11 +140,4 @@ export function Login() {
             </div>
         </div>
     </WelcomePage>
-}
-
-async function GetUser() {
-    const result = await axios.get("/api/user");
-    
-    if (result.status === 200) return result.data;
-    else return null;
 }

@@ -10,6 +10,7 @@ public class UserEntity
         Id = userModel.Id;
         Username = userModel.Username;
         Email = userModel.SendEmailNotification ? userModel.Email ?? null : null;
+        SendToEmail = userModel.SendEmailNotification;
     }
 
     [JsonConstructor]
@@ -20,7 +21,16 @@ public class UserEntity
         Email = email;
     }
     
+    [JsonPropertyName("id")]
     public ulong Id { get; }
+    
+    [JsonPropertyName("username")]
     public string Username { get; }
+    
+    [JsonPropertyName("email")]
     public string? Email { get; }
+    
+    [JsonPropertyName("sendToEmail")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? SendToEmail { get; }
 }

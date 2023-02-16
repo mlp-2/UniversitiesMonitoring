@@ -3,6 +3,7 @@ using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
 using UniversitiesMonitoring.Api.WebSocket;
 using UniversityMonitoring.Data.Entities;
+using UniversityMonitoring.Data.Models;
 
 namespace UniversitiesMonitoring.Api.Controllers;
 
@@ -34,10 +35,8 @@ public class ServicesController : ControllerBase
             return BadRequest("Сервис не найден");
         }
 
-        var serviceEntity = new UniversityServiceEntity(service)
-        {
-            IsSubscribed = service.UserSubscribeToServices.Any(x => x.UserId.ToString() == User.Identity!.Name)
-        };
+        var serviceEntity = new UniversityServiceEntity(service,
+            isSubscribed: CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!)));
 
         return Ok(serviceEntity);
     }
@@ -137,7 +136,17 @@ public class ServicesController : ControllerBase
         
         var services = (await _servicesProvider.GetAllServicesAsync(universityId)).ToArray();
 
-        return Ok(from service in services select new UniversityServiceEntity(service, loadUsers, loadComments));
+        var userId = ulong.Parse(User.Identity!.Name!);
+        
+        var servicesApiEntities = User.IsInRole(JwtGenerator.UserRole) ? from service in services select new UniversityServiceEntity(
+                service,
+                loadUsers,
+                loadComments,
+                CheckIfUserSubscribed(service, userId)) : 
+            from service in services 
+                select new UniversityServiceEntity(service, loadUsers, loadComments);
+
+        return Ok(servicesApiEntities);
     }
 
     [HttpGet("universities/{id:long}")]
@@ -194,4 +203,7 @@ public class ServicesController : ControllerBase
         if (updateSuccess) return Ok();
         else return BadRequest("Часть сервисов не найдены");
     }
+    
+    private bool CheckIfUserSubscribed(UniversityService service, ulong userId) =>
+        service.UserSubscribeToServices.Any(x => x.UserId == userId);
 }

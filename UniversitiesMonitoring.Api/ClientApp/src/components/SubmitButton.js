@@ -10,6 +10,7 @@ const useStyles = createUseStyles({
         padding: "0.5em 1em 0.5em 1em",
         fontSize: 24,
         transition: "background 0.3s, transform 0.3s",
+        textShadow: "#050505 0.3px 0 1px",
         "&:hover": {
             background: "#0a64c7"
         },

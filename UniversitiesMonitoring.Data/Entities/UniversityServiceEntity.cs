@@ -5,7 +5,7 @@ namespace UniversityMonitoring.Data.Entities;
 
 public class UniversityServiceEntity
 {
-    public UniversityServiceEntity(UniversityService universityServiceModel, bool loadUsers = true, bool loadComments = true)
+    public UniversityServiceEntity(UniversityService universityServiceModel, bool loadUsers = true, bool loadComments = true, bool? isSubscribed = null)
     { 
         ServiceId = universityServiceModel.Id;
         ServiceName = universityServiceModel.Name;
@@ -19,6 +19,7 @@ public class UniversityServiceEntity
                     $"{universityServiceModel.IpAddress[3]}:" +
                     $"{universityServiceModel.IpAddress[4]}:" +
                     $"{universityServiceModel.IpAddress[5]}";
+        IsSubscribed = isSubscribed;
     }
 
     [JsonConstructor]
@@ -62,5 +63,5 @@ public class UniversityServiceEntity
     
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     [JsonPropertyName("isSubscribed")]
-    public bool? IsSubscribed { get; set; }
+    public bool? IsSubscribed { get; }
 }

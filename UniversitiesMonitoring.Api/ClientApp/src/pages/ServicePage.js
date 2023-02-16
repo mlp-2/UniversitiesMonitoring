@@ -5,8 +5,13 @@ import Constants from "../Constants";
 import {faStar} from "@fortawesome/free-solid-svg-icons";
 import MessagePart from "../assets/images/message-part.svg";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import {SubmitButton} from "../components/SubmitButton";
+import {GetReports, SendComment, SendReportToService, SubscribeToService, UnsubscribeToService} from "../ApiMethods";
+import Swal from "sweetalert2";
+import {Stack} from "react-bootstrap";
+import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
+import {GenerateUUID} from "../Utils";
 
 const useStyles = createUseStyles({
     serviceHeader: {
@@ -32,16 +37,21 @@ const useStyles = createUseStyles({
             gap: 10
         },
         "& .service-name-with-status": {
+            display: "flex",
+            alignItems: ""
+        },
+        "& .service-name-with-status span": {
             position: "relative",
             fontSize: 64,
-            height: "fit-content"
+            height: "fit-content",
+            verticalAlign: "bottom"
         },
-        "& .service-name-with-status::after": {
+        "& .service-name-with-status span::after": {
             content: '""',
             position: "absolute",
             width: 64,
             height: 64,
-            right: "-80px",
+            right: "-80px", 
             top: "calc(50% - 32px)",
             borderRadius: "50%",
             background: "var(--service-status)"
@@ -51,7 +61,31 @@ const useStyles = createUseStyles({
         background: "#F5F5F5",
         display: "flex",
         flexDirection: "row",
-        justifyContent: "space-around"
+        justifyContent: "space-around",
+        alignItems: "baseline",
+        "& .title": {
+            position: "sticky",
+            fontSize: 32,
+            top: 10,
+            zIndex: 3,
+            backdropFilter: "blur(10px)",
+            padding: 10,
+            borderRadius: "3em",
+            textAlign: "center",
+            verticalAlign: "middle",
+            width: "fit-content"
+        },
+        "& .title::after": {
+            borderRadius: "3em",
+            background: "rgba(245,245,245,0.55)",
+            position: "absolute",
+            content: '""',
+            width: "100%",
+            height: "100%",
+            zIndex: -1,
+            left: 0,
+            top: 0
+        }
     },
     comment: {
         background: "#FFF",
@@ -87,14 +121,14 @@ const useStyles = createUseStyles({
         "& .comments-container": {
             display: "flex",
             flexDirection: "column",
-            gap: 50,
+            gap: 60,
             paddingLeft: 33,
             paddingTop: 33
         },
-        "& .comments-title": {
-            fontSize: 32,
-        },
         padding: 40,
+        display: "flex",
+        flexDirection: "column",
+        gap: 10,
         width: "30%"
     },
     starsBar: {
@@ -110,6 +144,8 @@ const useStyles = createUseStyles({
         }
     },
     commentForm: {
+        position: "sticky",
+        top: 10,
         display: "flex",
         justifyContent: "center",
         flexDirection: "column",
@@ -118,47 +154,140 @@ const useStyles = createUseStyles({
             width: "15vw",
             borderRadius: "0 0 15px 15px",
             outline: "none",
-            padding: 10
+            padding: 10,
         }
     }
 });
 
 export function ServicePage() {
     const location = useLocation();
-    const {service} = location.state;
+    const [service, setService] = useState(location.state.service)
+    
+    function updateService(service) {  
+        setService(service);
+    }   
     
     return <div>
-        <ServiceHeader service={service}/>
-        <ServiceBody service={service}/>
+        <ServiceHeader service={service} updateService={updateService}/>
+        <ServiceBody service={service} updateService={updateService}/>
     </div>
 }
 
-function ServiceHeader({service}) {
+function ServiceHeader({service, updateService}) {
     const style = useStyles();
+    
+    async function handleClickOnSubscribeButton() {
+        if (!service.isSubscribed) {
+            await SubscribeToService(service.serviceId);
+            
+        } else {
+            await UnsubscribeToService(service.serviceId);
+        }
+        
+        updateService({
+            ...service,
+            isSubscribed: !service.isSubscribed 
+        });
+    }
+    
+    async function handleClickOnReportButton() {
+         await Swal.fire({
+            title: `Сообщение о ${service.isOnline ? "не" : ""}доступности сервиса`,
+            input: "textarea",
+            inputPlaceholder: service.isOnline ? "Опишите. Что случилось? Желательно, подробно" :
+                "Если Вам есть, что добавить, то пишите сюда",
+            showCancelButton: true,
+            confirmButtonText: "Отправить",
+            cancelButtonText: "Отмена",
+            confirmButtonColor: "#0798EA",
+            showLoaderOnConfirm: true,
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then(result => {
+            if (!result.isConfirmed) return;
+            
+            return SendReportToService(service.serviceId, !service.isOnline, result.value)
+        }).then(result => {
+            if(result) {
+                Swal.fire({
+                    title: "Успешно. Ожидайте подтверждения Вашего обращения от администрации",
+                    icon: "success"
+                });
+            } else if(result === false) {
+                Swal.fire({
+                    title: "Что-то пошло не так...",
+                    icon: "error"
+                });
+            }
+        });
+    }
+
+    async function handleClickOnReportOfflineButton() {
+        await Swal.fire({
+            title: `Сообщение о недоступности сервиса`,
+            input: "textarea",
+            inputPlaceholder: "Опишите. Что случилось? Подробно",
+            showCancelButton: true,
+            confirmButtonText: "Отправить",
+            cancelButtonText: "Отмена",
+            confirmButtonColor: "#0798EA",
+            showLoaderOnConfirm: true,
+            allowOutsideClick: () => !Swal.isLoading()
+        }).then(result => {
+            if (!result.isConfirmed) return;
+
+            return SendReportToService(service.serviceId, false, result.value)
+        }).then(result => {
+            if(result) {
+                Swal.fire({
+                    title: `Спасибо большое за указание причины недоступности ${service.serviceName}!`,
+                    icon: "success"
+                });
+            } else if(result === false) {
+                Swal.fire({
+                    title: "Что-то пошло не так...",
+                    icon: "error"
+                });
+            }
+        });
+    }
     
     return <div className={style.serviceHeader}>
         <div className="university-name">
             <span>{service.universityName}</span>
         </div>
         <div className="action-section">
-            <div className="service-name-with-status" style={{"--service-status": "#3CFB38"}}>
-                <span>{service.serviceName}</span>    
+            <div className="service-name-with-status" 
+                 style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438"}}>
+                <span className="to-bottom">{service.serviceName}</span>    
             </div>
-            <div className="service-action-buttons">
-                <Button style={{background: "#00EE75"}}>Сервис офлайн?</Button>
-                <Button style={{background: "#FF4D15"}}>Подписаться</Button>
-            </div>
+            <Stack className="flex-grow-0 gap-2">
+                <Button onClick={handleClickOnReportButton} 
+                        style={{background: "#1FE03C"}}>
+                    Сервис {service.isOnline ? "офлайн" : "онлайн"}?
+                </Button>
+                {
+                    !service.isOnline &&
+                        <Button onClick={handleClickOnReportOfflineButton}
+                                style={{background: "#EDD715"}}>
+                            Вы знаете почему сервис не работает?
+                        </Button>
+                }
+                <Button onClick={handleClickOnSubscribeButton} 
+                        style={{background: service.isSubscribed ? "#FF4D15" : "#9D9D9D"}}>
+                    {service.isSubscribed ? "Отписаться" : "Подписаться"}
+                </Button>
+            </Stack>
         </div>
     </div>
 }
 
-function ServiceBody({service}) {
+function ServiceBody({service, updateService}) {
     const style = useStyles();
     
     return <div className={style.serviceBody}>
         <CommentsColumn comments={service.comments}/>
-        {service.isOnline && <ReportsColumn/>}
-        <SendCommentForm/>
+        {!service.isOnline && <ReportsColumn service={service}/>}
+        <SendCommentForm service={service} updateService={updateService}/>
     </div>;
 }
 
@@ -166,20 +295,22 @@ function CommentsColumn({comments}) {
     const style = useStyles();
     
     return <div className={style.commentsWrapper}>
-        <span className="comments-title">Комментарии</span>
+        <span className="title">Комментарии</span>
         <div className="comments-container">
             {comments.map(comment => 
-                <Comment key={comment.id} from={comment.author.username} content={comment.comment} stars={comment.rate}/>)}
+                <Comment key={comment.id} from={comment.author.username} content={comment.content} stars={comment.rate}/>)}
         </div>
     </div>
 }
 
-function ReportsColumn() {
+function ReportsColumn({service}) {
     const [reports, setReports] = useState(null);
     const style = useStyles();
     
     useEffect(() => {
-        setReports(getServiceReports());
+        (async () => {
+            setReports(await GetReports(service.serviceId));
+        })();
     }, []);
     
     if(reports === null)
@@ -188,27 +319,58 @@ function ReportsColumn() {
     }
     
     return <div className={style.commentsWrapper}>
-        <span className="comments-title">Сообщения о текущем сбое</span>
-        <div className="comments-container">
-            {reports.map(report =>
-                <Comment key={report.id} from="Пользователя сервиса" content={report.content}/>)}
-        </div>
+        <span className="title">Сообщения о текущем сбое</span>
+        {
+            <div className="comments-container">
+                {reports.length > 0 ? reports.map(report =>
+                    <Comment key={report.id} from="Пользователя сервиса" content={report.content}/>) :  
+                    <span>Пока что нет никаких данных об этом сбое. Приходите сюда позже 👀</span>}
+            </div>
+        }
     </div>
 }
 
-function SendCommentForm() {
+function SendCommentForm({service, updateService}) {
     const [rate, setRate] = useState();
     const style = useStyles();
     
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
         
         const form = e.target;
         const formData = new FormData(form);
         formData.append("rate", rate);
 
-        const formJson = Object.fromEntries(formData.entries());
-        console.log(formJson);
+        const apiData = Object.fromEntries(formData.entries());
+        
+        if (await SendComment(service.serviceId, apiData)) {
+            await Swal.fire({
+                title: "Комментарий добавлен",
+                icon: "success",
+                timer: 1000,
+                showConfirmButton: false
+            }); 
+            
+            service.comments.push({
+                id: GenerateUUID(),
+                author: {
+                    username: "Вас"  
+                },
+                ...apiData
+            });
+            
+            updateService({
+                ...service,
+                comments: service.comments,
+            });
+        } else {
+            await Swal.fire({
+                title: "Что-то пошло не так...",
+                icon: "error",
+                timer: 1000,
+                showConfirmButton: false
+            });
+        }
     }
     
     return <form className={style.commentForm} method="post" onSubmit={handleSubmit}>
@@ -245,7 +407,7 @@ function RateStar({index, rate, onClick}) {
 function Comment({from, content, stars = -1}) {
     const style = useStyles();
     
-    return <div className={style.comment}>
+    return <div className={style.comment}>  
         <div className="comment-header">
             <span>от <span className="comment-author">{from}</span></span>
             {

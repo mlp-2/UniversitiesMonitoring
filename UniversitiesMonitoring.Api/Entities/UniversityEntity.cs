@@ -10,7 +10,7 @@ public class UniversityEntity
         Id = university.Id;
         Name = university.Name;
         IsOnline = true;
-        
+
         foreach (var service in university.UniversityServices)
         {
             IsOnline &= service.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false; 
@@ -22,7 +22,8 @@ public class UniversityEntity
             }
         }
 
-        Rating /= CommentsCount;
+        if (CommentsCount > 0) Rating /= CommentsCount;
+        else Rating = 0;
     }
 
     [JsonPropertyName("id")]

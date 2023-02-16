@@ -4,7 +4,10 @@ import {createUseStyles} from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faComment, faStar} from "@fortawesome/free-solid-svg-icons";
 import Constants from "../Constants";
-import {Link} from "react-router-dom";
+import {Link, useLocation} from "react-router-dom";
+import axios from "axios";
+import {Loading} from "../components/Loading";
+import {SubscribeToService, UnsubscribeToService} from "../ApiMethods";
 
 const useStyles = createUseStyles({
     universityHeader: {
@@ -79,282 +82,126 @@ const useStyles = createUseStyles({
 });
 
 export function UniversityPage() {
-    const universityId = getUniversityId();
+    const location = useLocation();
+    const [university, setUniversity] = useState(location.state.university);
+    const [services, setServices] = useState(null);
+    const [isSubscribed, setSubscribed] = useState(false);
+    
+    function updateServices(servicesToChange) {
+        setServices(servicesToChange ?? services);
+    }
+    
+    useEffect(() => {
+        (async () => {
+            setServices(await getUniversityServices(university.id));
+        })();
+    }, []);
+    
+    let isSub = true;
+    
+    for (let i in services) {
+        isSub &= services[i].isSubscribed;
+    }
+
+    if (isSubscribed !== isSub) setSubscribed(isSub);
     
     return <div>
-        <UniversityHeader universityId={universityId}/>
-        <ServicesList universityId={universityId}/>
+        <UniversityHeader university={university} services={services} isSubscribed={isSubscribed} updateServices={updateServices}/>
+        <ServicesList services={services} updateServices={updateServices}/>
     </div>
 }
 
-function UniversityHeader({universityId}) {
+function UniversityHeader({university, services, updateServices, isSubscribed}) {
     const style = useStyles();
-    const [university, setUniversity] = useState(null);
-
-    useEffect(() => {
-        setUniversity(getUniversity(universityId));
-    }, []);
     
-    if(university === null) return <span>ЗАГРУЗКА</span>;
+    async function handleClickOnSubscribeButton() {
+        for (let i in services) {
+            if (isSubscribed) { // Отписываемся от всего
+                await UnsubscribeToService(services[i].serviceId);
+                services[i].isSubscribed = false;
+            } else {
+                await SubscribeToService(services[i].serviceId);
+                services[i].isSubscribed = true;
+            }
+        }
+        
+        updateServices(services);
+    }
     
     return <div className={style.universityHeader}>
         <span>{university.name}</span>
-        <Button style={{background: "#FF4D15"}}>Подписаться</Button>
+        <Button onClick={handleClickOnSubscribeButton} style={{background: isSubscribed ? "#959595" : "#FF4D15"}}>
+            {isSubscribed ? "Отписаться" : "Подписаться"}
+        </Button>
     </div>    
 } 
 
-function ServicesList({universityId}) {
+function ServicesList({services, updateServices}) {
     const style = useStyles();
-    const [services, setServices] = useState(null);
     
-    useEffect(() => {
-        setServices(getUniversityServices());
-    }, []) //TODO: Добавить обработку обновления по WS
-    
-    if(services === null) return <span>ЗАГРУЗКА</span>;
+    if (services === null) return <Loading/>
     
     return <div className={style.servicesBlock}>
         <span className="services-title">Сервисы</span>
         <div className={style.servicesWrapper}>
-            {services.map(service => <ServiceContainer key={service.serviceId} service={service}/>)}
+            {services.map(service => <ServiceContainer updateServices={updateServices} key={service.serviceId} service={service}/>)}
         </div>
     </div>
 }
 
-function ServiceContainer({service}) {
+function ServiceContainer({service, updateServices}) {
     const style = useStyles();
+    
+    async function handleClickSubscribe() {
+        service.isSubscribed = !service.isSubscribed;
+        
+        if (service.isSubscribed) {
+            await axios.post(`/api/services/${service.serviceId}/subscribe`);
+        } else {
+            await axios.delete(`/api/services/${service.serviceId}/unsubscribe`);
+        }
+        
+        updateServices(null);
+    }
     
     let rateAvg = 0;
     
-    for (let i in service.comments) {
-        rateAvg += service.comments[i].rate;
+    if(service.comments.length === 0) rateAvg = -1;
+    else {
+        for (let i in service.comments) {
+            rateAvg += service.comments[i].rate;
+        }
+
+        rateAvg /= service.comments.length;
     }
-    
-    rateAvg /= service.comments.length;
     
     return <div className={style.servicePanel}>
             <Link to="/service" state={{ service: service }}>
                 {service.serviceName}
             </Link>
             <div className="service-actions">
-                <Button style={{background: "#9D9D9D"}}>Подписаться</Button>
+                <Button onClick={handleClickSubscribe} style={{background: service.isSubscribed ? "#9D9D9D" : "#FF4D15"}}>
+                    {service.isSubscribed ? "Отписаться" : "Подписаться"}
+                </Button>
                 <div className="additional-info">
                     <FontAwesomeIcon icon={faComment}/>
                     <span>{service.comments.length}</span>
                 </div>
-                <div className="additional-info">
-                    <FontAwesomeIcon icon={faStar}/>
-                    <span>{rateAvg}/5</span>
-                </div>
+                {
+                    rateAvg > 0 &&
+                        <div className="additional-info">
+                            <FontAwesomeIcon icon={faStar}/>
+                            <span>{rateAvg.toFixed(1)}/5.0</span>
+                        </div>
+                }
                 <div className="service-status"
                      style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438" }}/>
             </div>
-        </div>
+        </div>;
 }
 
-function getUniversityId() {
-    return 0;
-}
-
-function getUniversity() {
-    return {
-        name: "ВШЭ"
-    };
-}
-
-function getUniversityServices() {
-    return [
-        {
-            serviceId: 1,
-            serviceName: "ВШЭ Мобильный",
-            universityName: "ВШЭ",
-            isOnline: true,
-            comments: [
-                {
-                    id: 1,
-                    rate: 5,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "DenVot"
-                    }
-                },
-                {
-                    id: 2,
-                    rate: 4,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "Prowx"
-                    }
-                }
-            ]
-        },
-        {
-            serviceId: 2,
-            serviceName: "ВШЭ сайт",
-            universityName: "ВШЭ",
-            isOnline: false,
-            comments: [
-                {
-                    id: 3,
-                    rate: 5,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "DenVot"
-                    }
-                },
-                {
-                    id: 4,
-                    rate: 4,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "Prowx"
-                    }
-                }
-            ]
-        },
-        {
-            serviceId: 3,
-            serviceName: "ВШЭ сайт",
-            universityName: "ВШЭ",
-            isOnline: false,
-            comments: [
-                {
-                    id: 5,
-                    rate: 5,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "DenVot"
-                    }
-                },
-                {
-                    id: 6,
-                    rate: 4,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "Prowx"
-                    }
-                }
-            ]
-        },
-        {
-            serviceId: 4,
-            serviceName: "ВШЭ сайт",
-            universityName: "ВШЭ",
-            isOnline: false,
-            comments: [
-                {
-                    id: 7,
-                    rate: 5,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "DenVot"
-                    }
-                },
-                {
-                    id: 8,
-                    rate: 4,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "Prowx"
-                    }
-                }
-            ]
-        },
-        {
-            serviceId: 5,
-            serviceName: "ВШЭ сайт",
-            universityName: "ВШЭ",
-            isOnline: false,
-            comments: [
-                {
-                    id: 9,
-                    rate: 5,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "DenVot"
-                    }
-                },
-                {
-                    id: 10,
-                    rate: 4,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "Prowx"
-                    }
-                }
-            ]
-        },
-        {
-            serviceId: 6,
-            serviceName: "ВШЭ сайт",
-            universityName: "ВШЭ",
-            isOnline: false,
-            comments: [
-                {
-                    id: 11,
-                    rate: 5,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "DenVot"
-                    }
-                },
-                {
-                    id: 12,
-                    rate: 4,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "Prowx"
-                    }
-                }
-            ]
-        },
-        {
-            serviceId: 7,
-            serviceName: "ВШЭ сайт",
-            universityName: "ВШЭ",
-            isOnline: false,
-            comments: [
-                {
-                    id: 13,
-                    rate: 5,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "DenVot"
-                    }
-                },
-                {
-                    id: 14,
-                    rate: 4,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "Prowx"
-                    }
-                }
-            ]
-        },
-        {
-            serviceId: 8,
-            serviceName: "ВШЭ сайт",
-            universityName: "ВШЭ",
-            isOnline: false,
-            comments: [
-                {
-                    id: 15,
-                    rate: 5,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "DenVot"
-                    }
-                },
-                {
-                    id: 16,
-                    rate: 4,
-                    comment: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas at sapien ut ligula ullamcorper pharetra. Phasellus tempus volutpat tellus a dictum. Cras vel facilisis sapien. Quisque mollis varius enim, eu euismod lacus pellentesque at. Proin vulputate feugiat neque, volutpat ullamcorper elit luctus et. Nullam est metus, pulvinar id euismod vel, laoreet sed tortor. Duis enim arcu, dictum volutpat ipsum vel, bibendum consequat est.",
-                    author: {
-                        username: "Prowx"
-                    }
-                }
-            ]
-        },
-    ];
+async function getUniversityServices(universityId) {
+    const requestResult = await axios.get(`/api/services?loadComments=true&universityId=${universityId}`);
+    
+    return requestResult.data;
 }

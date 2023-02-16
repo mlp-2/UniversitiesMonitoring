@@ -6,6 +6,7 @@ import {SubmitButton} from "../components/SubmitButton";
 import {createUseStyles} from "react-jss";
 import FireBall from "../assets/images/fireball.svg"
 
+const emailRegex = /[\w\d.]+@[a-z]+\.[a-z]{2,3}/
 const useStyles = createUseStyles({
    editEmailForm: {
        display: "flex",
@@ -62,6 +63,16 @@ const useStyles = createUseStyles({
 export function AccountPage() {
     const [user, setUser] = useState(null);
     const style = useStyles();
+    
+    async function handleEditEmailSettingsFormSubmit(e) {
+        const target = e.target;
+        const formData = new FormData(target);
+        const data = Object.fromEntries(formData.entries());
+        
+        if (emailRegex.exec(data.email) === data.email) {
+            
+        }
+    }
     
     useEffect(() => {
         setUser(getUser());

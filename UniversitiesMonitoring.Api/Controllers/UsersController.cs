@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
+using UniversityMonitoring.Data.Entities;
 using UniversityMonitoring.Data.Models;
 
 namespace UniversitiesMonitoring.Api.Controllers;
@@ -63,6 +64,17 @@ public class UsersController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = JwtGenerator.UserRole)]
+    [HttpGet]
+    public async Task<IActionResult> GetUser()
+    {
+        var user = await _usersProvider.GetUserAsync(User.Identity!.Name!);
+
+        if (user == null) return BadRequest();
+        
+        return Ok(new UserEntity(user));
+    }
+    
     [Authorize(Roles = JwtGenerator.UserRole)]
     [HttpPut("email/update")]
     public async Task<IActionResult> EmailUpdate([FromBody] EmailUpdateEntity update)

@@ -3,6 +3,10 @@ import HeaderBackground from "../assets/images/figures.png";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import { faStar, faComment, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import Constants from "../Constants";
+import axios from "axios";
+import {useEffect, useState} from "react";
+import {Loading} from "../components/Loading";
+import {Link} from "react-router-dom";
 
 const useStyles = createUseStyles({
     layout: {
@@ -82,7 +86,8 @@ const useStyles = createUseStyles({
         },
         "& .university-name": {
             fontWeight: "bold",
-            fontSize: 28
+            fontSize: 28,
+            color: "#000"
         },
         "& .additional-information": {
             color: "#878787",
@@ -112,93 +117,6 @@ const useStyles = createUseStyles({
     }
 });
 
-const testData = [
-    {
-        id: 1,
-        name: "ВШЭ",
-        commentsCount: 352,
-        rating: 4.2,
-        isOnline: true,
-    },
-    {
-        id: 2,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    },
-    {
-        id: 3,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    },
-    {
-        id: 4,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    },
-    {
-        id: 5,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    },
-    {
-        id: 6,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    },
-    {
-        id: 7,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    },
-    {
-        id: 8,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    },
-    {
-        id: 9,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    },
-    {
-        id: 10,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    },
-    {
-        id: 11,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    },
-    {
-        id: 12,
-        name: "РТУ МИРЭА",
-        commentsCount: 102,
-        rating: 4.0,
-        isOnline: false
-    }
-]
-
 export function UniversitiesList() {
     const style = useStyles();
     
@@ -212,24 +130,48 @@ function Header() {
     const style = useStyles();
     
     return <div className={style.header}>
-        <span>Найдите нужный Вам ВУЗ быстрее, вбив его название в поиск</span>
+        <span>Вбейте в поиск названия ВУЗа</span>
     </div>
 }
 
 function Listing() {
     const style = useStyles();
+    const [universities, setUniversities] = useState(null);
+    const [query, setQuery] = useState("");
+    
+    function updateQuery(newQuery) {
+        setQuery(makeStringQueryable(newQuery))
+    }
+    
+    useEffect(() => {
+        (async () => {
+            const universities = await getUniversities();
+            
+            for(let i in universities) {
+                universities[i].nameQueryable = makeStringQueryable(universities[i].name);
+            }
+            
+            setUniversities(universities);
+        })();
+    }, []);
+    
+    if (universities === null) return <Loading/>
     
     return <div className={style.listing}>
-        <SearchBar/>
-        <Universities universities={testData}/>
+        <SearchBar updateSearch={updateQuery}/>
+        <Universities universities={universities.filter(university => query === "" || university.nameQueryable.startsWith(query))}/>
     </div>
 }
 
-function SearchBar() {
+function SearchBar({updateSearch}) {
+    function handleChangingOfText(e) {
+        updateSearch(e.target.value);
+    }
+    
     return <div>
         <div className="searchbar">
             <FontAwesomeIcon icon={faMagnifyingGlass}/>
-            <input type="text" placeholder="Название ВУЗа"/>
+            <input onKeyUp={handleChangingOfText} type="text" placeholder="Название ВУЗа"/>
         </div>
     </div>
 }
@@ -247,13 +189,17 @@ function UniversityContainer(props) {
     
     return <div className={style.universityContainer}>
         <div>
-            <span className="university-name">{props.university.name}</span>    
+            <Link to="/university" 
+                  state={{university: props.university}}
+                  className="university-name">
+                {props.university.name}
+            </Link>    
         </div>
         <div className={style.informationCombo}>
             <div>
                 <div className="additional-information">
                     <FontAwesomeIcon icon={faStar} />
-                    <span>{props.university.rating}/5</span>
+                    <span>{props.university.rating.toFixed(1)}/5.0</span>
                 </div>
                 <div className="additional-information">
                     <FontAwesomeIcon icon={faComment} />
@@ -264,4 +210,12 @@ function UniversityContainer(props) {
                  style={{"--status-color": props.university.isOnline ? "#3CFB38" : "#FB4438"}}/>
         </div>
     </div>
+}
+
+async function getUniversities() {
+    return (await axios.get("/api/services/universities")).data;
+}
+
+function makeStringQueryable(s) {
+    return s.replaceAll(" ", "").toLowerCase();
 }

@@ -9,9 +9,10 @@ const useStyles = createUseStyles({
        outline: "none",
        padding: "0.5em 1em 0.5em 1em",
        fontSize: 24,
-       transition: "background 0.3s, transform 0.3s",
+       transition: "filter 0.3s, transform 0.3s",
+       textShadow: "#050505 0.3px 0 1px",
        "&:hover": {
-           background: "#0a64c7"
+           filter: "contrast(90%)"
        },
        "&:active": {
            transform: "scale(0.95)"

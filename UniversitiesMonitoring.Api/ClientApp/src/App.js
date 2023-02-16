@@ -9,6 +9,8 @@ import {UniversitiesList} from "./pages/UniversitiesList";
 import {ServicePage} from "./pages/ServicePage";
 import {LoginPanel} from "./pages/LoginPanel";
 import axios from 'axios';
+import {ModerationLoginPage} from "./pages/ModerationLoginPage";
+import {ReportsPage} from "./pages/ReportsPage";
 
 axios.interceptors.request.use(
     config => {
@@ -34,6 +36,8 @@ export default class App extends Component {
                 <Route key={6} path="universities-list" element={<UniversitiesList/>}/>
                 <Route key={7} path="service" element={<ServicePage/>}/>
             </Route>
+            <Route key={8} path="moderator/login" element={<ModerationLoginPage/>}/>
+            <Route key={8} path="moderator/reports" element={<ReportsPage/>}/>
         </Routes>
     );
   }

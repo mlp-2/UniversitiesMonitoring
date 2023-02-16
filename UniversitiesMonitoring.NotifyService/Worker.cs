@@ -1,16 +1,67 @@
+using UniversitiesMonitoring.NotifyService.Helpers;
+using UniversitiesMonitoring.NotifyService.Notifying;
+using UniversitiesMonitoring.NotifyService.WebSocket;
+using UniversityMonitoring.Data.Entities;
+
 namespace UniversitiesMonitoring.NotifyService;
 
-public class Worker : BackgroundService
+internal class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
-
-    public Worker(ILogger<Worker> logger)
+    private readonly IStateChangesListener _stateChangesListener;
+    private readonly IServiceProvider _serviceProvider;
+    private readonly ServicesFinder _servicesFinder;
+    private readonly EmailNotifier _emailNotifier;
+    
+    public Worker(ILogger<Worker> logger,
+        IStateChangesListener stateChangesListener,
+        IServiceProvider serviceProvider,
+        ServicesFinder servicesFinder,
+        EmailNotifier emailNotifier)
     {
         _logger = logger;
+        _stateChangesListener = stateChangesListener;
+        _serviceProvider = serviceProvider;
+        _servicesFinder = servicesFinder;
+        _emailNotifier = emailNotifier;
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        return Task.CompletedTask;
+        var connected = false;
+
+        while (!connected)
+        {
+            try
+            {
+                await _stateChangesListener.ConnectAsync();
+                connected = true;
+                _logger.LogInformation("Connected to WS");
+            }
+            catch
+            {
+                _logger.LogWarning("Can't connect to the WS. Retry in 10 seconds");
+                await Task.Delay(10000, stoppingToken);
+            }
+        }
+        
+        using var scope = _serviceProvider.CreateScope();
+
+        while (true)
+        {
+            var dataFromSocket = await _stateChangesListener.TryGetChangesAsync(stoppingToken);
+            var dataFromSocketInArray = dataFromSocket as UniversityServiceChangeStateEntity[] ?? dataFromSocket.ToArray();
+            if (!dataFromSocketInArray.Any()) continue;
+
+            var services = await _servicesFinder.GetServicesEntityAsync(from update in dataFromSocketInArray select update.Id);
+            
+            foreach (var service in services)
+            {
+                foreach (var serviceSubscriber in service.Subscribers)
+                {
+                    await _emailNotifier.NotifyAsync(serviceSubscriber, service);
+                }
+            }
+        }
     }
 }

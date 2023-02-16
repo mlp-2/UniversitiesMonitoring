@@ -1,6 +1,7 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using UniversitiesMonitoring.Api.Services;
 using UniversityMonitoring.Data.Entities;
 using UniversityMonitoring.Data.Models;
 using UniversityMonitoring.Data.Repositories;
@@ -10,12 +11,12 @@ namespace UniversitiesMonitoring.Api.WebSocket;
 
 public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
 {
+    private readonly IServiceProvider _serviceProvider;
     private readonly List<Tuple<WS, TaskCompletionSource<object>>> _webSockets = new();
-    private readonly IRepository<UniversityService, ulong> _universitiesServices;
 
-    public WebSocketUpdateStateNotifier(IDataProvider provider)
+    public WebSocketUpdateStateNotifier(IServiceProvider serviceProvider)
     {
-        _universitiesServices = provider.UniversityServices;
+        _serviceProvider = serviceProvider;
     }
     
     public void AppendWebSocket(WS webSocket, TaskCompletionSource<object> socketFinishedTcs)
@@ -52,11 +53,13 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
     private async Task<UniversityServiceChangeStateEntity[]> CreateChangeStatesReportsAsync(ulong[] servicesIds)
     {
         var changes = new UniversityServiceChangeStateEntity[servicesIds.Length];
-
+        using var scope = _serviceProvider.CreateScope();
+        var universitiesServices = scope.ServiceProvider.GetRequiredService<IDataProvider>().UniversityServices;
+        
         for (var serviceIndex = 0; serviceIndex < servicesIds.Length; serviceIndex++)
         {
             var serviceId = servicesIds[serviceIndex];
-            var service = await _universitiesServices.FindAsync(serviceId);
+            var service = await universitiesServices.FindAsync(serviceId);
 
             if (service == null)
             {

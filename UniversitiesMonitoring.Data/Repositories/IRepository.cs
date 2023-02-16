@@ -23,4 +23,8 @@ public interface IRepository<TEntity, in TKey> where TEntity : class
     /// </summary>
     /// <param name="sql">SQL</param>
     IEnumerable<TEntity> ExecuteSql(string sql);
+    /// <summary>
+    /// Получает все сущности
+    /// </summary>
+    IEnumerable<TEntity> GetlAll();
 }

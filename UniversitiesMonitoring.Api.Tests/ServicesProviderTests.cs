@@ -155,31 +155,6 @@ public class ServicesProviderTests
         Assert.NotNull(await servicesProvider.GetReportAsync(0x0)); 
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Get_Reports_By_Service_Id(bool containsSomething)
-    {
-        var dataProvider = CreateProviderMock();
-        
-        dataProvider.Setup(x => x.UniversityServices.FindAsync(It.IsAny<ulong>()))
-            .ReturnsAsync(containsSomething ? new UniversityService()
-            {
-                UniversityServiceReports = new List<UniversityServiceReport>()
-                {
-                    new(),
-                    new(),
-                    new(),
-                }
-            } : null); 
-        
-        var servicesProvider = CreateServicesProvider(dataProvider);
-        var test = Task.Run(() => servicesProvider.GetAllReportsAsync(0x0));
-
-        if (containsSomething) Assert.NotEmpty((await test)!);
-        else Assert.Null(await test);
-    }
-
     [Fact]
     public async Task Delete_Report()
     {

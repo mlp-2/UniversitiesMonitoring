@@ -3,9 +3,9 @@ using UniversityMonitoring.Data.Repositories;
 
 namespace UniversitiesMonitoring.Api.Services;
 
-internal class ModeratorsProvider : IModeratorProvider
+internal class ModeratorsProvider : IModeratorsProvider
 {
-    private IDataProvider _dataProvider; 
+    private readonly IDataProvider _dataProvider; 
     
     public ModeratorsProvider(IDataProvider dataProvider)
     {

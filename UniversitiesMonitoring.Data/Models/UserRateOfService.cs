@@ -8,7 +8,7 @@
         public ulong AuthorId { get; set; }
         public ulong ServiceId { get; set; }
 
-        public User Author { get; set; } = null!;
-        public UniversityService Service { get; set; } = null!;
+        public virtual User Author { get; set; } = null!;
+        public virtual UniversityService Service { get; set; } = null!;
     }
 }

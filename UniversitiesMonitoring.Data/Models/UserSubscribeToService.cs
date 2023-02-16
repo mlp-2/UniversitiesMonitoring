@@ -6,7 +6,7 @@
         public ulong UserId { get; set; }
         public ulong ServiceId { get; set; }
 
-        public UniversityService Service { get; set; } = null!;
-        public User User { get; set; } = null!;
+        public virtual UniversityService Service { get; set; } = null!;
+        public virtual User User { get; set; } = null!;
     }
 }

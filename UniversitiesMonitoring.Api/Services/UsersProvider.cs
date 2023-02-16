@@ -1,7 +1,4 @@
-﻿using System.Runtime.Intrinsics.Arm;
-using System.Security.Cryptography;
-using System.Text;
-using UniversityMonitoring.Data.Models;
+﻿using UniversityMonitoring.Data.Models;
 using UniversityMonitoring.Data.Repositories;
 
 namespace UniversitiesMonitoring.Api.Services
@@ -16,28 +13,37 @@ namespace UniversitiesMonitoring.Api.Services
         }
         
         /// <summary>
-        /// Сам такой
+        /// Получает пользователя
         /// </summary>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        public async Task<User?> GetUserAsync(ulong userId)
-        {
-            return await _dataProvider.Users.FindAsync(userId);
-        }
-        
+        /// <param name="userId">ID пользователя</param>
+        /// <returns>Пользователя. Null, если пользователь не найден</returns>
+        public async Task<User?> GetUserAsync(ulong userId) => await _dataProvider.Users.FindAsync(userId);
+
         /// <summary>
-        /// Получает пользователя по айди, а потом полученный инстанс прогоняет через модифэй экшен (юзер), мы можем поменять айди, юзернейм, вот этот метод должэен это делать
+        /// Получает пользователя
         /// </summary>
-        /// <param name="userId"></param>
-        /// <param name="modifyAction"></param>
-        /// <returns>возвращает тру, если удачно всё сделал, если удачно изменился объект.</returns>
-        /// <exception cref="NotImplementedException"></exception>
+        /// <param name="userId">ID пользователя</param>
+        /// <returns>Пользователя. Null, если пользователь не найден</returns>
+        public Task<User?> GetUserAsync(string userId) => GetUserAsync(ulong.Parse(userId));
+
+        /// <summary>
+        /// Получает пользователя
+        /// </summary>
+        /// <param name="username">Имя пользователя</param>
+        /// <returns>Полbьзователя. Null, если пользователь не найден</returns>
+        public User? GetUser(string username) => _dataProvider.Users.ExecuteSql($"SELECT * FROM universities_monitoring.User WHERE Username = '{username}'").FirstOrDefault();
+
+        /// <summary>
+        /// Изменяет пользователя по ID и методу
+        /// </summary>
+        /// <param name="userId">ID пользователя</param>
+        /// <param name="modifyAction">Метод, который изменяет пользователя</param>
+        /// <returns>Если удачно, то true</returns>
         public async Task<bool> ModifyUserAsync(ulong userId, Action<User> modifyAction)
         {
             var user = await _dataProvider.Users.FindAsync(userId);
             
-            if (user == null)
-                return false;
+            if (user == null) return false;
 
             modifyAction(user);
             await _dataProvider.SaveChangesAsync();
@@ -45,34 +51,30 @@ namespace UniversitiesMonitoring.Api.Services
             return true;
         }
         
-        
-        
         /// <summary>
-        /// Просто тупо создёет нового пользователя, прям по-тупому
+        /// Создает нового пользователя
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
+        /// <param name="username">Имя пользоваетя</param>
+        /// <param name="password">Пароль пользователя</param>
         /// <returns></returns>
-        public async Task<User> CreateUserAsync(string username, string password)
+        public async Task<User?> CreateUserAsync(string username, string password)
         {
-            User user = new User()
+            try
             {
-                Username = username,
-                PasswordSha256hash = ComputeSha256(password)
-            };
+                var user = new User()
+                {
+                    Username = username,
+                    PasswordSha256hash = Sha256Computing.ComputeSha256(password)
+                };
 
-            await _dataProvider.Users.AddAsync(user);
-            await _dataProvider.SaveChangesAsync();
+                await _dataProvider.Users.AddAsync(user);
+                await _dataProvider.SaveChangesAsync();
 
-            return user;
-        }
-        
-        private static byte[] ComputeSha256(string s)
-        {
-            using (SHA256 sha256 = SHA256.Create())
+                return user;
+            }
+            catch
             {
-                byte[] hashValue = sha256.ComputeHash(Encoding.UTF8.GetBytes(s));
-                return hashValue;
+                return null;
             }
         }
     }

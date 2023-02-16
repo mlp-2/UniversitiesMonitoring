@@ -7,6 +7,6 @@
         public bool IsOnline { get; set; }
         public DateTime ChangedAt { get; set; }
 
-        public UniversityService Service { get; set; } = null!;
+        public virtual UniversityService Service { get; set; } = null!;
     }
 }

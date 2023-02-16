@@ -8,19 +8,29 @@ public class UserEntity
     public UserEntity(User userModel)
     {
         Id = userModel.Id;
+        Username = userModel.Username;
         Email = userModel.SendEmailNotification ? userModel.Email ?? null : null;
-        TelegramTag = userModel.SendTelegramNotification ? userModel.TelegramTag ?? null : null;
+        SendToEmail = userModel.SendEmailNotification;
     }
 
     [JsonConstructor]
-    public UserEntity(ulong id, string? email, string? telegramTag)
+    public UserEntity(ulong id, string username, string? email)
     {
         Id = id;
+        Username = username;
         Email = email;
-        TelegramTag = telegramTag;
     }
     
+    [JsonPropertyName("id")]
     public ulong Id { get; }
+    
+    [JsonPropertyName("username")]
+    public string Username { get; }
+    
+    [JsonPropertyName("email")]
     public string? Email { get; }
-    public string? TelegramTag { get; }
+    
+    [JsonPropertyName("sendToEmail")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? SendToEmail { get; }
 }

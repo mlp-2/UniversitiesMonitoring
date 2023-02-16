@@ -2,7 +2,7 @@
 
 namespace UniversitiesMonitoring.MonitoringService.Services;
 
-internal interface IServicesInspector
+internal interface IServiceInspector
 {
     Task<bool> InspectServiceAsync(IPAddress ip);
 }

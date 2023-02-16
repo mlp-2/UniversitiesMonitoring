@@ -7,8 +7,15 @@ internal class PingInspectingStrategy : IInspectingStrategy
 {
     public async Task<bool> ExecuteStrategyAsync(IPAddress ip)
     {
-        using var ping = new Ping();
-        var reply = await ping.SendPingAsync(ip);
-        return reply.Status == IPStatus.Success;
+        try
+        {
+            using var ping = new Ping();
+            var reply = await ping.SendPingAsync(ip);
+            return reply.Status == IPStatus.Success;
+        }
+        catch
+        {
+            return false;
+        }
     }
 }

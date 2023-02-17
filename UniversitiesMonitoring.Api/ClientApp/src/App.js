@@ -14,7 +14,13 @@ import {ReportsPage} from "./pages/ReportsPage";
 
 axios.interceptors.request.use(
     config => {
-        config.headers.authorization = `Bearer ${localStorage.getItem("token")}`;
+        if (config.url.includes("moderator")) {
+            console.info("Detected Moderation API Request. Trying using modToken");
+            config.headers.authorization = `Bearer ${localStorage.getItem("modToken")}`;    
+        } else {
+            console.info("Detected User API Request. Trying using modToken");
+            config.headers.authorization = `Bearer ${localStorage.getItem("token")}`;    
+        }
         return config;
     },
     error => {

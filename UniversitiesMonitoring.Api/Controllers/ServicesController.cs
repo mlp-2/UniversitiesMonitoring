@@ -121,7 +121,7 @@ public class ServicesController : ControllerBase
             return BadRequest("Сервис не найден");
         }
 
-        return Ok(_servicesProvider.GetReportsByOffline(service));
+        return Ok(from report in _servicesProvider.GetReportsByOffline(service) select new ReportEntity(report));
     }
     
     [HttpGet]

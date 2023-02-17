@@ -49,7 +49,7 @@ public class ModeratorController : ControllerBase
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpGet("reports")]
     public IActionResult GetReports() => Ok(from report in _servicesProvider.GetAllReports() 
-        select new Report(report.Content, report.IsOnline, report.ServiceId, report.Id));
+        select new ReportEntity(report));
 
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpPost("reports/{id:long}/accept")]

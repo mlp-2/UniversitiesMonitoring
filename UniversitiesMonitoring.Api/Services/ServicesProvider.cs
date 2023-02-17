@@ -107,7 +107,8 @@ public class ServicesProvider : IServicesProvider
     
     public Task<UniversityServiceReport?> GetReportAsync(ulong reportId) => _dataProvider.Reports.FindAsync(reportId);
 
-    public IEnumerable<UniversityServiceReport> GetAllReports() => _dataProvider.Reports.GetlAll().Where(x => !x.IsSolved);
+    public IEnumerable<UniversityServiceReport> GetAllReports() => _dataProvider.Reports.GetlAll()
+        .Where(x => !x.IsSolved).ToArray();
 
     public Task DeleteReportAsync(UniversityServiceReport report)
     {
@@ -115,18 +116,17 @@ public class ServicesProvider : IServicesProvider
         return SaveChangesAsync();
     }
 
-    public IEnumerable<Report> GetReportsByOffline(UniversityService service)
+    public IEnumerable<UniversityServiceReport> GetReportsByOffline(UniversityService service)
     {
         var lastStatus = service.UniversityServiceStateChanges.LastOrDefault();
-        if (lastStatus == null || lastStatus.IsOnline) return Array.Empty<Report>();
+        if (lastStatus == null || lastStatus.IsOnline) return Array.Empty<UniversityServiceReport>();
 
         var lastSeenOffline = GetSqlTime(lastStatus.ChangedAt);
 //        var lastSeenOnline = GetSqlTime(service.UniversityServiceStateChanges.LastOrDefault(x => x.IsOnline)?.ChangedAt ?? new DateTime(1970, 1, 1, 0, 0, 0, 0));
 
-        return from report in  _dataProvider.Reports.ExecuteSql(
+        return _dataProvider.Reports.ExecuteSql(
             $"SELECT * FROM universities_monitoring.UniversityServiceReport WHERE ServiceId = {service.Id} AND " +
-            $"AddedAt > {lastSeenOffline}")
-            select new Report(report);
+            $"AddedAt > {lastSeenOffline}").ToArray();
     }
 
 

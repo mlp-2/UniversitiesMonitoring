@@ -4,5 +4,5 @@ namespace UniversitiesMonitoring.MonitoringService.Services;
 
 internal interface IServiceInspector
 {
-    Task<bool> InspectServiceAsync(IPAddress ip);
+    Task<bool> InspectServiceAsync(Uri serviceUrl);
 }

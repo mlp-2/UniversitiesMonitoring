@@ -17,15 +17,11 @@ internal class UniversityServiceInspector
 
     public async Task UpdateStateAsync(UpdateBuilder reportBuilder)
     {
-        var nowStatus = await _serviceInspector.InspectServiceAsync(IPAddress.Parse(_universityServiceEntity.IpAddress));
-        var lockObj = new object();
-        
+        var nowStatus = await _serviceInspector.InspectServiceAsync(new Uri(_universityServiceEntity.Url));
+
         if (nowStatus != _isOnline)
         {
-            lock (lockObj)
-            {
-                reportBuilder.AddChangeState(_universityServiceEntity.ServiceId, nowStatus);    
-            }
+            reportBuilder.AddChangeState(_universityServiceEntity.ServiceId, nowStatus);
             _isOnline = nowStatus;
         }
     }

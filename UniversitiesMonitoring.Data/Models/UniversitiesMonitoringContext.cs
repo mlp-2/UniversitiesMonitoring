@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace UniversityMonitoring.Data.Models
 {
@@ -21,6 +24,15 @@ namespace UniversityMonitoring.Data.Models
         public virtual DbSet<User> Users { get; set; } = null!;
         public virtual DbSet<UserRateOfService> UserRateOfServices { get; set; } = null!;
         public virtual DbSet<UserSubscribeToService> UserSubscribeToServices { get; set; } = null!;
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseMySql("server=localhost;user=root;password=denvot;database=universities_monitoring", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.31-mysql"));
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -55,10 +67,13 @@ namespace UniversityMonitoring.Data.Models
 
                 entity.HasIndex(e => e.UniversityId, "UniversityService_University_Id_fk");
 
-                entity.Property(e => e.IpAddress).HasColumnType("tinyblob");
-
                 entity.Property(e => e.Name)
                     .HasMaxLength(128)
+                    .UseCollation("utf8mb3_general_ci")
+                    .HasCharSet("utf8mb3");
+
+                entity.Property(e => e.Url)
+                    .HasMaxLength(2048)
                     .UseCollation("utf8mb3_general_ci")
                     .HasCharSet("utf8mb3");
 
@@ -173,6 +188,10 @@ namespace UniversityMonitoring.Data.Models
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("UserSubscribeToService_User_Id_fk");
             });
+
+            OnModelCreatingPartial(modelBuilder);
         }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

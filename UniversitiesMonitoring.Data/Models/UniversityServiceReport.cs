@@ -1,6 +1,9 @@
-﻿namespace UniversityMonitoring.Data.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace UniversityMonitoring.Data.Models
 {
-    public class UniversityServiceReport
+    public partial class UniversityServiceReport
     {
         public ulong Id { get; set; }
         public string? Content { get; set; }

@@ -31,7 +31,7 @@ namespace UniversitiesMonitoring.Api.Services
         /// </summary>
         /// <param name="username">Имя пользователя</param>
         /// <returns>Полbьзователя. Null, если пользователь не найден</returns>
-        public User? GetUser(string username) => _dataProvider.Users.ExecuteSql($"SELECT * FROM universities_monitoring.User WHERE Username = {username}").FirstOrDefault();
+        public User? GetUser(string username) => _dataProvider.Users.ExecuteSql($"SELECT * FROM universities_monitoring.User WHERE Username = '{username}'").FirstOrDefault();
 
         /// <summary>
         /// Изменяет пользователя по ID и методу

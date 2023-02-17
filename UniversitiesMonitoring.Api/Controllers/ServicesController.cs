@@ -3,12 +3,12 @@ using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
 using UniversitiesMonitoring.Api.WebSocket;
 using UniversityMonitoring.Data.Entities;
-using UniversityMonitoring.Data.Models;
 
 namespace UniversitiesMonitoring.Api.Controllers;
 
-[Route("/services/")]
-internal class ServicesController : ControllerBase
+[ApiController]
+[Route("api/services")]
+public class ServicesController : ControllerBase
 {
     private readonly IServicesProvider _servicesProvider;
     private readonly IUsersProvider _usersProvider;
@@ -84,7 +84,7 @@ internal class ServicesController : ControllerBase
         
         if (service == null || user == null)
         {
-            return BadRequest("Сервис или пользователь не найден");
+            return BadRequest("Сервис или пользователь не найдены");
         }
 
         await _servicesProvider.CreateReportAsync(service, user, report);
@@ -92,6 +92,20 @@ internal class ServicesController : ControllerBase
         return Ok();
     }
 
+    [Authorize(Roles = JwtGenerator.UserRole)]
+    [HttpGet("{id:long}/reports-by-offline")]
+    public async Task<ActionResult> GetAllReportsByOffline([FromRoute] ulong id)
+    {
+        var service = await _servicesProvider.GetServiceAsync(id);
+
+        if (service == null)
+        {
+            return BadRequest("Сервис не найден");
+        }
+
+        return Ok(_servicesProvider.GetReportsByOffline(service));
+    }
+    
     [HttpGet]
     public IActionResult GetAllServices(
         [FromQuery] bool loadUsers,
@@ -101,7 +115,7 @@ internal class ServicesController : ControllerBase
         loadUsers = loadUsers && IsLocalHostRequest;
         loadComments = loadComments && IsLocalHostRequest;
         
-        var services = _servicesProvider.GetAllServices();
+        var services = _servicesProvider.GetAllServices().ToArray();
 
         return Ok(from service in services select new UniversityServiceEntity(service, loadUsers, loadComments));
     }
@@ -127,7 +141,7 @@ internal class ServicesController : ControllerBase
                 continue;
             }
 
-            await _servicesProvider.UpdateServiceStateAsync(service, update.IsOnline, false);
+            await _servicesProvider.UpdateServiceStateAsync(service, update.IsOnline, i == updates.Length - 1);
         }
 
         await _webSocketUpdateStateNotifier.NotifyAsync(servicesId);

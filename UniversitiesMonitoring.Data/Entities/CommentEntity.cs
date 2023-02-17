@@ -14,5 +14,5 @@ public class CommentEntity
 
     [JsonPropertyName("author")] public UserEntity Author { get; }
     [JsonPropertyName("content")] public string? Content { get; }
-    [JsonPropertyName("Rate")] public sbyte Rate { get; }
+    [JsonPropertyName("rate")] public sbyte Rate { get; }
 }

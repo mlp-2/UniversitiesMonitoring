@@ -3,7 +3,7 @@ using UniversityMonitoring.Data.Models;
 
 namespace UniversitiesMonitoring.Api.Services;
 
-internal interface IServicesProvider
+public interface IServicesProvider
 {
     Task<UniversityService?> GetServiceAsync(ulong serviceId);
     IEnumerable<UniversityService> GetAllServices();
@@ -15,4 +15,6 @@ internal interface IServicesProvider
     Task<UniversityServiceReport?> GetReportAsync(ulong reportId);
     IEnumerable<UniversityServiceReport> GetAllReports();
     Task DeleteReportAsync(UniversityServiceReport report);
+    IEnumerable<Report> GetReportsByOffline(UniversityService service);
+    Task SolveReportAsync(UniversityServiceReport report);
 }

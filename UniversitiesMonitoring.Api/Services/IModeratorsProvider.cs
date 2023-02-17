@@ -2,7 +2,7 @@
 
 namespace UniversitiesMonitoring.Api.Services;
 
-internal interface IModeratorsProvider
+public interface IModeratorsProvider
 {
     Task<Moderator?> GetModeratorAsync(ulong moderatorId);
 }

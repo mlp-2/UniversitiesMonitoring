@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace UniversitiesMonitoring.Api.Entities;
 
-internal class AuthEntity
+public class AuthEntity
 {
     [JsonConstructor]
     public AuthEntity(string username, string password)

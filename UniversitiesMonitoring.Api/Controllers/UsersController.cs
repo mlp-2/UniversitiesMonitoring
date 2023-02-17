@@ -6,8 +6,8 @@ using UniversityMonitoring.Data.Models;
 namespace UniversitiesMonitoring.Api.Controllers;
 
 [ApiController]
-[Route("/user/")]
-internal class UsersController : ControllerBase
+[Route("api/user")]
+public class UsersController : ControllerBase
 {
     private readonly IUsersProvider _usersProvider;
     private readonly JwtGenerator _jwtGenerator;
@@ -29,12 +29,12 @@ internal class UsersController : ControllerBase
         }
         
         var passwordHash = Sha256Computing.ComputeSha256(auth.Password);
-
-        if (user.PasswordSha256hash != passwordHash)
+        
+        if (!user.PasswordSha256hash.IsSequenceEquals(passwordHash))
         {
             return BadRequest("Некорректное имя пользователя или пароль");
         }
-
+        
         var token = _jwtGenerator.GenerateTokenForUser(user.Id, true);
 
         Response.Cookies.Append("auth", token);
@@ -64,25 +64,6 @@ internal class UsersController : ControllerBase
     }
 
     [Authorize(Roles = JwtGenerator.UserRole)]
-    [HttpPut("telegram/update")]
-    public async Task<IActionResult> TelegramUpdate([FromBody] TelegramUpdateEntity update)
-    {
-        if (!User.Identity?.IsAuthenticated ?? true)
-        {
-            return BadRequest();
-        }
-
-        var isSuccess = await _usersProvider.ModifyUserAsync(ulong.Parse(User.Identity.Name!), CreateModifyTelegramAction(update));
-
-        if (!isSuccess)
-        {
-            return BadRequest("Некорректные данные");
-        }
-
-        return Ok();
-    }
-
-    [Authorize(Roles = JwtGenerator.UserRole)]
     [HttpPut("email/update")]
     public async Task<IActionResult> EmailUpdate([FromBody] EmailUpdateEntity update)
     {
@@ -101,12 +82,6 @@ internal class UsersController : ControllerBase
         return Ok();
     }
 
-    private Action<User> CreateModifyTelegramAction(TelegramUpdateEntity update) => user =>
-    {
-        user.TelegramTag = update.TelegramTag;
-        user.SendTelegramNotification = update.CanSend;
-    };
-    
     private Action<User> CreateModifyEmailAction(EmailUpdateEntity update) => user =>
     {
         user.Email = update.Email;

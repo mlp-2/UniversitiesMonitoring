@@ -1,12 +1,22 @@
 namespace UniversitiesMonitoring.Api;
 
-public class HandlingExceptionsMiddleware : IMiddleware
+public class HandlingExceptionsMiddleware
 {
-    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+    private readonly RequestDelegate _next;
+    private readonly ILogger<HandlingExceptionsMiddleware> _logger;
+
+    public HandlingExceptionsMiddleware(RequestDelegate next, ILogger<HandlingExceptionsMiddleware> logger)
     {
+        _next = next;
+        _logger = logger;
+    }
+    
+    public async Task InvokeAsync(HttpContext context)
+    {
+        _logger.LogInformation("Request");
         try
         {
-            await next(context);
+            await _next(context);
         }
         catch (InvalidOperationException)
         {

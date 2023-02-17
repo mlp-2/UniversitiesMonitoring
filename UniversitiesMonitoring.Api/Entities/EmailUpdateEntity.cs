@@ -2,7 +2,7 @@ using System.Text.Json.Serialization;
 
 namespace UniversitiesMonitoring.Api.Entities;
 
-internal class EmailUpdateEntity
+public class EmailUpdateEntity
 {
     [JsonConstructor]
     public EmailUpdateEntity(string email, bool canSend)

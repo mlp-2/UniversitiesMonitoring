@@ -9,7 +9,7 @@ public interface IServicesProvider
     Task<IEnumerable<UniversityService>> GetAllServicesAsync(ulong? universityId = null);
     Task SubscribeUserAsync(User user, UniversityService service);
     Task<University?> GetUniversityAsync(ulong universityId);
-    IEnumerable<University> GetAllUniversities();
+    IQueryable<University> GetAllUniversities();
     Task UnsubscribeUserAsync(User user, UniversityService service);
     Task UpdateServiceStateAsync(UniversityService service, bool isOnline, bool forceSafe);
     Task LeaveCommentAsync(UniversityService service, User author, Comment comment);        

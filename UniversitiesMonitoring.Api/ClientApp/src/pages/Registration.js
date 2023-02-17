@@ -1,13 +1,11 @@
 import {WelcomePage} from "./WelcomePage";
-import {TextInput} from "../components/TextInput";
-import {Button} from "../components/Button";
 import {Link, Navigate} from "react-router-dom";
 import {createUseStyles} from "react-jss";
 import Constants from "../Constants";
-import {SubmitButton} from "../components/SubmitButton";
 import Swal from "sweetalert2";
 import axios from "axios";
 import {useState} from "react";
+import {Button, Form} from "react-bootstrap";
 
 const useStyles = createUseStyles({
     formStyle: {
@@ -20,13 +18,8 @@ const useStyles = createUseStyles({
             flexDirection: "column",
             width: "100%"
         },
-        "& div input": {
-            margin: "10px 0 10px 0",
-            width: "100%"
-        },
         "& button": {
-            width: "50%",
-            marginTop: "6vh"
+            width: "50%"
         }
     },
     frameStyle: {
@@ -37,7 +30,7 @@ const useStyles = createUseStyles({
         height: "80%"
     },
     registrationLabel: {
-        fontSize: 24,
+        fontSize: 16,
         "& a": {
             color: Constants.brandColor,
             textDecoration: "none"
@@ -48,9 +41,11 @@ const useStyles = createUseStyles({
 export function Registration() {
     const style = useStyles();
     const [registrationDialogEndedWithSuccess, setDialog] = useState(false);
+    const [loading, setLoading] = useState(false);
     
     async function handleFormSubmit(e) {
         e.preventDefault();
+        setLoading(true);
         
         const form = e.target;
         const formData = new FormData(form);
@@ -87,6 +82,7 @@ export function Registration() {
             });
             
             localStorage.setItem("token", result.data.jwt);
+            setDialog(true);
         } catch (error) {
             console.log(error);
             await Swal.fire({
@@ -96,6 +92,8 @@ export function Registration() {
                 timer: 2000
             });
         }
+        
+        setLoading(false);
     }
     
     if (registrationDialogEndedWithSuccess) {
@@ -104,14 +102,24 @@ export function Registration() {
     
     return <WelcomePage>
         <div className={style.frameStyle}>
-            <form className={style.formStyle} method="port" onSubmit={handleFormSubmit}>
-                <div>
-                    <TextInput type="text" name="username" placeholder="Логин"/>
-                    <TextInput type="password" name="password" placeholder="Пароль"/>
-                    <TextInput type="password" name="retryPassword" placeholder="Повторите пароль"/>
-                </div>
-                <SubmitButton content="Регистрация"/>
-            </form>
+            <Form method="post" className={style.formStyle} onSubmit={handleFormSubmit}>
+                <Form.Control disabled={loading} 
+                              className="mb-3"
+                              type="text" 
+                              placeholder="Логин"
+                              name="username"/>
+                <Form.Control disabled={loading} 
+                              className="mb-3" 
+                              type="password"
+                              placeholder="Пароль"
+                              name="password"/>
+                <Form.Control disabled={loading}
+                              className="mb-3"
+                              type="password" 
+                              placeholder="Повторите пароль"
+                              name="retryPassword"/>
+                <Button disabled={loading} type="submit">Зарегистрироваться</Button>
+            </Form>
             <div>
                 <span className={style.registrationLabel}>
                     Вы уже с нами? <Link to="/login">Войти</Link>

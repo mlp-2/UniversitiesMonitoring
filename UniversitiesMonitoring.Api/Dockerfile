@@ -5,7 +5,6 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 
-# Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash - \
     && apt-get install -y \
         nodejs \
@@ -19,6 +18,13 @@ WORKDIR "/src/UniversitiesMonitoring.Api"
 RUN dotnet build "UniversitiesMonitoring.Api.csproj" -c Release -o /app/build
 
 FROM build AS publish
+
+ARG JWT_SECRET
+ARG CONNECTION_STRING
+
+RUN dotnet user-secrets set "JwtSecret" "$EMAIL_ADDRESS"
+RUN dotnet user-secrets set "ConnectionStrings:UniversitiesMonitoring" "$CONECTION_STRING"
+
 RUN dotnet publish "UniversitiesMonitoring.Api.csproj" -c Release -o /app/publish
 
 FROM base AS final

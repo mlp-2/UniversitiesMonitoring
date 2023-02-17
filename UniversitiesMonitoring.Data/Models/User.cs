@@ -1,6 +1,9 @@
-﻿namespace UniversityMonitoring.Data.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace UniversityMonitoring.Data.Models
 {
-    public class User
+    public partial class User
     {
         public User()
         {
@@ -13,12 +16,10 @@
         public string Username { get; set; } = null!;
         public byte[] PasswordSha256hash { get; set; } = null!;
         public string? Email { get; set; }
-        public string? TelegramTag { get; set; }
         public bool SendEmailNotification { get; set; }
-        public bool SendTelegramNotification { get; set; }
 
-        public ICollection<UniversityServiceReport> UniversityServiceReports { get; set; }
-        public ICollection<UserRateOfService> UserRateOfServices { get; set; }
-        public ICollection<UserSubscribeToService> UserSubscribeToServices { get; set; }
+        public virtual ICollection<UniversityServiceReport> UniversityServiceReports { get; set; }
+        public virtual ICollection<UserRateOfService> UserRateOfServices { get; set; }
+        public virtual ICollection<UserSubscribeToService> UserSubscribeToServices { get; set; }
     }
 }

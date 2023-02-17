@@ -30,9 +30,7 @@ public class UsersProviderTests
             Username = "DenVot",
             PasswordSha256hash = new byte[] { 0x0, 0x1, 0xf },
             Email = null,
-            TelegramTag = "denvot",
             SendEmailNotification = false,
-            SendTelegramNotification = false
         };
         
         var dataProviderMock = new Mock<IDataProvider>();
@@ -64,25 +62,13 @@ public class ModifyUserTestData : IEnumerable<object[]>
             new Action<User>(user => user.SendEmailNotification = true),
             new Func<User, bool>(user => user.SendEmailNotification)
         };
-        
-        yield return new object[]
-        {
-            new Action<User>(user => user.SendTelegramNotification = true),
-            new Func<User, bool>(user => user.SendTelegramNotification)
-        };
-        
+
         yield return new object[]
         {
             new Action<User>(user => user.Email = "awesome@email.com"),
             new Func<User, bool>(user => user.Email == "awesome@email.com")
         };
-        
-        yield return new object[]
-        {
-            new Action<User>(user => user.TelegramTag = "hello"),
-            new Func<User, bool>(user => user.TelegramTag == "hello")
-        };
-        
+
         yield return new object[]
         {
             new Action<User>(user => user.Email = "awesome@email.com"),

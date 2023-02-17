@@ -1,6 +1,9 @@
-﻿namespace UniversityMonitoring.Data.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace UniversityMonitoring.Data.Models
 {
-    public class UniversityService
+    public partial class UniversityService
     {
         public UniversityService()
         {
@@ -11,14 +14,14 @@
         }
 
         public ulong Id { get; set; }
-        public byte[] IpAddress { get; set; } = null!;
         public ulong UniversityId { get; set; }
         public string Name { get; set; } = null!;
+        public string Url { get; set; } = null!;
 
-        public University University { get; set; } = null!;
-        public ICollection<UniversityServiceReport> UniversityServiceReports { get; set; }
-        public ICollection<UniversityServiceStateChange> UniversityServiceStateChanges { get; set; }
-        public ICollection<UserRateOfService> UserRateOfServices { get; set; }
-        public ICollection<UserSubscribeToService> UserSubscribeToServices { get; set; }
+        public virtual University University { get; set; } = null!;
+        public virtual ICollection<UniversityServiceReport> UniversityServiceReports { get; set; }
+        public virtual ICollection<UniversityServiceStateChange> UniversityServiceStateChanges { get; set; }
+        public virtual ICollection<UserRateOfService> UserRateOfServices { get; set; }
+        public virtual ICollection<UserSubscribeToService> UserSubscribeToServices { get; set; }
     }
 }

@@ -20,11 +20,10 @@ const useStyles = createUseStyles({
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        "& span": {
+        "& h1": {
             background: "#FFF",
             fontWeight: "bold",
             color: Constants.brandColor,
-            fontSize: "2em",
             borderRadius: "0.5em",
             padding: 10
         }
@@ -37,6 +36,7 @@ const useStyles = createUseStyles({
             alignItems: "center",
             position: "absolute",
             left: "10vw",
+            right: "10vw",
             top: -25,
             background: "#FFF",
             boxShadow: "0px 3px 8px 3px rgba(0, 0, 0, 0.25)",
@@ -51,7 +51,9 @@ const useStyles = createUseStyles({
                 fontSize: 24
             },
             "& .fa-magnifying-glass": {
-                width: "2vw",
+                width: "32px",
+                marginRight: 10,
+                marginLeft: 10,
                 height: 40,
                 color: Constants.brandColor
             }
@@ -107,6 +109,7 @@ const useStyles = createUseStyles({
     informationCombo: {
         display: "flex",
         flexDirection: "row",
+        flexWrap: "wrap",
         gap: 10,
         "& div": {
             display: "flex",
@@ -114,7 +117,7 @@ const useStyles = createUseStyles({
             alignItems: "center",
             gap: 2
         }
-    }
+    },
 });
 
 export function UniversitiesList() {
@@ -130,7 +133,7 @@ function Header() {
     const style = useStyles();
     
     return <div className={style.header}>
-        <span>Вбейте в поиск названия ВУЗа</span>
+        <h1>Вбейте в поиск названия ВУЗа</h1>
     </div>
 }
 

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
 using UniversitiesMonitoring.Api.WebSocket;
@@ -171,7 +172,9 @@ public class ServicesController : ControllerBase
 
     [HttpGet("universities")]
     public IActionResult GetAllUniversities() => Ok(
-        from university in _servicesProvider.GetAllUniversities().ToArray()
+        from university in _servicesProvider.GetAllUniversities()
+            .Include(x => x.UniversityServices)
+            .ToList()
         select new UniversityEntity(university));
 
     [HttpPut("update")]

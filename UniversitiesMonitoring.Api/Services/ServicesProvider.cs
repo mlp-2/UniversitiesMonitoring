@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using UniversitiesMonitoring.Api.Entities;
 using UniversityMonitoring.Data.Models;
 using UniversityMonitoring.Data.Repositories;
@@ -29,7 +30,7 @@ public class ServicesProvider : IServicesProvider
 
     public Task<University?> GetUniversityAsync(ulong universityId) => _dataProvider.Universities.FindAsync(universityId);
 
-    public IEnumerable<University> GetAllUniversities() => _dataProvider.Universities.GetlAll(); 
+    public IQueryable<University> GetAllUniversities() => _dataProvider.Universities.GetlAll(); 
 
     public async Task SubscribeUserAsync(User user, UniversityService service)
     {
@@ -108,7 +109,9 @@ public class ServicesProvider : IServicesProvider
     public Task<UniversityServiceReport?> GetReportAsync(ulong reportId) => _dataProvider.Reports.FindAsync(reportId);
 
     public IEnumerable<UniversityServiceReport> GetAllReports() => _dataProvider.Reports.GetlAll()
-        .Where(x => !x.IsSolved).ToArray();
+        .Include(x => x.Service)
+        .Include(x => x.Issuer)
+        .Where(x => !x.IsSolved).ToList();
 
     public Task DeleteReportAsync(UniversityServiceReport report)
     {

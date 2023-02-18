@@ -17,5 +17,5 @@ public class Repository<TEntity, TKey> : IRepository<TEntity, TKey> where TEntit
 
     public void Remove(TEntity entity) => _dbSet.Remove(entity);
     public IEnumerable<TEntity> ExecuteSql(string sql) => _dbSet.FromSqlRaw(sql);
-    public IEnumerable<TEntity> GetlAll() => _dbSet;
+    public IQueryable<TEntity> GetlAll() => _dbSet;
 }

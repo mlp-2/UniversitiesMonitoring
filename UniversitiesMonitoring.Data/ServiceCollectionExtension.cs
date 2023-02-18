@@ -13,7 +13,7 @@ public static class ServiceCollectionExtension
             options.UseMySql(
                     configuration.GetConnectionString("UniversitiesMonitoring"),
                     new MySqlServerVersion(new Version(8, 0, 29)))
-                //.UseLazyLoadingProxies()
+                .UseLazyLoadingProxies()
                 .LogTo(Console.WriteLine))
             .AddScoped<IDataProvider, DataProvider>();
 }

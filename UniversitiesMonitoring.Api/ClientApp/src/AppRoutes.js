@@ -29,6 +29,9 @@ const AppRoutes = [
     {
         path: "account",
         element: <AccountPage/>
+    },
+    {
+        path: ""
     }
 ];
 

@@ -137,13 +137,11 @@ public class ServicesController : ControllerBase
         
         var services = (await _servicesProvider.GetAllServicesAsync(universityId)).ToArray();
 
-        var userId = ulong.Parse(User.Identity!.Name!);
-        
         var servicesApiEntities = User.IsInRole(JwtGenerator.UserRole) ? from service in services select new UniversityServiceEntity(
                 service,
                 loadUsers,
                 loadComments,
-                CheckIfUserSubscribed(service, userId)) : 
+                CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!))) : 
             from service in services 
                 select new UniversityServiceEntity(service, loadUsers, loadComments);
 
@@ -162,9 +160,9 @@ public class ServicesController : ControllerBase
 
         var universityEntity = new UniversityEntity(university)
         {
-            IsSubscribed = university.UniversityServices.All(service => 
+            IsSubscribed = User.IsInRole(JwtGenerator.UserRole) ? university.UniversityServices.All(service => 
                 service.UserSubscribeToServices.Any(subscribe =>
-                    subscribe.UserId.ToString() == User.Identity!.Name!))
+                    subscribe.UserId.ToString() == User.Identity!.Name!)) : null
         };
 
         return Ok(universityEntity);
@@ -173,7 +171,6 @@ public class ServicesController : ControllerBase
     [HttpGet("universities")]
     public IActionResult GetAllUniversities() => Ok(
         from university in _servicesProvider.GetAllUniversities()
-            .Include(x => x.UniversityServices)
             .ToList()
         select new UniversityEntity(university));
 
@@ -204,9 +201,9 @@ public class ServicesController : ControllerBase
         await _webSocketUpdateStateNotifier.NotifyAsync(servicesId);
         
         if (updateSuccess) return Ok();
-        else return BadRequest("Часть сервисов не найдены");
+        return BadRequest("Часть сервисов не найдены");
     }
     
-    private bool CheckIfUserSubscribed(UniversityService service, ulong userId) =>
+    private static bool CheckIfUserSubscribed(UniversityService service, ulong userId) =>
         service.UserSubscribeToServices.Any(x => x.UserId == userId);
 }

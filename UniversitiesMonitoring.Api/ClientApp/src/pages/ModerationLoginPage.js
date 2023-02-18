@@ -30,7 +30,7 @@ export function ModerationLoginPage() {
         }
     }
     
-    if (passedAuth) return <Navigate to="/moderator/reports"/>
+    if (passedAuth) return <Navigate to="/moderator"/>
     
     return <Container>
         <h1>Панель модератора</h1>

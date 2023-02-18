@@ -179,8 +179,6 @@ namespace UniversityMonitoring.Data.Models
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("UserSubscribeToService_User_Id_fk");
             });
-
-            OnModelCreatingPartial(modelBuilder);
         }
     }
 }

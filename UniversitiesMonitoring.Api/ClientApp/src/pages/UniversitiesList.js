@@ -43,7 +43,7 @@ const useStyles = createUseStyles({
             borderRadius: "5em",
             padding: "0.25vh 0.45vw 0.25vh 0.45vw",
             "& input": {
-                width: "78vw",
+                width: "100%",
                 height: 50,
                 border: "none",
                 borderRadius: "5em",
@@ -88,7 +88,7 @@ const useStyles = createUseStyles({
         },
         "& .university-name": {
             fontWeight: "bold",
-            fontSize: 28,
+            fontSize: 25,
             color: "#000"
         },
         "& .additional-information": {
@@ -118,6 +118,16 @@ const useStyles = createUseStyles({
             gap: 2
         }
     },
+    "@media screen and (max-width: 750px)": {
+        mark: {
+            display: "none !important"
+        },
+        universityContainer: {
+            borderRight: "15px solid var(--status-color) !important",
+            alignItems: "flex-start",
+            flexDirection: "column"
+        }
+    }
 });
 
 export function UniversitiesList() {
@@ -133,7 +143,7 @@ function Header() {
     const style = useStyles();
     
     return <div className={style.header}>
-        <h1>Вбейте в поиск названия ВУЗа</h1>
+        <h1>Выберите ВУЗ</h1>
     </div>
 }
 
@@ -190,7 +200,8 @@ function Universities(props) {
 function UniversityContainer(props) {
     const style = useStyles();
     
-    return <div className={style.universityContainer}>
+    return <div className={style.universityContainer}
+                style={{"--status-color": props.university.isOnline ? "#3CFB38" : "#FB4438"}}>
         <div>
             <Link to="/university" 
                   state={{university: props.university}}

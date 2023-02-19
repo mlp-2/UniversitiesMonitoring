@@ -22,12 +22,10 @@ FROM build AS publish
 ARG JWT_SECRET
 ARG CONNECTION_STRING
 
-RUN dotnet user-secrets set "JwtSecret" "$EMAIL_ADDRESS"
-RUN dotnet user-secrets set "ConnectionStrings:UniversitiesMonitoring" "$CONECTION_STRING"
-
 RUN dotnet publish "UniversitiesMonitoring.Api.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
 ENTRYPOINT ["dotnet", "UniversitiesMonitoring.Api.dll"]

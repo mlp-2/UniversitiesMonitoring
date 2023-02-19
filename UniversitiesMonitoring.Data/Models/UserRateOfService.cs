@@ -1,6 +1,9 @@
-﻿namespace UniversityMonitoring.Data.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace UniversityMonitoring.Data.Models
 {
-    public class UserRateOfService
+    public partial class UserRateOfService
     {
         public ulong Id { get; set; }
         public sbyte Rate { get; set; }

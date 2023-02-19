@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 import {Navigate} from "react-router-dom";
 
 export function ModerationLoginPage() {
-    const [jwt, setJwt] = useState(null);
+    const [passedAuth, setPassed] = useState(false);
     
     async function handleSubmitForm(e) {
         e.preventDefault();
@@ -18,7 +18,8 @@ export function ModerationLoginPage() {
         
         try {
             const response = await axios.post("/api/moderator/auth", apiEntity);
-            setJwt(response.data.jwt);
+            localStorage.setItem("modToken", response.data.jwt);
+            setPassed(true);
         } catch (error) {
             await Swal.fire({
                 title: "Неверный логин или пароль",
@@ -29,7 +30,7 @@ export function ModerationLoginPage() {
         }
     }
     
-    if (jwt) return <Navigate to="/moderator/reports" state={{jwt: jwt}}/>
+    if (passedAuth) return <Navigate to="/moderator"/>
     
     return <Container>
         <h1>Панель модератора</h1>

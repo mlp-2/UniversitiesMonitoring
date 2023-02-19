@@ -12,7 +12,8 @@
         <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-      <UserSecretsId>9ea5b3db-0a42-4550-a9a9-d5764a75e1ca</UserSecretsId>
+        <DockerfileRunArguments>-v "$(AppData)/Microsoft/UserSecrets:/root/.microsoft/usersecrets"</DockerfileRunArguments>
+        <UserSecretsId>9ea5b3db-0a42-4550-a9a9-d5764a75e1ca</UserSecretsId>
   </PropertyGroup>
 
     <ItemGroup>

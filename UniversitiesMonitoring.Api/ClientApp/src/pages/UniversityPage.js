@@ -1,5 +1,4 @@
 import {useEffect, useState} from "react";
-import {Button} from "../components/Button";
 import {createUseStyles} from "react-jss";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faComment, faStar} from "@fortawesome/free-solid-svg-icons";
@@ -8,6 +7,7 @@ import {Link, useLocation} from "react-router-dom";
 import axios from "axios";
 import {Loading} from "../components/Loading";
 import {SubscribeToService, UnsubscribeToService} from "../ApiMethods";
+import {Button} from "react-bootstrap";
 
 const useStyles = createUseStyles({
     universityHeader: {
@@ -38,16 +38,16 @@ const useStyles = createUseStyles({
         padding: 30,
         boxShadow: "0px 4px 16px 4px rgba(0, 0, 0, 0.25)",
         borderRadius: 15,
-        fontSize: 20,
+        fontSize: 16,
         userSelect: "none",
         "& .service-status": {
-            width: 50,
-            height: 50,
+            width: 35,
+            height: 35,
             borderRadius: "50%",
             background: "var(--service-status)"
         },
         "& a": {
-            fontSize: 32,
+            fontSize: 25,
             fontWeight: "bolder",
             color: "#000"
         },
@@ -78,6 +78,23 @@ const useStyles = createUseStyles({
         height: "75vh",
         overflowX: "hidden",
         overflowY: "auto"
+    },
+    "@media screen and (max-width: 1000px)": {
+        servicePanel: {
+            alignItems: "flex-start",
+            flexDirection: "column",
+            width: "80%",
+            "& a": {
+                textAlign: "center"
+            },
+            "& .service-actions": {
+                flexWrap: "wrap"
+            },
+            "& .service-status": {
+                display: "none"
+            },
+            borderRight: "15px solid var(--service-status)"
+        }
     }
 });
 
@@ -88,7 +105,7 @@ export function UniversityPage() {
     const [isSubscribed, setSubscribed] = useState(false);
     
     function updateServices(servicesToChange) {
-        setServices(servicesToChange ?? services);
+        setServices([...(servicesToChange ?? services)]);
     }
     
     useEffect(() => {
@@ -130,7 +147,7 @@ function UniversityHeader({university, services, updateServices, isSubscribed}) 
     
     return <div className={style.universityHeader}>
         <span>{university.name}</span>
-        <Button onClick={handleClickOnSubscribeButton} style={{background: isSubscribed ? "#959595" : "#FF4D15"}}>
+        <Button onClick={handleClickOnSubscribeButton} variant={isSubscribed ? "secondary" : "danger"}>
             {isSubscribed ? "Отписаться" : "Подписаться"}
         </Button>
     </div>    
@@ -175,25 +192,28 @@ function ServiceContainer({service, updateServices}) {
         rateAvg /= service.comments.length;
     }
     
-    return <div className={style.servicePanel}>
+    return <div className={style.servicePanel} 
+                style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438" }}>
             <Link to="/service" state={{ service: service }}>
                 {service.serviceName}
             </Link>
             <div className="service-actions">
-                <Button onClick={handleClickSubscribe} style={{background: service.isSubscribed ? "#9D9D9D" : "#FF4D15"}}>
+                <Button onClick={handleClickSubscribe} variant={service.isSubscribed ? "secondary" : "danger"}>
                     {service.isSubscribed ? "Отписаться" : "Подписаться"}
                 </Button>
-                <div className="additional-info">
-                    <FontAwesomeIcon icon={faComment}/>
-                    <span>{service.comments.length}</span>
-                </div>
-                {
-                    rateAvg > 0 &&
+                <div>
+                    <div className="additional-info">
+                        <FontAwesomeIcon icon={faComment}/>
+                        <span>{service.comments.length}</span>
+                    </div>
+                    {
+                        rateAvg > 0 &&
                         <div className="additional-info">
                             <FontAwesomeIcon icon={faStar}/>
                             <span>{rateAvg.toFixed(1)}/5.0</span>
                         </div>
-                }
+                    }
+                </div>
                 <div className="service-status"
                      style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438" }}/>
             </div>

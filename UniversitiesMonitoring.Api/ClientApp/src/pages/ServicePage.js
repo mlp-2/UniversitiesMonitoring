@@ -5,11 +5,11 @@ import Constants from "../Constants";
 import {faStar} from "@fortawesome/free-solid-svg-icons";
 import MessagePart from "../assets/images/message-part.svg";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {SubmitButton} from "../components/SubmitButton";
 import {GetReports, SendComment, SendReportToService, SubscribeToService, UnsubscribeToService} from "../ApiMethods";
 import Swal from "sweetalert2";
-import {Stack} from "react-bootstrap";
+import {Carousel, Stack} from "react-bootstrap";
 import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
 import {GenerateUUID} from "../Utils";
 
@@ -19,7 +19,8 @@ const useStyles = createUseStyles({
         color: "#FFF",
         display: "flex",
         flexDirection: "column",
-        height: "25vh",
+        minHeight: "25%",
+        padding: 10,
         paddingLeft: "5vw",
         paddingRight: "5vw",
         paddingTop: "5vh",
@@ -51,8 +52,8 @@ const useStyles = createUseStyles({
             position: "absolute",
             width: 64,
             height: 64,
-            right: "-80px", 
-            top: "calc(50% - 32px)",
+            right: "-90px", 
+            top: "calc(50% - 12px)",
             borderRadius: "50%",
             background: "var(--service-status)"
         }
@@ -63,6 +64,7 @@ const useStyles = createUseStyles({
         flexDirection: "row",
         justifyContent: "space-around",
         alignItems: "baseline",
+        minHeight: "75%",
         "& .title": {
             position: "sticky",
             fontSize: 32,
@@ -85,6 +87,9 @@ const useStyles = createUseStyles({
             zIndex: -1,
             left: 0,
             top: 0
+        },
+        "& .carousel-control-prev, .carousel-control-next": {
+            position: "fixed"
         }
     },
     comment: {
@@ -135,7 +140,7 @@ const useStyles = createUseStyles({
         background: "#0798EA",
         borderRadius: "15px 15px 0 0",
         padding: 10,
-        width: "15vw",
+        width: "100%",
         "& .fa-star": {
             cursor: "pointer",
             width: "15%",
@@ -150,12 +155,58 @@ const useStyles = createUseStyles({
         justifyContent: "center",
         flexDirection: "column",
         gap: 10,
+        width: 300,
         "& textarea": {
-            width: "15vw",
+            width: "100%",
             borderRadius: "0 0 15px 15px",
             outline: "none",
             padding: 10,
         }
+    },
+    commentFormMobile: {
+        position: "fixed",
+        left: 0,
+        bottom: 0,
+        width: "100%",
+        height: "7%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#FFF",
+        transition: "background 0.3s",
+        cursor: "pointer",
+        userSelect: "none"
+    },
+    commentFormMobileWrapper: {
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        top: 0,
+        left: 0,
+        zIndex: 10000000,
+        background: "rgba(88,88,88,0.5)"
+    },
+    "@media screen and (max-width: 1136px)": {
+        commentsWrapper: {
+            width: "100%"
+        },
+        serviceHeader: {
+            "& .action-section": {
+                flexDirection: "column",
+                "& *": {
+                    fontSize: 16  
+                }
+            },
+            "& .service-name-with-status span::after": {
+                width: 32,
+                height: 32,
+                right: "-32px",
+                top: "calc(50% - 16px)",
+            }
+        },
     }
 });
 
@@ -167,7 +218,7 @@ export function ServicePage() {
         setService(service);
     }   
     
-    return <div>
+    return <div className="h-100">
         <ServiceHeader service={service} updateService={updateService}/>
         <ServiceBody service={service} updateService={updateService}/>
     </div>
@@ -282,13 +333,53 @@ function ServiceHeader({service, updateService}) {
 }
 
 function ServiceBody({service, updateService}) {
+    const [screenWidth, setWidth] = useState(window.innerWidth);
     const style = useStyles();
     
+    useEffect(() => {
+        function handleResize(e) {
+            setWidth(window.innerWidth);
+        }
+        
+        window.addEventListener("resize", handleResize);
+        
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
+    
     return <div className={style.serviceBody}>
-        <CommentsColumn comments={service.comments}/>
-        {!service.isOnline && <ReportsColumn service={service}/>}
-        <SendCommentForm service={service} updateService={updateService}/>
+        {
+            screenWidth == null || screenWidth > 1136 ? 
+                <>
+                    <CommentsColumn comments={service.comments}/>
+                    {!service.isOnline && <ReportsColumn service={service}/>}
+                </> : <CommentsAndReportsCarousel service={service}/>
+        }
+        {
+            screenWidth == null || screenWidth > 1136 ? 
+                <SendCommentForm service={service} updateService={updateService}/> :
+                <SendCommentFormMobile service={service} updateService={updateService}/>
+        }
     </div>;
+}
+
+function CommentsAndReportsCarousel({service}) {
+    const [index, setIndex] = useState(0);
+
+    const handleSelect = (selectedIndex, e) => {
+        setIndex(selectedIndex);
+    };
+    
+    return <Carousel indicators={false} interval={null} variant="dark" activeIndex={index} onSelect={handleSelect}>
+        <Carousel.Item>
+            <CommentsColumn comments={service.comments}/>
+        </Carousel.Item>
+        {
+            !service.isOnline && 
+            <Carousel.Item>
+                <ReportsColumn service={service}/>
+            </Carousel.Item>
+        }
+    </Carousel>;
 }
 
 function CommentsColumn({comments}) {
@@ -330,7 +421,7 @@ function ReportsColumn({service}) {
     </div>
 }
 
-function SendCommentForm({service, updateService}) {
+function SendCommentForm({reference, service, updateService, onEnded}) {
     const [rate, setRate] = useState();
     const style = useStyles();
     
@@ -344,6 +435,8 @@ function SendCommentForm({service, updateService}) {
         const apiData = Object.fromEntries(formData.entries());
         
         if (await SendComment(service.serviceId, apiData)) {
+            if(onEnded) onEnded();
+            
             await Swal.fire({
                 title: "Комментарий добавлен",
                 icon: "success",
@@ -373,7 +466,7 @@ function SendCommentForm({service, updateService}) {
         }
     }
     
-    return <form className={style.commentForm} method="post" onSubmit={handleSubmit}>
+    return <form className={style.commentForm} method="post" onSubmit={handleSubmit} ref={reference}>
             <div>
                 <StarsBar onChange={(count) => setRate(count)}/>
                 <textarea placeholder="Оставьте Ваше мнение о сервисе здесь" name="content" rows={10} cols={1}/>
@@ -421,19 +514,53 @@ function Comment({from, content, stars = -1}) {
     </div>
 }
 
-function getServiceReports(serviceId) {
-    return [
-        {
-            id: 1,
-            content: "Технические работы",
-            isOnline: false,
-            serviceId: 1
-        },
-        {
-            id: 2,
-            content: "Сайт не открывается!!!!!",
-            isOnline: false,
-            serviceId: 1
+function SendCommentFormMobile({service, updateService}) {
+    const style = useStyles();
+    const [showPopup, setShowPopup] = useState(false);
+    
+    if (showPopup) return <SendCommentFormPopup service={service} 
+                                                updateService={updateService} 
+                                                closePopup={() => setShowPopup(false)}/>
+    
+    return <div className={style.commentFormMobile} onClick={() => setShowPopup(true)}>
+        <span className="text-muted">Оставить комментарий</span>
+    </div>
+}
+
+function SendCommentFormPopup({closePopup, service, updateService}) {
+    const style = useStyles();
+    const formElement = useRef();
+    
+    function handleClick(e) {
+        let context = e.target;
+        
+        if (context === formElement.current) return
+        
+        while (context.parentElement !== null) {
+            context = context.parentElement;
+            
+            if (context === formElement.current) return;
         }
-    ];
+
+        endDialog();
+    }
+    
+    function endDialog() {
+        const htmlElement = document.querySelector("html");
+
+        htmlElement.style.overflowY = null;
+        closePopup()
+    }
+    
+    useEffect(() => {
+        let a = document.documentElement.scrollTop !== undefined ? document.documentElement : document.body;
+        a.scrollTop = 0;
+        const htmlElement = document.querySelector("html");
+        
+        htmlElement.style.overflowY = "hidden";
+    }, [])
+    
+    return <div onClick={handleClick} className={style.commentFormMobileWrapper}>
+        <SendCommentForm onEnded={() => endDialog()} service={service} reference={formElement} updateService={updateService}/>
+    </div>
 }

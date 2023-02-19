@@ -1,6 +1,7 @@
 import useGlobalStyles from "../GlobalStyle";
 import PreviewImage from "../assets/images/preview.png";
 import {createUseStyles} from "react-jss";
+import {Container} from "react-bootstrap";
 
 const useStyles = createUseStyles({
     layout: {
@@ -11,29 +12,41 @@ const useStyles = createUseStyles({
         justifyContent: "space-between"
     },
     leftPanel: {
+        height: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-around",
         alignItems: "center",
-        flex: 1
+        flex: 1,
+        gap: "10%"
     },
     headerOfLeftPanel: {
-        padding: "8vh",
+        paddingLeft: 20,
+        paddingRight: 20,
+        paddingTop: 20,
         flex: 1
     },
     contentOfLeftPanel: {
         flex: 3,
         width: "100%",
-        padding: "8vh"
+        padding: "5%",
+        display: "block"
     },
     rightPanel: {
-        flex: 2,
-        backgroundSize: "contain",
         backgroundColor: "#F6F5F5",
-        height: "100%",
         display: "flex",
+        width: "100%",
+        background: `url(${PreviewImage})`,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        backgroundSize: "contain",
+        backgroundRepeat: "no-repeat",
+        backgroundPosition: "center"
+    },
+    "@media screen and (max-width: 1024px)": {
+        rightPanel: {
+            display: "none"
+        }
     }
 });
 
@@ -52,7 +65,7 @@ function LeftPanel(props) {
     const globalStyle = useGlobalStyles();
     const ctxStyle = useStyles();
     
-    return <div className={ctxStyle.leftPanel}>
+    return <Container className={ctxStyle.leftPanel}>
         <div className={ctxStyle.headerOfLeftPanel}>
             <h1>
                 Контролируйте доступность ВУЗов с помощью <span className={globalStyle.brandFontColored}>UniversitiesMonitoring</span>
@@ -61,13 +74,11 @@ function LeftPanel(props) {
         <div className={ctxStyle.contentOfLeftPanel}>
             {props.children}
         </div>
-    </div>;
+    </Container>;
 }
 
 function RightPanel() {
     const styles = useStyles();
     
-    return <div className={styles.rightPanel}>
-        <img src={PreviewImage} alt="Что-то пошло не так"  width="80%"/>
-    </div>
+    return <div className={styles.rightPanel}/>
 }

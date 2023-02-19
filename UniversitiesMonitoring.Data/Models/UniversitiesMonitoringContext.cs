@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace UniversityMonitoring.Data.Models
 {
@@ -55,10 +58,13 @@ namespace UniversityMonitoring.Data.Models
 
                 entity.HasIndex(e => e.UniversityId, "UniversityService_University_Id_fk");
 
-                entity.Property(e => e.IpAddress).HasColumnType("tinyblob");
-
                 entity.Property(e => e.Name)
                     .HasMaxLength(128)
+                    .UseCollation("utf8mb3_general_ci")
+                    .HasCharSet("utf8mb3");
+
+                entity.Property(e => e.Url)
+                    .HasMaxLength(2048)
                     .UseCollation("utf8mb3_general_ci")
                     .HasCharSet("utf8mb3");
 

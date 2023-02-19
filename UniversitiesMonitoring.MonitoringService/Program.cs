@@ -8,8 +8,7 @@ var host = Host.CreateDefaultBuilder(args)
         .AddHostedService<Worker>()
         .AddSingleton<IEnumerable<IInspectingStrategy>, IInspectingStrategy[]>(_ => new []
         {
-            // Порядок важен
-            (IInspectingStrategy)new PingInspectingStrategy(),
+            // Можно добавить еще варианты проверки
             new HeadInspectingStrategy(),
         })
         .AddSingleton<IServiceInspector, ServiceInspector>())

@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
 using UniversitiesMonitoring.Api.WebSocket;
@@ -53,6 +54,11 @@ public class ServicesController : ControllerBase
             return BadRequest("Сервис или пользователь не найден");
         }
 
+        if (CheckIfUserSubscribed(service, user.Id))
+        {
+            return BadRequest("Вы уже подписаны на этот сервис");
+        }
+        
         await _servicesProvider.SubscribeUserAsync(user, service);
         return Ok();
     }
@@ -69,6 +75,11 @@ public class ServicesController : ControllerBase
             return BadRequest("Сервис или пользователь не найден");
         }
 
+        if (!CheckIfUserSubscribed(service, user.Id))
+        {
+            return BadRequest("Вы не подписаны на данный сервис");
+        }
+        
         await _servicesProvider.UnsubscribeUserAsync(user, service);
         return Ok();
     }
@@ -121,7 +132,7 @@ public class ServicesController : ControllerBase
             return BadRequest("Сервис не найден");
         }
 
-        return Ok(_servicesProvider.GetReportsByOffline(service));
+        return Ok(from report in _servicesProvider.GetReportsByOffline(service) select new ReportEntity(report));
     }
     
     [HttpGet]
@@ -136,13 +147,11 @@ public class ServicesController : ControllerBase
         
         var services = (await _servicesProvider.GetAllServicesAsync(universityId)).ToArray();
 
-        var userId = ulong.Parse(User.Identity!.Name!);
-        
         var servicesApiEntities = User.IsInRole(JwtGenerator.UserRole) ? from service in services select new UniversityServiceEntity(
                 service,
                 loadUsers,
                 loadComments,
-                CheckIfUserSubscribed(service, userId)) : 
+                CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!))) : 
             from service in services 
                 select new UniversityServiceEntity(service, loadUsers, loadComments);
 
@@ -161,9 +170,9 @@ public class ServicesController : ControllerBase
 
         var universityEntity = new UniversityEntity(university)
         {
-            IsSubscribed = university.UniversityServices.All(service => 
+            IsSubscribed = User.IsInRole(JwtGenerator.UserRole) ? university.UniversityServices.All(service => 
                 service.UserSubscribeToServices.Any(subscribe =>
-                    subscribe.UserId.ToString() == User.Identity!.Name!))
+                    subscribe.UserId.ToString() == User.Identity!.Name!)) : null
         };
 
         return Ok(universityEntity);
@@ -171,7 +180,8 @@ public class ServicesController : ControllerBase
 
     [HttpGet("universities")]
     public IActionResult GetAllUniversities() => Ok(
-        from university in _servicesProvider.GetAllUniversities().ToArray()
+        from university in _servicesProvider.GetAllUniversities()
+            .ToList()
         select new UniversityEntity(university));
 
     [HttpPut("update")]
@@ -201,9 +211,9 @@ public class ServicesController : ControllerBase
         await _webSocketUpdateStateNotifier.NotifyAsync(servicesId);
         
         if (updateSuccess) return Ok();
-        else return BadRequest("Часть сервисов не найдены");
+        return BadRequest("Часть сервисов не найдены");
     }
     
-    private bool CheckIfUserSubscribed(UniversityService service, ulong userId) =>
+    private static bool CheckIfUserSubscribed(UniversityService service, ulong userId) =>
         service.UserSubscribeToServices.Any(x => x.UserId == userId);
 }

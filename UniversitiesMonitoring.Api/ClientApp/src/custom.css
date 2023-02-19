@@ -8,6 +8,7 @@ h1 {
 
 html {
   background: #F5F5F5;
+  height: 100%;
 }
 
 ::-webkit-scrollbar {

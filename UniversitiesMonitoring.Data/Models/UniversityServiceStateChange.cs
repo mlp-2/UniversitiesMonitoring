@@ -1,6 +1,9 @@
-﻿namespace UniversityMonitoring.Data.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace UniversityMonitoring.Data.Models
 {
-    public class UniversityServiceStateChange
+    public partial class UniversityServiceStateChange
     {
         public ulong Id { get; set; }
         public ulong ServiceId { get; set; }

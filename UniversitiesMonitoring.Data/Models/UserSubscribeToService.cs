@@ -1,6 +1,9 @@
-﻿namespace UniversityMonitoring.Data.Models
+﻿using System;
+using System.Collections.Generic;
+
+namespace UniversityMonitoring.Data.Models
 {
-    public class UserSubscribeToService
+    public partial class UserSubscribeToService
     {
         public ulong Id { get; set; }
         public ulong UserId { get; set; }

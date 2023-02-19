@@ -2,11 +2,37 @@ version: '3'
 
 services:
   api:
+    container_name: umapi
+    image: "ghcr.io/denvot/universities-monitoring-api:latest"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
-      - USER_SECRETS_ID=836b9b8b-fd89-4aff-9286-809bda60998f
+      - ASPNETCORE_ENVIRONMENT=Production
+      - USER_SECRETS_ID=9ea5b3db-0a42-4550-a9a9-d5764a75e1ca
     ports:
-      - "80"
+      - "80:80"
     volumes:
       - $APPDATA/Microsoft/UserSecrets/$USER_SECRETS_ID:/root/.microsoft/usersecrets/$USER_SECRETS_ID
-      - $HOME/.microsoft/usersecrets/$USER_SECRETS_ID:/root/.microsoft/usersecrets/$USER_SECRETS_ID
+  notify-service:
+    container_name: umnotify
+    image: "ghcr.io/denvot/universities-monitoring-notify-service:latest"
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - USER_SECRETS_ID=dotnet-UniversitiesMonitoring.NotifyService-2B45D338-08E1-4793-98FA-371378AA8407
+    volumes:
+      - $APPDATA/Microsoft/UserSecrets/$USER_SECRETS_ID:/root/.microsoft/usersecrets/$USER_SECRETS_ID
+  monitoring-service: 
+    container_name: ummonitoring
+    image: "ghcr.io/denvot/universities-monitoring-monitoring-service:latest"
+    environment:
+      - DOTNET_ENVIRONMENT=Production
+      - USER_SECRETS_ID=dotnet-UniversitiesMonitoring.MonitoringService-25CAB5F5-6D47-411E-86BB-1C081C8E8B9B
+    volumes:
+      - $APPDATA/Microsoft/UserSecrets/$USER_SECRETS_ID:/root/.microsoft/usersecrets/$USER_SECRETS_ID
+  db:
+    container_name: mysql
+    image: "mysql"
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: denvot
+      

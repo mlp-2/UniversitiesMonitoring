@@ -26,5 +26,5 @@ public interface IRepository<TEntity, in TKey> where TEntity : class
     /// <summary>
     /// Получает все сущности
     /// </summary>
-    IEnumerable<TEntity> GetlAll();
+    IQueryable<TEntity> GetlAll();
 }

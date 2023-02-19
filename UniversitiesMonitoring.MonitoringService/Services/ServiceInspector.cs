@@ -12,11 +12,11 @@ internal class ServiceInspector : IServiceInspector
         _inspectingStrategies = inspectingStrategies;
     }
     
-    public async Task<bool> InspectServiceAsync(IPAddress ip)
+    public async Task<bool> InspectServiceAsync(Uri serviceUrl)
     {
         foreach (var inspectingStrategy in _inspectingStrategies)
         {
-            if (await inspectingStrategy.ExecuteStrategyAsync(ip)) return true;
+            if (await inspectingStrategy.ExecuteStrategyAsync(serviceUrl)) return true;
         }
 
         return false;

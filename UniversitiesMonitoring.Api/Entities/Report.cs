@@ -6,7 +6,7 @@ namespace UniversitiesMonitoring.Api.Entities;
 public class Report
 {
     [JsonConstructor]
-    public Report(ulong id, string content, bool isOnline, ulong serviceId)
+    public Report(string content, bool isOnline, ulong serviceId, ulong id = 0)
     {
         Id = id;
         Content = content;

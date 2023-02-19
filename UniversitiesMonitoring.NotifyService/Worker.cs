@@ -54,13 +54,26 @@ internal class Worker : BackgroundService
             if (!dataFromSocketInArray.Any()) continue;
 
             var services = await _servicesFinder.GetServicesEntityAsync(from update in dataFromSocketInArray select update.Id);
+            var countSkipped = 0;
             
             foreach (var service in services)
             {
                 foreach (var serviceSubscriber in service.Subscribers)
                 {
-                    await _emailNotifier.NotifyAsync(serviceSubscriber, service);
+                    try
+                    {
+                        await _emailNotifier.NotifyAsync(serviceSubscriber, service);
+                    }
+                    catch
+                    {
+                        countSkipped += 1;
+                    }
                 }
+            }
+
+            if (countSkipped > 0)
+            {
+                _logger.LogWarning("Skipped {CountSkipped} users", countSkipped);
             }
         }
     }

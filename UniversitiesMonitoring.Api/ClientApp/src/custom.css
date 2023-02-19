@@ -1,18 +1,30 @@
-/* Provide sufficient contrast against white background */
-a {
-  color: #0366d6;
+* {
+  font-family: 'Inter', sans-serif;
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+h1 {
+  font-weight: bold;
 }
 
-code {
-  color: #E01A76;
+html {
+  background: #F5F5F5;
+  height: 100%;
 }
 
-.btn-primary {
-  color: #fff;
-  background-color: #1b6ec2;
-  border-color: #1861ac;
+::-webkit-scrollbar {
+  width: 20px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #0798EA;
+  border-radius: 3em;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #5bbef4;
 }

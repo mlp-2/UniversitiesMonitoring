@@ -137,7 +137,7 @@ public class ServicesProviderTests
         
         var servicesProvider = CreateServicesProvider(dataProvider);
 
-        await servicesProvider.CreateReportAsync(new UniversityService(), new User(), new Report(0,"Smthg went wrong", false, 0x0));
+        await servicesProvider.CreateReportAsync(new UniversityService(), new User(), new Report("Smthg went wrong", false, 0x0));
         
         dataProvider.Verify(x => x.Reports.AddAsync(It.IsAny<UniversityServiceReport>()), Times.Once);
         dataProvider.Verify(x => x.SaveChangesAsync(), Times.Once);

@@ -31,7 +31,7 @@ internal class Worker : BackgroundService
             _logger.LogInformation("Found {CountOfServices} services for monitoring", allServices.Length);
         }
 
-        var inspectors = UniversityServiceInspectorsCreator.CreateInspectorsAsync(_defaultInspector, allServices).ToArray();
+        var inspectors = UniversityServiceInspectorsCreator.CreateInspectors(_defaultInspector, allServices).ToArray();
         
         _logger.LogTrace("Inspectors created");
         
@@ -47,16 +47,42 @@ internal class Worker : BackgroundService
             {
                 _logger.LogTrace("Update skipped");
                 await Wait5Minutes(stoppingToken);
+                inspectors = await RefreshServicesInspectorsList(inspectors);
                 continue;
             }
 
-            await _universitiesServiceProvider.SendUpdateAsync(update);
+            await _universitiesServiceProvider.SendUpdateAsync(update.Changes);
             
             _logger.LogTrace("Update sent");
-            
+
+            inspectors = await RefreshServicesInspectorsList(inspectors);
             await Wait5Minutes(stoppingToken);
         }
     }
 
-    private Task Wait5Minutes(CancellationToken token) => Task.Delay(TimeSpan.FromMinutes(5), token);
+    private async Task<UniversityServiceInspector[]> RefreshServicesInspectorsList(UniversityServiceInspector[] inspectors)
+    {
+        var allServices = (await _universitiesServiceProvider.GetAllUniversitiesServicesAsync()).ToArray();
+        var newInspectors = new UniversityServiceInspector[allServices.Length];
+        var countAdded = allServices.Length;
+        
+        for (var i = 0; i < allServices.Length; i++)
+        {
+            newInspectors[i] = inspectors.FirstOrDefault(inspector =>
+                               {
+                                   var cond = inspector.ServiceId == allServices[i].ServiceId;
+                                   if (cond) countAdded--;
+
+                                   inspector.Service = allServices[i];
+                                   return cond;
+                               }) ??
+                               new UniversityServiceInspector(_defaultInspector, allServices[i]);
+        }
+
+        _logger.LogTrace("Loaded new {ServicesCount} services", countAdded);
+        
+        return newInspectors;
+    }
+
+    private Task Wait5Minutes(CancellationToken token) => Task.Delay(TimeSpan.FromSeconds(30), token);
 }

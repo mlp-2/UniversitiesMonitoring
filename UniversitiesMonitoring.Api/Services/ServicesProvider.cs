@@ -58,13 +58,21 @@ public class ServicesProvider : IServicesProvider
         await SaveChangesAsync();
     }
 
-    public async Task UpdateServiceStateAsync(UniversityService service, bool isOnline, bool forceSafe)
+    public async Task UpdateServiceStateAsync(UniversityService service,
+        bool isOnline,
+        bool forceSafe,
+        DateTime? updateTime = null)
     {
         var updateState = new UniversityServiceStateChange()
         {
             Service = service,
             IsOnline = isOnline
         };
+
+        if (updateTime != null)
+        {
+            updateState.ChangedAt = updateTime.Value;
+        }
         
         await _dataProvider.UniversityServiceStateChange.AddAsync(updateState);
 
@@ -125,11 +133,10 @@ public class ServicesProvider : IServicesProvider
         if (lastStatus == null || lastStatus.IsOnline) return Array.Empty<UniversityServiceReport>();
 
         var lastSeenOffline = GetSqlTime(lastStatus.ChangedAt);
-//        var lastSeenOnline = GetSqlTime(service.UniversityServiceStateChanges.LastOrDefault(x => x.IsOnline)?.ChangedAt ?? new DateTime(1970, 1, 1, 0, 0, 0, 0));
 
         return _dataProvider.Reports.ExecuteSql(
             $"SELECT * FROM universities_monitoring.UniversityServiceReport WHERE ServiceId = {service.Id} AND " +
-            $"AddedAt > {lastSeenOffline}").ToArray();
+            $"AddedAt >= {lastSeenOffline}").ToArray();
     }
 
 

@@ -54,6 +54,11 @@ public class ServicesController : ControllerBase
             return BadRequest("Сервис или пользователь не найден");
         }
 
+        if (CheckIfUserSubscribed(service, user.Id))
+        {
+            return BadRequest("Вы уже подписаны на этот сервис");
+        }
+        
         await _servicesProvider.SubscribeUserAsync(user, service);
         return Ok();
     }
@@ -70,6 +75,11 @@ public class ServicesController : ControllerBase
             return BadRequest("Сервис или пользователь не найден");
         }
 
+        if (!CheckIfUserSubscribed(service, user.Id))
+        {
+            return BadRequest("Вы не подписаны на данный сервис");
+        }
+        
         await _servicesProvider.UnsubscribeUserAsync(user, service);
         return Ok();
     }

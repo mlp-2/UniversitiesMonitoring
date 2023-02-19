@@ -11,7 +11,7 @@ public interface IServicesProvider
     Task<University?> GetUniversityAsync(ulong universityId);
     IQueryable<University> GetAllUniversities();
     Task UnsubscribeUserAsync(User user, UniversityService service);
-    Task UpdateServiceStateAsync(UniversityService service, bool isOnline, bool forceSafe);
+    Task UpdateServiceStateAsync(UniversityService service, bool isOnline, bool forceSafe, DateTime? updateTime = null);
     Task LeaveCommentAsync(UniversityService service, User author, Comment comment);        
     Task CreateReportAsync(UniversityService service, User issuer, Report report);        
     Task<UniversityServiceReport?> GetReportAsync(ulong reportId);

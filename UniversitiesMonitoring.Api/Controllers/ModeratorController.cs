@@ -69,9 +69,7 @@ public class ModeratorController : ControllerBase
             return BadRequest("Репорт не найден");
         }
 
-        var service = await _servicesProvider.GetServiceAsync(report.ServiceId);
-
-        await _servicesProvider.UpdateServiceStateAsync(service!, report.IsOnline, true);
+        await _moderatorsProvider.AcceptReportAsync(report);
         await _servicesProvider.SolveReportAsync(report);
         return Ok();
     }

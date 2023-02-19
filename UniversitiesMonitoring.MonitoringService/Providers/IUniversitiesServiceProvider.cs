@@ -13,5 +13,5 @@ internal interface IUniversitiesServiceProvider
     /// Отправляет изменения состояний
     /// </summary>
     /// <param name="update">Сущность, описывающая изменения</param>
-    Task SendUpdateAsync(UpdateEntity update);
+    Task SendUpdateAsync(ChangeStateEntity[] update);
 }

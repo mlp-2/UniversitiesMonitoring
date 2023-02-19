@@ -17,16 +17,16 @@ internal class UniversitiesServiceProvider : IUniversitiesServiceProvider
     
     public async Task<IEnumerable<UniversityServiceEntity>> GetAllUniversitiesServicesAsync()
     {
-        var response = await _client.GetAsync("/services");
+        var response = await _client.GetAsync("/api/services");
 
         response.EnsureSuccessStatusCode();
 
         return await response.Content.ReadFromJsonAsync<UniversityServiceEntity[]>() ?? Array.Empty<UniversityServiceEntity>();
     }
     
-    public async Task SendUpdateAsync(UpdateEntity update)
+    public async Task SendUpdateAsync(ChangeStateEntity[] update)
     {
-        var response = await _client.PostAsJsonAsync("/services/update", update);
+        var response = await _client.PutAsJsonAsync("/api/services/update", update);
         response.EnsureSuccessStatusCode();
     }
 }

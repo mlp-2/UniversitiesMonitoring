@@ -11,7 +11,8 @@ internal class ServicesFinder
     {
         _client = new HttpClient()
         {
-            BaseAddress = new Uri(configuration["ApiUrl"])
+            BaseAddress = new Uri(Environment.GetEnvironmentVariable("API_URL") ??
+                                  configuration["ApiUrl"])
         };
     }
 

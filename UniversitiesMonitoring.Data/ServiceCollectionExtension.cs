@@ -11,9 +11,9 @@ public static class ServiceCollectionExtension
     public static IServiceCollection AddDataContext(this IServiceCollection collection, IConfiguration configuration) =>
         collection.AddDbContext<UniversitiesMonitoringContext>(options => 
             options.UseMySql(
-                    configuration.GetConnectionString("UniversitiesMonitoring"),
+                    Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? 
+                        configuration.GetConnectionString("UniversitiesMonitoring"),
                     new MySqlServerVersion(new Version(8, 0, 29)))
-                .UseLazyLoadingProxies()
-                .LogTo(Console.WriteLine))
+                .UseLazyLoadingProxies())
             .AddScoped<IDataProvider, DataProvider>();
 }

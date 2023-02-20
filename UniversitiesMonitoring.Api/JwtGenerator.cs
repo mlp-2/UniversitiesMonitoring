@@ -23,7 +23,7 @@ public class JwtGenerator
     
     public JwtGenerator(IConfiguration configuration) =>
         _jwtSecret = new SymmetricSecurityKey(
-            Encoding.ASCII.GetBytes(configuration["JwtSecret"]));
+            Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? configuration["JwtSecret"]));
 
     /// <summary>
     /// Генерирует JWT токен, исходя из переданных данных

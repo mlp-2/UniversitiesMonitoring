@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>dotnet-UniversitiesMonitoring.MonitoringService-25CAB5F5-6D47-411E-86BB-1C081C8E8B9B</UserSecretsId>
+        <UserSecretsId>25CAB5F5-6D47-411E-86BB-1C081C8E8B9B</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 

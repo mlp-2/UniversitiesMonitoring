@@ -56,6 +56,8 @@ internal class Worker : BackgroundService
             var services = await _servicesFinder.GetServicesEntityAsync(from update in dataFromSocketInArray select update.Id);
             var countSkipped = 0;
             
+            _logger.LogInformation("New update information Got");
+            
             foreach (var service in services)
             {
                 foreach (var serviceSubscriber in service.Subscribers)

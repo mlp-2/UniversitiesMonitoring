@@ -12,11 +12,11 @@
         <SpaProxyLaunchCommand>npm start</SpaProxyLaunchCommand>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-      <UserSecretsId>9ea5b3db-0a42-4550-a9a9-d5764a75e1ca</UserSecretsId>
+        <DockerfileRunArguments>-v "$(AppData)/Microsoft/UserSecrets:/root/.microsoft/usersecrets"</DockerfileRunArguments>
+        <UserSecretsId>9ea5b3db-0a42-4550-a9a9-d5764a75e1ca</UserSecretsId>
   </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="EntityFrameworkCore.NCache" Version="5.3.0" />
         <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.13" />
         <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.12" />

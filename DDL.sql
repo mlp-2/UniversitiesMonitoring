@@ -18,9 +18,9 @@ create table UniversityService
 (
     Id           bigint unsigned auto_increment
         primary key,
-    IpAddress    tinyblob                     not null,
-    UniversityId bigint unsigned              not null,
-    Name         varchar(128) charset utf8mb3 not null,
+    UniversityId bigint unsigned               not null,
+    Name         varchar(128) charset utf8mb3  not null,
+    Url          varchar(2048) charset utf8mb3 not null,
     constraint UniversityService_University_Id_fk
         foreign key (UniversityId) references University (Id)
             on delete cascade

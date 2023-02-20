@@ -11,13 +11,13 @@ internal class EmailNotifier
     
     public EmailNotifier(IConfiguration configuration)
     {
-        var address = configuration["Email:Username"];
+        var address = Environment.GetEnvironmentVariable("EMAIL_ADDRESS") ?? configuration["Email:Username"];
         _mailAddress = new MailAddress(address);
         _emailClient = new SmtpClient()
         {
             Host = "mail.hosting.reg.ru",
             Port = 587,
-            Credentials = new NetworkCredential(address, configuration["Email:Password"]),
+            Credentials = new NetworkCredential(address, Environment.GetEnvironmentVariable("EMAIL_PASSWORD") ?? configuration["Email:Password"]),
             EnableSsl = false
         };
     }

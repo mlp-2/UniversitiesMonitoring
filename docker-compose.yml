@@ -3,30 +3,37 @@ version: '3'
 services:
   api:
     container_name: umapi
-    image: "ghcr.io/denvot/universities-monitoring-api:latest"
+    image: "um-api"
+    build:
+      context: "."
+      dockerfile: "UniversitiesMonitoring.Api/Dockerfile"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - USER_SECRETS_ID=9ea5b3db-0a42-4550-a9a9-d5764a75e1ca
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CONNECTION_STRING=Server=mysql;User=root;Password=denvot;Database=universities_monitoring
+      - JWT_SECRET=bfbfd98b-2ccf-4f19-8025-b51c512cf2ca
     ports:
       - "80:80"
-    volumes:
-      - $APPDATA/Microsoft/UserSecrets/$USER_SECRETS_ID:/root/.microsoft/usersecrets/$USER_SECRETS_ID
   notify-service:
     container_name: umnotify
-    image: "ghcr.io/denvot/universities-monitoring-notify-service:latest"
+    image: "um-notify"
+    build:
+      context: "."
+      dockerfile: "UniversitiesMonitoring.NotifyService/Dockerfile"
     environment:
-      - DOTNET_ENVIRONMENT=Production
-      - USER_SECRETS_ID=dotnet-UniversitiesMonitoring.NotifyService-2B45D338-08E1-4793-98FA-371378AA8407
-    volumes:
-      - $APPDATA/Microsoft/UserSecrets/$USER_SECRETS_ID:/root/.microsoft/usersecrets/$USER_SECRETS_ID
+      - DOTNET_ENVIRONMENT=Development
+      - WS_URL=ws://umapi:80/api/updates-socket
+      - API_URL=http://umapi:80/
+      - EMAIL_ADDRESS=universitiesmonitoring@denvot.dev
+      - EMAIL_PASSWORD=universitiesmonitoring
   monitoring-service: 
     container_name: ummonitoring
-    image: "ghcr.io/denvot/universities-monitoring-monitoring-service:latest"
+    image: "um-mon"
+    build:
+      context: "."
+      dockerfile: "UniversitiesMonitoring.MonitoringService/Dockerfile"
     environment:
-      - DOTNET_ENVIRONMENT=Production
-      - USER_SECRETS_ID=dotnet-UniversitiesMonitoring.MonitoringService-25CAB5F5-6D47-411E-86BB-1C081C8E8B9B
-    volumes:
-      - $APPDATA/Microsoft/UserSecrets/$USER_SECRETS_ID:/root/.microsoft/usersecrets/$USER_SECRETS_ID
+      - DOTNET_ENVIRONMENT=Development
+      - API_URL=http://umapi:80/
   db:
     container_name: mysql
     image: "mysql"

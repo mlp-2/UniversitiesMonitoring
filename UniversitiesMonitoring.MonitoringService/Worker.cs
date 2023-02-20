@@ -31,12 +31,14 @@ internal class Worker : BackgroundService
             _logger.LogInformation("Found {CountOfServices} services for monitoring", allServices.Length);
         }
 
-        var inspectors = UniversityServiceInspectorsCreator.CreateInspectors(_defaultInspector, allServices).ToArray();
+        var inspectors = Array.Empty<UniversityServiceInspector>();
         
         _logger.LogTrace("Inspectors created");
         
         while (true)
         {
+            inspectors = await RefreshServicesInspectorsList(inspectors);
+            
             var updateBuilder = new UpdateBuilder();
             await Task.WhenAll(inspectors.Select(inspector => inspector.UpdateStateAsync(updateBuilder)));
 
@@ -47,15 +49,13 @@ internal class Worker : BackgroundService
             {
                 _logger.LogTrace("Update skipped");
                 await Wait5Minutes(stoppingToken);
-                inspectors = await RefreshServicesInspectorsList(inspectors);
                 continue;
             }
 
             await _universitiesServiceProvider.SendUpdateAsync(update.Changes);
             
             _logger.LogTrace("Update sent");
-
-            inspectors = await RefreshServicesInspectorsList(inspectors);
+            
             await Wait5Minutes(stoppingToken);
         }
     }

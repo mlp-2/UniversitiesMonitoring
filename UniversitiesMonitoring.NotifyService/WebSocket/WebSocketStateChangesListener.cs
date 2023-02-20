@@ -14,7 +14,8 @@ internal class WebSocketStateChangesListener : IStateChangesListener, IDisposabl
     
     public WebSocketStateChangesListener(IConfiguration configuration)
     {
-        var localhostUrl = configuration["LocalHostWsUrl"];
+        var localhostUrl = Environment.GetEnvironmentVariable("WS_URL") ?? 
+                           configuration["LocalHostWsUrl"];
         _wsRoute = new Uri(localhostUrl);
     }
 

@@ -4,7 +4,7 @@
         <TargetFramework>net6.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UserSecretsId>dotnet-UniversitiesMonitoring.NotifyService-2B45D338-08E1-4793-98FA-371378AA8407</UserSecretsId>
+        <UserSecretsId>2B45D338-08E1-4793-98FA-371378AA8407</UserSecretsId>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 

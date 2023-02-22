@@ -56,12 +56,16 @@ public class UsersController : ControllerBase
             return BadRequest("Пользователь с таким именем уже существует");
         }
 
-        if (await _usersProvider.CreateUserAsync(auth.Username, auth.Password) == null)
+        var result = await _usersProvider.CreateUserAsync(auth.Username, auth.Password); 
+        
+        if (result == null)
         {
             return BadRequest("Пользователь с таким именем уже существует");
         }
 
-        return Ok();
+        return Ok(new {
+            jwt = _jwtGenerator.GenerateTokenForUser(result.Id, true)
+        });
     }
 
     [Authorize(Roles = JwtGenerator.UserRole)]

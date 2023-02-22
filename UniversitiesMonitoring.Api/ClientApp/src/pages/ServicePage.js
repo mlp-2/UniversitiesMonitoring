@@ -210,6 +210,10 @@ const useStyles = createUseStyles({
     }
 });
 
+const monthNames = ["янв", "фев", "мар", "апр",
+                    "май", "июн", "июл", "авг", 
+                    "сен", "окт", "ноя", "дек"]
+
 export function ServicePage() {
     const location = useLocation();
     const [service, setService] = useState(location.state.service)
@@ -389,7 +393,11 @@ function CommentsColumn({comments}) {
         <span className="title">Комментарии</span>
         <div className="comments-container">
             {comments.map(comment => 
-                <Comment key={comment.id} from={comment.author.username} content={comment.content} stars={comment.rate}/>)}
+                <Comment key={comment.id} 
+                         from={comment.author.username}
+                         content={comment.content}
+                         stars={comment.rate} 
+                         addedAt={comment.addedAt}/>)}
         </div>
     </div>
 }
@@ -449,8 +457,11 @@ function SendCommentForm({reference, service, updateService, onEnded}) {
                 author: {
                     username: "Вас"  
                 },
-                ...apiData
+                ...apiData,
+                rate: Number.parseInt(apiData.rate)
             });
+            
+            console.log(apiData)
             
             updateService({
                 ...service,
@@ -497,12 +508,14 @@ function RateStar({index, rate, onClick}) {
                             style={{"--star-color": index <= rate ? "#FDD64E" : "#046298"}}/>
 }
 
-function Comment({from, content, stars = -1}) {
+function Comment({from, content, addedAt = null, stars = -1}) {
     const style = useStyles();
     
     return <div className={style.comment}>  
         <div className="comment-header">
-            <span>от <span className="comment-author">{from}</span></span>
+            <span>
+                от <span className="comment-author">{from}</span> {addedAt !== null && <span className="text-muted">{formatDate(new Date(addedAt + "Z"))}</span>}
+            </span>
             {
                 stars > 0 &&
                     <div>{[...Array(stars).keys()].map(_ => <FontAwesomeIcon icon={faStar}/>)}</div> 
@@ -564,3 +577,14 @@ function SendCommentFormPopup({closePopup, service, updateService}) {
         <SendCommentForm onEnded={() => endDialog()} service={service} reference={formElement} updateService={updateService}/>
     </div>
 }
+
+function formatDate(date) {
+    const month = date.getMonth();
+    
+    return `${padTo2Digits(date.getHours())}:${padTo2Digits(date.getMinutes())} ${date.getDay()} ${monthNames[month]}`;
+}
+
+function padTo2Digits(num) {
+    return num.toString().padStart(2, '0');
+}
+

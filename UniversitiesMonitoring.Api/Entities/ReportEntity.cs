@@ -12,6 +12,7 @@ public class ReportEntity
         Timestamp = report.AddedAt;
         IsOnline = report.IsOnline;
         Service = new UniversityServiceEntity(report.Service, false, false);
+        AddedAt = report.AddedAt;
     }
     
     public ulong Id { get; }
@@ -19,4 +20,5 @@ public class ReportEntity
     public DateTime? Timestamp { get; }
     public bool IsOnline { get; }
     public UniversityServiceEntity Service { get; }
+    public DateTime AddedAt { get; }
 }

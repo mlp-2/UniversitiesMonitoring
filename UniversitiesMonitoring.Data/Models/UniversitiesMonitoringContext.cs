@@ -145,6 +145,10 @@ namespace UniversityMonitoring.Data.Models
 
                 entity.HasIndex(e => e.AuthorId, "UserRateOfService_User_Id_fk");
 
+                entity.Property(e => e.AddedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
                 entity.Property(e => e.Comment)
                     .HasMaxLength(4096)
                     .UseCollation("utf8mb3_general_ci")
@@ -179,6 +183,10 @@ namespace UniversityMonitoring.Data.Models
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("UserSubscribeToService_User_Id_fk");
             });
+
+            OnModelCreatingPartial(modelBuilder);
         }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

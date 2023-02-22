@@ -1,10 +1,12 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using UniversitiesMonitoring.Api;
 using UniversitiesMonitoring.Api.Services;
 using UniversitiesMonitoring.Api.WebSocket;
 using UniversityMonitoring.Data;
+using UniversityMonitoring.Data.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +35,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 });
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<UniversitiesMonitoringContext>();
+    
+    if (await dbContext.Moderators.CountAsync() == 0)
+    {
+        var moderator = new Moderator()
+        {
+            Id = 1,
+            PasswordSha256hash = Sha256Computing.ComputeSha256("12345678")
+        };
+
+        await dbContext.Moderators.AddAsync(moderator);
+        await dbContext.SaveChangesAsync();
+    }
+}
 
 if (!app.Environment.IsDevelopment())
 {

@@ -1,12 +1,10 @@
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using UniversitiesMonitoring.Api;
 using UniversitiesMonitoring.Api.Services;
 using UniversitiesMonitoring.Api.WebSocket;
 using UniversityMonitoring.Data;
-using UniversityMonitoring.Data.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,7 +15,8 @@ builder.Services.AddScoped<IUsersProvider, UsersProvider>()
     .AddScoped<IServicesProvider, ServicesProvider>()
     .AddScoped<IModeratorsProvider, ModeratorsProvider>()
     .AddSingleton<IWebSocketUpdateStateNotifier, WebSocketUpdateStateNotifier>()
-    .AddSingleton<JwtGenerator>();
+    .AddSingleton<JwtGenerator>()
+    .AddScoped<DatabaseSetupHelper>();
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
 {
     options.RequireHttpsMetadata = false;
@@ -38,25 +37,11 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider.GetRequiredService<UniversitiesMonitoringContext>();
-    
-    if (await dbContext.Moderators.CountAsync() == 0)
-    {
-        var moderator = new Moderator()
-        {
-            Id = 1,
-            PasswordSha256hash = Sha256Computing.ComputeSha256("12345678")
-        };
-
-        await dbContext.Moderators.AddAsync(moderator);
-        await dbContext.SaveChangesAsync();
-    }
+    var dbHelper = scope.ServiceProvider.GetRequiredService<DatabaseSetupHelper>();
+    await dbHelper.SetupDatabaseAsync();
 }
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseHsts();
-}
+if (!app.Environment.IsDevelopment()) app.UseHsts();
 else
 {
     app.UseSwagger();

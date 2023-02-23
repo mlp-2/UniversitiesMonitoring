@@ -422,7 +422,7 @@ function ReportsColumn({service}) {
         {
             <div className="comments-container">
                 {reports.length > 0 ? reports.map(report =>
-                    <Comment key={report.id} from="Пользователя сервиса" content={report.content}/>) :  
+                    <Comment key={report.id} from="Пользователя сервиса" addedAt={report.addedAt} content={report.content}/>) :  
                     <span>Пока что нет никаких данных об этом сбое. Приходите сюда позже 👀</span>}
             </div>
         }

@@ -265,12 +265,16 @@ function ServiceHeader({service, updateService}) {
             if(result) {
                 Swal.fire({
                     title: "Успешно. Ожидайте подтверждения Вашего обращения от администрации",
-                    icon: "success"
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 2000
                 });
             } else if(result === false) {
                 Swal.fire({
                     title: "Что-то пошло не так...",
-                    icon: "error"
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 2000
                 });
             }
         });
@@ -295,12 +299,16 @@ function ServiceHeader({service, updateService}) {
             if(result) {
                 Swal.fire({
                     title: `Спасибо большое за указание причины недоступности ${service.serviceName}!`,
-                    icon: "success"
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 2000
                 });
             } else if(result === false) {
                 Swal.fire({
                     title: "Что-то пошло не так...",
-                    icon: "error"
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 2000
                 });
             }
         });

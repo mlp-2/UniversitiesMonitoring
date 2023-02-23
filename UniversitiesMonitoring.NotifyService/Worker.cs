@@ -28,23 +28,8 @@ internal class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var connected = false;
+        await _stateChangesListener.ConnectAsync();
 
-        while (!connected)
-        {
-            try
-            {
-                await _stateChangesListener.ConnectAsync();
-                connected = true;
-                _logger.LogInformation("Connected to WS");
-            }
-            catch
-            {
-                _logger.LogWarning("Can't connect to the WS. Retry in 10 seconds");
-                await Task.Delay(10000, stoppingToken);
-            }
-        }
-        
         using var scope = _serviceProvider.CreateScope();
 
         while (true)

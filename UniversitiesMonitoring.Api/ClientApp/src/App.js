@@ -37,13 +37,15 @@ export default class App extends Component {
   render() {
     return (
         <Routes>
-            <Route key={1} path="login" element={<Login/>}/>
             <Route key={2} path="registration" element={<Registration/>}/>
-            <Route key={4} path="/" element={<LoginPanel/>}>
-                <Route key={3} path="account" element={<AccountPage/>}/>
-                <Route key={5} path="university" element={<UniversityPage/>}/>
-                <Route key={6} path="universities-list" element={<UniversitiesList/>}/>
-                <Route key={7} path="service" element={<ServicePage/>}/>
+            <Route path="/">
+                <Route key={4} element={<LoginPanel/>}>
+                    <Route key={3} path="account" element={<AccountPage/>}/>
+                    <Route key={5} path="university" element={<UniversityPage/>}/>
+                    <Route key={6} path="universities-list" element={<UniversitiesList/>}/>
+                    <Route key={7} path="service" element={<ServicePage/>}/>
+                </Route>
+                <Route key={1} path="/*" element={<Login/>}/>
             </Route>
             <Route key={8} path="moderator" element={<Moderation/>}/>
             <Route key={9} path="moderator/login" element={<ModerationLoginPage/>}/>

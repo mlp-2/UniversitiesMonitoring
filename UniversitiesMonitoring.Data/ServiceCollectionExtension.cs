@@ -14,6 +14,9 @@ public static class ServiceCollectionExtension
                     Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? 
                         configuration.GetConnectionString("UniversitiesMonitoring"),
                     new MySqlServerVersion(new Version(8, 0, 29)))
-                .UseLazyLoadingProxies())
+                .UseLazyLoadingProxies()
+#if DEBUG
+                .LogTo(Console.WriteLine))
+#endif
             .AddScoped<IDataProvider, DataProvider>();
 }

@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using UniversitiesMonitoring.Api.Entities;
 using UniversityMonitoring.Data.Models;
 using UniversityMonitoring.Data.Repositories;
@@ -8,10 +9,12 @@ namespace UniversitiesMonitoring.Api.Services;
 public class ServicesProvider : IServicesProvider
 {
     private readonly IDataProvider _dataProvider;
+    private readonly IMemoryCache _cache;
 
-    public ServicesProvider(IDataProvider dataProvider)
+    public ServicesProvider(IDataProvider dataProvider, IMemoryCache cache)
     {
         _dataProvider = dataProvider;
+        _cache = cache;
     }
 
     public Task<UniversityService?> GetServiceAsync(ulong serviceId) =>
@@ -77,6 +80,8 @@ public class ServicesProvider : IServicesProvider
         await _dataProvider.UniversityServiceStateChange.AddAsync(updateState);
 
         if (forceSafe) await SaveChangesAsync();
+        
+        _cache.Remove(GenerateCacheKeyForReports(service));
     }
 
     public async Task LeaveCommentAsync(UniversityService service, User author, Comment comment)
@@ -95,15 +100,25 @@ public class ServicesProvider : IServicesProvider
 
     public async Task CreateReportAsync(UniversityService service, User issuer, Report report)
     {
+        var solvedDueOffline = (service.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false) == report.IsOnline; 
+        
         var reportEntity = new UniversityServiceReport()
         {
             Content = report.Content,
             IsOnline = report.IsOnline,
             Issuer = issuer,
             Service = service,
-            IsSolved = (service.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false) == report.IsOnline
+            IsSolved = solvedDueOffline
         };
-
+        
+        if (solvedDueOffline &&
+            _cache.TryGetValue<List<UniversityServiceReport>>(
+                GenerateCacheKeyForReports(service),
+                out var cachedReports))
+        {
+            cachedReports.Add(reportEntity);
+        }
+        
         await _dataProvider.Reports.AddAsync(reportEntity);
         await SaveChangesAsync();
     }
@@ -129,18 +144,30 @@ public class ServicesProvider : IServicesProvider
 
     public IEnumerable<UniversityServiceReport> GetReportsByOffline(UniversityService service)
     {
+        var cacheKey = GenerateCacheKeyForReports(service);
+        var contains = _cache.TryGetValue<List<UniversityServiceReport>>(cacheKey, out var cachedReports);
+
+        if (contains) return cachedReports;
+        
         var lastStatus = service.UniversityServiceStateChanges.LastOrDefault();
         if (lastStatus == null || lastStatus.IsOnline) return Array.Empty<UniversityServiceReport>();
 
         var lastSeenOffline = GetSqlTime(lastStatus.ChangedAt);
 
-        return _dataProvider.Reports.ExecuteSql(
+        var result = _dataProvider.Reports.ExecuteSql(
             $"SELECT * FROM universities_monitoring.UniversityServiceReport WHERE ServiceId = {service.Id} AND " +
-            $"AddedAt >= {lastSeenOffline}").ToArray();
+            $"AddedAt >= {lastSeenOffline}").ToList();
+
+        _cache.Set(cacheKey, result);
+
+        return result;
     }
 
 
     private string GetSqlTime(DateTime dateTime) => 
         $"STR_TO_DATE('{dateTime.Year}-{dateTime.Month}-{dateTime.Day} {dateTime.Hour}:{dateTime.Minute}:{dateTime.Second}', '%Y-%m-%d %H:%i:%s')";
+    
     private async Task SaveChangesAsync() => await _dataProvider.SaveChangesAsync();
+
+    private string GenerateCacheKeyForReports(UniversityService service) => $"REPORTS_{service.Id}";
 }

@@ -38,20 +38,19 @@ export default class App extends Component {
     return (
         <Routes>
             <Route key={2} path="registration" element={<Registration/>}/>
-            <Route path="/">
-                <Route key={4} element={<LoginPanel/>}>
-                    <Route key={3} path="account" element={<AccountPage/>}/>
-                    <Route key={5} path="university" element={<UniversityPage/>}/>
-                    <Route key={6} path="universities-list" element={<UniversitiesList/>}/>
-                    <Route key={7} path="service" element={<ServicePage/>}/>
-                </Route>
-                <Route key={1} path="/*" element={<Login/>}/>
+            <Route path="/" key={4} element={<LoginPanel/>}>
+                <Route key={3} path="account" element={<AccountPage/>}/>
+                <Route key={5} path="university" element={<UniversityPage/>}/>
+                <Route key={6} path="universities-list" element={<UniversitiesList/>}/>
+                <Route key={7} path="service" element={<ServicePage/>}/>
             </Route>
             <Route key={8} path="moderator" element={<Moderation/>}/>
             <Route key={9} path="moderator/login" element={<ModerationLoginPage/>}/>
             <Route key={10} path="moderator/reports" element={<ReportsPage/>}/>
             <Route key={11} path="moderator/universities" element={<UniversitiesModerationPanel/>}/>
             <Route key={12} path="moderator/university" element={<ServicesModerationPanel/>}/>
+            <Route key={1} index element={<Login/>}/>
+            <Route key={1} path="*" element={<Login/>}/>
         </Routes>
     );
   }

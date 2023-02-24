@@ -101,7 +101,7 @@ public class ServicesProvider : IServicesProvider
             IsOnline = report.IsOnline,
             Issuer = issuer,
             Service = service,
-            IsSolved = service.UniversityServiceStateChanges.LastOrDefault()?.IsOnline == report.IsOnline
+            IsSolved = (service.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false) == report.IsOnline
         };
 
         await _dataProvider.Reports.AddAsync(reportEntity);

@@ -75,6 +75,44 @@ export function AccountPage() {
     const emailRef = useRef();
     const style = useStyles();
     
+    async function updateEmailSettings(data) {
+        if (data.email !== null && emailRegex.exec(data.email)[0] !== data.email) {
+            await Swal.fire({
+                title: "Email должен соответствовать формату name@domain.ru",
+                icon: "error",
+                showConfirmButton: false,
+                timer: 2000
+            });
+
+            return;
+        }
+
+        try {
+            const result = await axios.put("/api/user/email/update", data);
+
+            if (result.status === 200) {
+                await Swal.fire({
+                    title: "Настройки оповещения обновлены",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+
+                user.email = data.email;
+                user.sendToEmail = data.canSend;
+
+                sessionStorage.setItem("user", JSON.stringify(user));
+            }
+        } catch {
+            await Swal.fire({
+                title: "Что-то пошло не так",
+                icon: "error",
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    }
+    
     async function handleEditEmailSettingsFormSubmit(e) {
         e.preventDefault();
         const target = e.target;
@@ -85,35 +123,13 @@ export function AccountPage() {
         
         console.log(data);
         
-        if (emailRegex.exec(data.email)[0] !== data.email) {
-            await Swal.fire({
-                title: "Email должен соответствовать формату name@domain.ru",
-                icon: "error",
-                showConfirmButton: false,
-                timer: 2000
+        if (data.email === "") {
+            await updateEmailSettings({
+                email: null,
+                canSend: false
             });
-            
-            return;
-        }
-        
-        try {
-            const result = await axios.put("/api/user/email/update", data);    
-            
-            if (result.status === 200) {
-                await Swal.fire({
-                    title: "Настройки оповещения обновлены",
-                    icon: "success",
-                    showConfirmButton: false,
-                    timer: 2000
-                });
-            }
-        } catch {
-            await Swal.fire({
-                title: "Что-то пошло не так",
-                icon: "error",
-                showConfirmButton: false,
-                timer: 2000
-            });
+        } else {
+            await updateEmailSettings(data);
         }
     }
     

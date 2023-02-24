@@ -11,6 +11,6 @@ public class EmailUpdateEntity
         CanSend = canSend;
     }
 
-    public string Email { get; }
+    public string? Email { get; }
     public bool CanSend { get; }
 }

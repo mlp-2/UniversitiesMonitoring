@@ -1,8 +1,13 @@
 import axios from "axios";
 
 export async function GetUser() {
+    const userFromStorage = JSON.parse(sessionStorage.getItem("user")); 
+    if (userFromStorage !== null) return userFromStorage;
+    
     const result = await axios.get("/api/user");
 
+    sessionStorage.setItem("user", JSON.stringify(result.data));
+    
     return ensureSuccessStatus(result, result.data);
 }
 

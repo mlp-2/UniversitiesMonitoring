@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
@@ -172,5 +173,5 @@ public class ServicesProviderTests
     
     private Mock<IDataProvider> CreateProviderMock() => new();
 
-    private ServicesProvider CreateServicesProvider(Mock<IDataProvider> dataProviderMock) => new(dataProviderMock.Object);
+    private ServicesProvider CreateServicesProvider(Mock<IDataProvider> dataProviderMock) => new(dataProviderMock.Object, new Mock<IMemoryCache>().Object);
 }

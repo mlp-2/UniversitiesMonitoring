@@ -13,7 +13,12 @@ public class UniversityServiceEntity
         ServiceId = universityServiceModel.Id;
         ServiceName = universityServiceModel.Name;
         UniversityName = universityServiceModel.University.Name;
-        IsOnline = universityServiceModel.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false;
+
+        var lastChange = universityServiceModel.UniversityServiceStateChanges.LastOrDefault();
+        
+        IsOnline = lastChange?.IsOnline ?? false;
+        ChangedStatusAt = lastChange?.ChangedAt;
+        
         Subscribers = loadUsers ? universityServiceModel.UserSubscribeToServices.Select(x => new UserEntity(x.User)) : Array.Empty<UserEntity>();
         Comments = loadComments ? universityServiceModel.UserRateOfServices.Select(x => new CommentEntity(x)) : Array.Empty<CommentEntity>();
         Url = universityServiceModel.Url;
@@ -44,6 +49,7 @@ public class UniversityServiceEntity
     public string ServiceName { get; }
     public string UniversityName { get; }
     public bool IsOnline { get; }
+    public DateTime? ChangedStatusAt { get; }
     public string Url { get; }
     public bool? IsSubscribed { get; }
     public IEnumerable<UserEntity> Subscribers { get; }

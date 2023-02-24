@@ -14,6 +14,13 @@ import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
 import {GenerateUUID} from "../Utils";
 
 const useStyles = createUseStyles({
+    status: {
+        background: "var(--status-color)",
+        borderRadius: 10,
+        fontSize: "24px !important",
+        textShadow: "0px 0px 2px #000",
+        padding: 10
+    },
     serviceHeader: {
         background: Constants.brandColor,
         color: "#FFF",
@@ -39,7 +46,8 @@ const useStyles = createUseStyles({
         },
         "& .service-name-with-status": {
             display: "flex",
-            alignItems: ""
+            alignItems: "center",
+            gap: 10
         },
         "& .service-name-with-status span": {
             position: "relative",
@@ -199,12 +207,6 @@ const useStyles = createUseStyles({
                 "& *": {
                     fontSize: 16  
                 }
-            },
-            "& .service-name-with-status span::after": {
-                width: 32,
-                height: 32,
-                right: "-32px",
-                top: "calc(50% - 16px)",
             }
         },
     }
@@ -230,6 +232,8 @@ export function ServicePage() {
 
 function ServiceHeader({service, updateService}) {
     const style = useStyles();
+    
+    const changedStatusAt = new Date(service.changedStatusAt);
     
     async function handleClickOnSubscribeButton() {
         if (!service.isSubscribed) {
@@ -319,9 +323,11 @@ function ServiceHeader({service, updateService}) {
             <span>{service.universityName}</span>
         </div>
         <div className="action-section">
-            <div className="service-name-with-status" 
-                 style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438"}}>
-                <span className="to-bottom">{service.serviceName}</span>    
+            <div className="service-name-with-status">
+                <span className="to-bottom">{service.serviceName}</span>
+                <span className={style.status} style={{"--status-color": service.isOnline ? "#3CFB38" : "#FB4438"}}>
+                    {service.isOnline ? "Онлайн" : "Офлайн"} с {formatDate(changedStatusAt)}
+                </span>
             </div>
             <Stack className="flex-grow-0 gap-2">
                 <Button onClick={handleClickOnReportButton} 

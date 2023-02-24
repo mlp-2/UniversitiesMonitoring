@@ -54,16 +54,6 @@ const useStyles = createUseStyles({
             fontSize: 64,
             height: "fit-content",
             verticalAlign: "bottom"
-        },
-        "& .service-name-with-status span::after": {
-            content: '""',
-            position: "absolute",
-            width: 64,
-            height: 64,
-            right: "-90px", 
-            top: "calc(50% - 12px)",
-            borderRadius: "50%",
-            background: "var(--service-status)"
         }
     },
     serviceBody: {
@@ -209,7 +199,12 @@ const useStyles = createUseStyles({
                 }
             }
         },
-    }
+    },
+    "@media screen and (max-width: 600px)": {
+        status: {
+            fontSize: "16px !important"
+        }
+    },
 });
 
 const monthNames = ["янв", "фев", "мар", "апр",

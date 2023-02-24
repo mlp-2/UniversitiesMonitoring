@@ -77,15 +77,7 @@ const useStyles = createUseStyles({
         background: "#FFF",
         width: "80%",
         padding: "20px 40px 20px 40px",
-        cursor: "pointer",
         userSelect: "none",
-        transition: "box-shadow 0.3s, transform 0.3s",
-        "&:hover": {
-            boxShadow: "0px 0px 18px 11px rgba(0, 0, 0, 0.25)"  
-        },
-        "&:active": {
-            transform: "scale(0.99)"
-        },
         "& .university-name": {
             fontWeight: "bold",
             fontSize: 25,

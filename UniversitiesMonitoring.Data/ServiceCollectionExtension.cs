@@ -16,7 +16,7 @@ public static class ServiceCollectionExtension
                     new MySqlServerVersion(new Version(8, 0, 29)))
                 .UseLazyLoadingProxies()
 #if DEBUG
-                .LogTo(Console.WriteLine))
+                .LogTo(Console.WriteLine)
 #endif
-            .AddScoped<IDataProvider, DataProvider>();
+            ).AddScoped<IDataProvider, DataProvider>();
 }

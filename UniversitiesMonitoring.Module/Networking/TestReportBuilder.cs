@@ -1,3 +1,5 @@
+using UniversityMonitoring.Data.Entities;
+
 namespace UniversitiesMonitoring.Module.Networking;
 
 public class TestReportBuilder

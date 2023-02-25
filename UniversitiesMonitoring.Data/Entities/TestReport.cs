@@ -1,4 +1,4 @@
-namespace UniversitiesMonitoring.Module.Networking;
+namespace UniversityMonitoring.Data.Entities;
 
 public class TestReport
 {

@@ -15,14 +15,19 @@ public class ServicesController : ControllerBase
     private readonly IServicesProvider _servicesProvider;
     private readonly IUsersProvider _usersProvider;
     private readonly IWebSocketUpdateStateNotifier _webSocketUpdateStateNotifier;
+    private readonly IModulesProvider _modulesProvider;
 
     private bool IsLocalHostRequest => Request.Host.Host == "localhost";
-    
-    public ServicesController(IServicesProvider servicesProvider, IUsersProvider usersProvider, IWebSocketUpdateStateNotifier webSocketUpdateStateNotifier)
+
+    public ServicesController(IServicesProvider servicesProvider,
+        IUsersProvider usersProvider,
+        IWebSocketUpdateStateNotifier webSocketUpdateStateNotifier,
+        IModulesProvider modulesProvider)
     {
         _servicesProvider = servicesProvider;
         _usersProvider = usersProvider;
         _webSocketUpdateStateNotifier = webSocketUpdateStateNotifier;
+        _modulesProvider = modulesProvider;
     }
 
     [Authorize(Roles = JwtGenerator.UserRole)]
@@ -42,6 +47,22 @@ public class ServicesController : ControllerBase
         return Ok(serviceEntity);
     }
 
+    [Authorize(Roles = JwtGenerator.UserRole)]
+    [HttpPost("{id:long}/test")]
+    public async Task<IActionResult> Test([FromRoute] ulong id)
+    {
+        var service = await _servicesProvider.GetServiceAsync(id);
+
+        if (service == null)
+        {
+            return BadRequest("Сервис не найден");
+        }
+
+        var testResult = await _modulesProvider.TestServiceAsync(service);
+
+        return Ok(testResult);
+    }
+    
     [Authorize(Roles = JwtGenerator.UserRole)]
     [HttpPost("{id:long}/subscribe")]
     public async Task<IActionResult> SubscribeService([FromRoute] ulong id)

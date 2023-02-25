@@ -1,4 +1,5 @@
 using UniversitiesMonitoring.Module.Networking.Testing;
+using UniversityMonitoring.Data.Entities;
 
 namespace UniversitiesMonitoring.Module.Networking;
 

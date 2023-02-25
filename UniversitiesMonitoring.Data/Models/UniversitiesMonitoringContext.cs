@@ -44,6 +44,11 @@ namespace UniversityMonitoring.Data.Models
             {
                 entity.HasIndex(e => e.Url, "MonitoringModules_Url_uindex")
                     .IsUnique();
+
+                entity.Property(e => e.Url)
+                    .HasMaxLength(1024)
+                    .UseCollation("utf8mb3_general_ci")
+                    .HasCharSet("utf8mb3");
             });
 
             modelBuilder.Entity<University>(entity =>

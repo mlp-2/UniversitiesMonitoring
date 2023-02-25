@@ -14,6 +14,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IUsersProvider, UsersProvider>()
     .AddScoped<IServicesProvider, ServicesProvider>()
     .AddScoped<IModeratorsProvider, ModeratorsProvider>()
+    .AddScoped<IModulesProvider, ModulesProvider>()
     .AddSingleton<IWebSocketUpdateStateNotifier, WebSocketUpdateStateNotifier>()
     .AddSingleton<JwtGenerator>()
     .AddScoped<DatabaseSetupHelper>();

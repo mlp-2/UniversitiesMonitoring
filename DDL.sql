@@ -1,10 +1,17 @@
-create database universities_monitoring;
-
 create table Moderator
 (
     Id                 bigint unsigned auto_increment
         primary key,
     PasswordSHA256Hash tinyblob not null
+);
+
+create table MonitoringModules
+(
+    Id  bigint unsigned auto_increment
+        primary key,
+    Url int not null,
+    constraint MonitoringModules_Url_uindex
+        unique (Url)
 );
 
 create table University
@@ -44,10 +51,10 @@ create table User
 (
     Id                    bigint unsigned auto_increment
         primary key,
-    Username              varchar(64)          not null,
-    PasswordSHA256Hash    tinyblob             not null,
-    Email                 varchar(256)         null,
-    SendEmailNotification tinyint(1) default 0 not null,
+    Username              varchar(64)  not null,
+    PasswordSHA256Hash    tinyblob     not null,
+    Email                 varchar(256) null,
+    SendEmailNotification tinyint(1)   not null,
     constraint User_Email_uindex
         unique (Email),
     constraint User_Username_uindex
@@ -58,12 +65,12 @@ create table UniversityServiceReport
 (
     Id        bigint unsigned auto_increment
         primary key,
-    Content   varchar(4096) charset utf8mb3        null,
-    ServiceId bigint unsigned                      not null,
-    IssuerId  bigint unsigned                      not null,
-    IsOnline  tinyint(1)                           not null,
-    AddedAt   datetime   default CURRENT_TIMESTAMP null,
-    IsSolved  tinyint(1) default 0                 not null,
+    Content   varchar(4096) charset utf8mb3      null,
+    ServiceId bigint unsigned                    not null,
+    IssuerId  bigint unsigned                    not null,
+    IsOnline  tinyint(1)                         not null,
+    AddedAt   datetime default CURRENT_TIMESTAMP not null,
+    IsSolved  tinyint(1)                         not null,
     constraint UniversityServiceReport_UniversityService_Id_fk
         foreign key (ServiceId) references UniversityService (Id)
             on delete cascade,
@@ -76,10 +83,11 @@ create table UserRateOfService
 (
     Id        bigint unsigned auto_increment
         primary key,
-    Rate      tinyint                       not null,
-    Comment   varchar(4096) charset utf8mb3 null,
-    AuthorId  bigint unsigned               not null,
-    ServiceId bigint unsigned               not null,
+    Rate      tinyint                            not null,
+    Comment   varchar(4096) charset utf8mb3      null,
+    AuthorId  bigint unsigned                    not null,
+    ServiceId bigint unsigned                    not null,
+    AddedAt   datetime default CURRENT_TIMESTAMP not null,
     constraint UserRateOfService_UniversityService_Id_fk
         foreign key (ServiceId) references UniversityService (Id)
             on delete cascade,

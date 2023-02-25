@@ -17,6 +17,7 @@ namespace UniversityMonitoring.Data.Models
         }
 
         public virtual DbSet<Moderator> Moderators { get; set; } = null!;
+        public virtual DbSet<MonitoringModule> MonitoringModules { get; set; } = null!;
         public virtual DbSet<University> Universities { get; set; } = null!;
         public virtual DbSet<UniversityService> UniversityServices { get; set; } = null!;
         public virtual DbSet<UniversityServiceReport> UniversityServiceReports { get; set; } = null!;
@@ -37,6 +38,12 @@ namespace UniversityMonitoring.Data.Models
                 entity.Property(e => e.PasswordSha256hash)
                     .HasColumnType("tinyblob")
                     .HasColumnName("PasswordSHA256Hash");
+            });
+
+            modelBuilder.Entity<MonitoringModule>(entity =>
+            {
+                entity.HasIndex(e => e.Url, "MonitoringModules_Url_uindex")
+                    .IsUnique();
             });
 
             modelBuilder.Entity<University>(entity =>

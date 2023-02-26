@@ -2,6 +2,8 @@ version: '3'
 
 services:
   api:
+    networks:
+      - um-network
     container_name: umapi
     image: "um-api"
     build:
@@ -14,6 +16,8 @@ services:
     ports:
       - "80:80"
   notify-service:
+    networks:
+      - um-network
     container_name: umnotify
     image: "um-notify"
     build:
@@ -25,7 +29,9 @@ services:
       - API_URL=http://umapi:80/
       - EMAIL_ADDRESS=universitiesmonitoring@denvot.dev
       - EMAIL_PASSWORD=universitiesmonitoring
-  monitoring-service: 
+  monitoring-service:
+    networks:
+      - um-network
     container_name: ummonitoring
     image: "um-mon"
     build:
@@ -35,6 +41,8 @@ services:
       - DOTNET_ENVIRONMENT=Development
       - API_URL=http://umapi:80/
   db:
+    networks:
+      - um-network
     container_name: mysql
     image: "mysql"
     restart: always
@@ -43,3 +51,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: denvot
       
+networks:
+  um-network:
+    name: um-network

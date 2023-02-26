@@ -2,18 +2,53 @@ import {useLocation} from "react-router-dom";
 import {Button} from "../components/Button";
 import {createUseStyles} from "react-jss";
 import Constants from "../Constants";
-import {faStar} from "@fortawesome/free-solid-svg-icons";
+import {faServer, faStar, faTreeCity} from "@fortawesome/free-solid-svg-icons";
 import MessagePart from "../assets/images/message-part.svg";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useEffect, useRef, useState} from "react";
 import {SubmitButton} from "../components/SubmitButton";
-import {GetReports, SendComment, SendReportToService, SubscribeToService, UnsubscribeToService} from "../ApiMethods";
+import {
+    GetReports,
+    SendComment,
+    SendReportToService,
+    SubscribeToService,
+    TestService,
+    UnsubscribeToService
+} from "../ApiMethods";
 import Swal from "sweetalert2";
-import {Carousel, Stack} from "react-bootstrap";
-import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
+import {Carousel, Container, Stack} from "react-bootstrap";
 import {GenerateUUID} from "../Utils";
 
 const useStyles = createUseStyles({
+    "@keyframes loading-animation": {
+        from: {
+            background: "#FFF"
+        },
+        to: {
+            background: "#ededed"
+        }
+    },
+    testResultContainerWrapper: {
+        background: "#f5f5f5",
+        padding: 30,
+        "& .test-result-container": {
+            background: "#FFF",
+            padding: 30,
+            borderRadius: 20,
+            "& .result-container": {
+                padding: "1rem",
+                borderRadius: 20,
+                justifyContent: "space-between",
+            }
+        },
+        "& .loading-container": {
+            animation: "$loading-animation 1s infinite alternate"
+        },
+        "& .results-list": {
+            maxHeight: "30vh",
+            overflowY: "auto"
+        }
+    },
     status: {
         background: "var(--status-color)",
         borderRadius: 10,
@@ -199,6 +234,19 @@ const useStyles = createUseStyles({
                 }
             }
         },
+        testResultContainerWrapper: {
+            "& .result-container": {
+                display: "flex",
+                flexDirection: "column !important",
+                
+            },
+            "& .header": {
+                justifyContent: "center"  
+            },
+            "& .fa-tree-city": {
+                display: "none"    
+            }
+        }
     },
     "@media screen and (max-width: 600px)": {
         status: {
@@ -219,8 +267,9 @@ export function ServicePage() {
         setService(service);
     }   
     
-    return <div className="h-100">
+    return <div className="h-100" style={{background: "#f5f5f5"}}>
         <ServiceHeader service={service} updateService={updateService}/>
+        <TestResultContainer service={service}/>
         <ServiceBody service={service} updateService={updateService}/>
     </div>
 }
@@ -400,13 +449,18 @@ function CommentsColumn({comments}) {
     
     return <div className={style.commentsWrapper}>
         <span className="title">Комментарии</span>
-        <div className="comments-container">
-            {comments.map(comment => 
-                <Comment key={comment.id} 
+         <div className="comments-container">
+            {
+                comments.length > 0 ? comments.map(comment =>
+                <Comment key={comment.id}
                          from={comment.author.username}
                          content={comment.content}
-                         stars={comment.rate} 
-                         addedAt={comment.addedAt}/>)}
+                         stars={comment.rate}
+                         addedAt={comment.addedAt}/>) : 
+                <Comment key="information-message"
+                         from="Администрации сайта"
+                         content="Никто пока что не оценивал этот сервис. Вы можете стать первым"/>
+            }
         </div>
     </div>
 }
@@ -431,8 +485,10 @@ function ReportsColumn({service}) {
         {
             <div className="comments-container">
                 {reports.length > 0 ? reports.map(report =>
-                    <Comment key={report.id} from="Пользователя сервиса" addedAt={report.addedAt} content={report.content}/>) :  
-                    <span>Пока что нет никаких данных об этом сбое. Приходите сюда позже 👀</span>}
+                    <Comment key={report.id} from="Пользователя сервиса" addedAt={report.addedAt} content={report.content}/>) :
+                    <Comment key="information-message"
+                             from="Администрации сайта"
+                             content='Никто еще сообщал о причинах этого сбоя. Если Вы что-нибудь знаете о нем, расскажите, пожалуйста, нажав на кнопку "Вы знаете почему сервис не работает?" 😁'/>}
             </div>
         }
     </div>
@@ -585,6 +641,51 @@ function SendCommentFormPopup({closePopup, service, updateService}) {
     return <div onClick={handleClick} className={style.commentFormMobileWrapper}>
         <SendCommentForm onEnded={() => endDialog()} service={service} reference={formElement} updateService={updateService}/>
     </div>
+}
+
+function LoadingContainer() {
+    return <div className="test-result-container loading-container">
+        <span className="text-muted fs-3 fw-bold">Собираем информацию из других городов для Вас</span>
+    </div>
+}
+
+function TestResultContainer({service}) {
+    const style = useStyles();
+    const [testResult, setTestResult] = useState(null);
+    
+    useEffect(() => {
+        (async () => {
+            setTestResult(await TestService(service.serviceId));
+        })();
+    }, []);
+    
+    if (testResult === null) {
+        return <Container className={style.testResultContainerWrapper}>
+            <LoadingContainer/>
+        </Container>;
+    }
+    
+    if (testResult.length === 0) return null;
+    
+    return <Container className={style.testResultContainerWrapper}>
+        <div className="test-result-container">
+            <h1>Статистика доступа из разных городов</h1>
+            <Stack className="results-list" gap={3}>
+                {
+                    testResult.map(result => <Stack className="result-container" style={{background: result.headTime !== null ? "rgb(175, 254, 159)" : "rgb(254, 159, 159)"}} direction="horizontal">
+                        <Stack direction="horizontal" className="header" gap={3}>
+                            <FontAwesomeIcon icon={faTreeCity} fontSize={64} color="#FFF"/>
+                            <span className="fw-bold fs-4">{result.testFrom}</span>
+                        </Stack>
+                        <div>
+                            {result.headTime !== null && <div><span><b>Время ответа сайта:</b> {result.headTime} мс</span></div>}
+                            {result.pingTime !== null && <div><span><b>Время ответа сервера:</b> {result.pingTime} мс</span></div>}
+                        </div>
+                    </Stack>)
+                }
+            </Stack>
+        </div>
+    </Container>
 }
 
 function formatDate(date) {

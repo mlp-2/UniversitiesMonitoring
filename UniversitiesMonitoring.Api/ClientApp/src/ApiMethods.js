@@ -1,5 +1,11 @@
 import axios from "axios";
 
+export async function TestService(id) {
+    const result = await axios.get(`/api/services/${id}/test`);
+    
+    return ensureSuccessStatus(result, result.data);
+}
+
 export async function GetUser() {
     const userFromStorage = JSON.parse(sessionStorage.getItem("user")); 
     if (userFromStorage !== null) return userFromStorage;

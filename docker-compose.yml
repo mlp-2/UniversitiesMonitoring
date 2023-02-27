@@ -13,6 +13,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - CONNECTION_STRING=Server=mysql;User=root;Password=denvot;Database=universities_monitoring
       - JWT_SECRET=bfbfd98b-2ccf-4f19-8025-b51c512cf2ca
+      - TRUSTED_HOSTS=umapi
     ports:
       - "80:80"
   notify-service:

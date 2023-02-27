@@ -16,18 +16,23 @@ public class ServicesController : ControllerBase
     private readonly IUsersProvider _usersProvider;
     private readonly IWebSocketUpdateStateNotifier _webSocketUpdateStateNotifier;
     private readonly IModulesProvider _modulesProvider;
-
-    private bool IsLocalHostRequest => Request.Host.Host == "localhost";
+    private readonly string[] _trustedHosts;
+    
+    private bool IsTrustedRequest => _trustedHosts.Contains(Request.Host.Host);
 
     public ServicesController(IServicesProvider servicesProvider,
         IUsersProvider usersProvider,
         IWebSocketUpdateStateNotifier webSocketUpdateStateNotifier,
-        IModulesProvider modulesProvider)
+        IModulesProvider modulesProvider,
+        IConfiguration configuration)
     {
         _servicesProvider = servicesProvider;
         _usersProvider = usersProvider;
         _webSocketUpdateStateNotifier = webSocketUpdateStateNotifier;
         _modulesProvider = modulesProvider;
+        _trustedHosts = (Environment.GetEnvironmentVariable("TRUSTED_HOSTS") ??
+                         configuration["TrustedHosts"] ?? 
+                         string.Empty).Split(";");
     }
 
     [Authorize(Roles = JwtGenerator.UserRole)]
@@ -163,8 +168,8 @@ public class ServicesController : ControllerBase
         [FromQuery] ulong? universityId = null)
     {
         // Нужно, чтобы не сливать инфу
-        loadUsers = loadUsers && IsLocalHostRequest;
-        loadComments = loadComments && IsLocalHostRequest;
+        loadUsers = loadUsers && IsTrustedRequest;
+        loadComments = loadComments && IsTrustedRequest;
         
         var services = (await _servicesProvider.GetAllServicesAsync(universityId)).ToArray();
 
@@ -208,7 +213,7 @@ public class ServicesController : ControllerBase
     [HttpPut("update")]
     public async Task<IActionResult> UpdateService([FromBody] ChangeStateEntity[] updates)
     {
-        if (!IsLocalHostRequest) return Ok();
+        if (!IsTrustedRequest) return Ok();
 
         var updateSuccess = true;
 

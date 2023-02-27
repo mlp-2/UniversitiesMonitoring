@@ -13,7 +13,8 @@ public class HandlingExceptionsMiddleware
     
     public async Task InvokeAsync(HttpContext context)
     {
-        _logger.LogInformation("Request. Route: {Route}. Method: {HttpMethod}", context.Request.Path.Value, context.Request.Method);
+        _logger.LogInformation("Request. Route: {Route}. Method: {HttpMethod}. From: {Host}:{HostPort}",
+            context.Request.Path.Value, context.Request.Method, context.Request.Host.Host, context.Request.Host.Port);
         try
         {
             await _next(context);

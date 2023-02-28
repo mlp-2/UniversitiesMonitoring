@@ -23,12 +23,12 @@ internal class Worker : BackgroundService
 
         while (true)
         {
-            inspectors = await RefreshServicesInspectorsList(inspectors);
+            inspectors = await RefreshServicesInspectorsList(inspectors, stoppingToken);
 
             if (inspectors.Length == 0)
             {
                 _logger.LogWarning("No inspectors found for monitoring. Retry to refresh list in 10 minutes");
-                await Task.Delay(TimeSpan.FromMinutes(10));
+                await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
                 continue;
             }
             
@@ -45,7 +45,7 @@ internal class Worker : BackgroundService
                 continue;
             }
 
-            await _universitiesServiceProvider.SendUpdateAsync(update.Changes);
+            await _universitiesServiceProvider.SendUpdateAsync(update.Changes, stoppingToken);
             
             _logger.LogTrace("Update sent");
             
@@ -53,9 +53,9 @@ internal class Worker : BackgroundService
         }
     }
 
-    private async Task<UniversityServiceInspector[]> RefreshServicesInspectorsList(UniversityServiceInspector[] inspectors)
+    private async Task<UniversityServiceInspector[]> RefreshServicesInspectorsList(UniversityServiceInspector[] inspectors, CancellationToken cancellationToken)
     {
-        var allServices = (await _universitiesServiceProvider.GetAllUniversitiesServicesAsync()).ToArray();
+        var allServices = (await _universitiesServiceProvider.GetAllUniversitiesServicesAsync(cancellationToken)).ToArray();
         var newInspectors = new UniversityServiceInspector[allServices.Length];
         var countAdded = allServices.Length;
         

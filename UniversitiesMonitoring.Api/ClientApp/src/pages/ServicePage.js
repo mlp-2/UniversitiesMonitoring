@@ -495,7 +495,7 @@ function ReportsColumn({service}) {
 }
 
 function SendCommentForm({reference, service, updateService, onEnded}) {
-    const [rate, setRate] = useState();
+    const [rate, setRate] = useState(1);
     const style = useStyles();
     
     async function handleSubmit(e) {
@@ -506,6 +506,10 @@ function SendCommentForm({reference, service, updateService, onEnded}) {
         formData.append("rate", rate);
 
         const apiData = Object.fromEntries(formData.entries());
+
+        if (apiData.content === "") {
+            return;
+        }
         
         if (await SendComment(service.serviceId, apiData)) {
             if(onEnded) onEnded();
@@ -553,7 +557,7 @@ function SendCommentForm({reference, service, updateService, onEnded}) {
 
 function StarsBar({onChange}) {
     const style = useStyles();
-    const [countOfStars, setCountOfStars] = useState(-1);
+    const [countOfStars, setCountOfStars] = useState(1);
     
     useEffect(() => {
         onChange(countOfStars);

@@ -168,8 +168,10 @@ public class ServicesController : ControllerBase
         [FromQuery] ulong? universityId = null)
     {
         // Нужно, чтобы не сливать инфу
-        loadUsers = loadUsers && IsTrustedRequest;
-        loadComments = loadComments && IsTrustedRequest;
+        var trustedRequest = IsTrustedRequest || User.IsInRole(JwtGenerator.UserRole);
+        
+        loadUsers = loadUsers && trustedRequest;
+        loadComments = loadComments && trustedRequest;
         
         var services = (await _servicesProvider.GetAllServicesAsync(universityId)).ToArray();
 

@@ -36,7 +36,7 @@ public class ServicesController : ControllerBase
     }
 
     [Authorize(Roles = JwtGenerator.UserRole)]
-    [HttpPost("{id:long}")]
+    [HttpGet("{id:long}")]
     public async Task<IActionResult> GetService([FromRoute] ulong id)
     {
         var service = await _servicesProvider.GetServiceAsync(id);

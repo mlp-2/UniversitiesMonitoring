@@ -124,10 +124,25 @@ const useStyles = createUseStyles({
 
 export function UniversitiesList() {
     const style = useStyles();
+    const [universities, setUniversities] = useState(null)
+    
+    useEffect(()=> {
+        (async () => {
+            const universities = await getUniversities();
+
+            for(let i in universities) {
+                universities[i].nameQueryable = makeStringQueryable(universities[i].name);
+            }
+            
+            setUniversities(universities);
+        })();
+    }, []);
+    
+    if (universities === null) return <Loading/>
     
     return <div className={style.layout}>
         <Header/>
-        <Listing/>
+        <Listing universities={universities}/>
     </div>
 }
 
@@ -139,28 +154,19 @@ function Header() {
     </div>
 }
 
-function Listing() {
+function Listing({universities}) {
     const style = useStyles();
-    const [universities, setUniversities] = useState(null);
     const [query, setQuery] = useState("");
+    const [loading, setLoadingState] = useState(false);
     
     function updateQuery(newQuery) {
         setQuery(makeStringQueryable(newQuery))
     }
     
-    useEffect(() => {
-        (async () => {
-            const universities = await getUniversities();
-            
-            for(let i in universities) {
-                universities[i].nameQueryable = makeStringQueryable(universities[i].name);
-            }
-            
-            setUniversities(universities);
-        })();
-    }, []);
-    
-    if (universities === null) return <Loading/>
+    if (universities === null && !loading) {
+        setLoadingState(true);
+        return null;
+    }
     
     return <div className={style.listing}>
         <SearchBar updateSearch={updateQuery}/>

@@ -194,7 +194,7 @@ function ServiceContainer({service, updateServices}) {
     
     return <div className={style.servicePanel} 
                 style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438" }}>
-            <Link to="/service" state={{ service: service }}>
+            <Link to="/service" state={{ serviceId: service.serviceId }}>
                 {service.serviceName}
             </Link>
             <div className="service-actions">

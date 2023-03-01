@@ -29,6 +29,12 @@ export async function UnsubscribeToService(serviceId) {
     return ensureSuccessStatus(result, true);
 }
 
+export async function GetService(serviceId) {
+    const result = await axios.get(`/api/services/${serviceId}`);
+
+    return ensureSuccessStatus(result, result.data);
+}
+
 export async function SendReportToService(serviceId, isOnline, content) {
     const apiEntity = {
         serviceId: serviceId,

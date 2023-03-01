@@ -2,13 +2,13 @@ import {useLocation} from "react-router-dom";
 import {Button} from "../components/Button";
 import {createUseStyles} from "react-jss";
 import Constants from "../Constants";
-import {faServer, faStar, faTreeCity} from "@fortawesome/free-solid-svg-icons";
+import {faStar, faTreeCity} from "@fortawesome/free-solid-svg-icons";
 import MessagePart from "../assets/images/message-part.svg";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useEffect, useRef, useState} from "react";
 import {SubmitButton} from "../components/SubmitButton";
 import {
-    GetReports,
+    GetReports, GetService,
     SendComment,
     SendReportToService,
     SubscribeToService,
@@ -18,6 +18,10 @@ import {
 import Swal from "sweetalert2";
 import {Carousel, Container, Stack} from "react-bootstrap";
 import {GenerateUUID} from "../Utils";
+import {FullscreenFrame} from "../components/FullScreenFrame";
+import {Navigate} from "react-router-dom";
+import {Query} from "../QueryHelper";
+import {Loading} from "../components/Loading";
 
 const useStyles = createUseStyles({
     "@keyframes loading-animation": {
@@ -120,9 +124,6 @@ const useStyles = createUseStyles({
             zIndex: -1,
             left: 0,
             top: 0
-        },
-        "& .carousel-control-prev, .carousel-control-next": {
-            position: "fixed"
         }
     },
     comment: {
@@ -208,7 +209,8 @@ const useStyles = createUseStyles({
         background: "#FFF",
         transition: "background 0.3s",
         cursor: "pointer",
-        userSelect: "none"
+        userSelect: "none",
+        zIndex: 100000000000
     },
     commentFormMobileWrapper: {
         position: "absolute",
@@ -219,7 +221,7 @@ const useStyles = createUseStyles({
         justifyContent: "center",
         top: 0,
         left: 0,
-        zIndex: 10000000,
+        zIndex: 10000000000000,
         background: "rgba(88,88,88,0.5)"
     },
     "@media screen and (max-width: 1136px)": {
@@ -261,11 +263,38 @@ const monthNames = ["янв", "фев", "мар", "апр",
 
 export function ServicePage() {
     const location = useLocation();
-    const [service, setService] = useState(location.state.service)
+    const [service, setService] = useState(null);
+    const [smthgWentWrong, setRedirect] = useState(false);
     
     function updateService(service) {  
         setService(service);
-    }   
+    }
+    
+    async function smthgFall() {
+        await Swal.fire({
+            title: "Что-то пошло не так",
+            text: "Мы переадресуем Вас на начальную страницу. Вы будете в полной безопасности",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 2000
+        });
+        
+        setRedirect(true);
+    }
+    
+    useEffect(() => {
+        (async () => {
+            try {
+                setService(await GetService(location.state.serviceId ?? Query.serviceId));    
+            } catch {
+                await smthgFall();  
+            }
+        })();
+    }, []);
+    
+    if (smthgWentWrong) return <Navigate to="/universities-list"/>
+    if (service === null) return <Loading/>
+    if (service.changedStatusAt === null) return <ServiceDidntSetupped service={service}/>
     
     return <div className="h-100" style={{background: "#f5f5f5"}}>
         <ServiceHeader service={service} updateService={updateService}/>
@@ -274,10 +303,19 @@ export function ServicePage() {
     </div>
 }
 
+function ServiceDidntSetupped({service}) {
+    return <FullscreenFrame>
+        <h1 className="text-center w-75">
+            О сервисе "{service.serviceName}" ВУЗа "{service.universityName}" еще нет никакой информации. 
+            Возращайтесь сюда через 15-20 минут, когда она точно будет.
+        </h1>
+    </FullscreenFrame>
+}
+
 function ServiceHeader({service, updateService}) {
     const style = useStyles();
     
-    const changedStatusAt = new Date(service.changedStatusAt);
+    const changedStatusAt = new Date(service.changedStatusAt + "Z");
     
     async function handleClickOnSubscribeButton() {
         if (!service.isSubscribed) {
@@ -475,20 +513,19 @@ function ReportsColumn({service}) {
         })();
     }, []);
     
-    if(reports === null)
-    {
-        return <span>ЗАГРУЗКА</span>
-    }
-    
     return <div className={style.commentsWrapper}>
         <span className="title">Сообщения о текущем сбое</span>
         {
             <div className="comments-container">
-                {reports.length > 0 ? reports.map(report =>
-                    <Comment key={report.id} from="Пользователя сервиса" addedAt={report.addedAt} content={report.content}/>) :
+                {reports === null ?
                     <Comment key="information-message"
-                             from="Администрации сайта"
-                             content='Никто еще сообщал о причинах этого сбоя. Если Вы что-нибудь знаете о нем, расскажите, пожалуйста, нажав на кнопку "Вы знаете почему сервис не работает?" 😁'/>}
+                             from="Системы"
+                             content='Загружаем жалобы...'/> : 
+                    reports.length > 0 ? reports.map(report =>
+                        <Comment key={report.id} from="Пользователя сервиса" addedAt={report.addedAt} content={report.content}/>) :
+                        <Comment key="information-message"
+                                 from="Администрации сайта"
+                                 content='Никто еще сообщал о причинах этого сбоя. Если Вы что-нибудь знаете о нем, расскажите, пожалуйста, нажав на кнопку "Вы знаете почему сервис не работает?" 😁'/>}
             </div>
         }
     </div>
@@ -701,4 +738,3 @@ function formatDate(date) {
 function padTo2Digits(num) {
     return num.toString().padStart(2, '0');
 }
-

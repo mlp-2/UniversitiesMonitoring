@@ -53,6 +53,18 @@ public class ServicesController : ControllerBase
     }
 
     [Authorize(Roles = JwtGenerator.UserRole)]
+    [HttpGet("{id:long}/uptime")]
+    public IActionResult GetServiceUptime([FromRoute] ulong id)
+    {
+        var uptime = _servicesProvider.GetServiceUptime(id);
+
+        return Ok(new
+        {
+            uptime
+        });
+    }
+    
+    [Authorize(Roles = JwtGenerator.UserRole)]
     [HttpGet("{id:long}/test")]
     public async Task<IActionResult> Test([FromRoute] ulong id)
     {

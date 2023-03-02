@@ -6,6 +6,7 @@ namespace UniversitiesMonitoring.Api.Services;
 public interface IServicesProvider
 {
     Task<UniversityService?> GetServiceAsync(ulong serviceId);
+    double? GetServiceUptime(ulong serviceId);
     Task<IEnumerable<UniversityService>> GetAllServicesAsync(ulong? universityId = null);
     Task SubscribeUserAsync(User user, UniversityService service);
     Task<University?> GetUniversityAsync(ulong universityId);

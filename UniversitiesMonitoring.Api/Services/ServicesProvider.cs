@@ -112,13 +112,9 @@ public class ServicesProvider : IServicesProvider
         var updateState = new UniversityServiceStateChange()
         {
             Service = service,
-            IsOnline = isOnline
+            IsOnline = isOnline,
+            ChangedAt = updateTime ?? DateTime.UtcNow
         };
-
-        if (updateTime != null)
-        {
-            updateState.ChangedAt = updateTime.Value;
-        }
 
         var lastUpdate = await _dataProvider.UniversityServiceStateChange.GetlAll().FirstOrDefaultAsync();
 

@@ -22,6 +22,7 @@ import {FullscreenFrame} from "../components/FullScreenFrame";
 import {Navigate} from "react-router-dom";
 import {Query} from "../QueryHelper";
 import {Loading} from "../components/Loading";
+import axios from "axios";
 
 const useStyles = createUseStyles({
     "@keyframes loading-animation": {
@@ -86,7 +87,7 @@ const useStyles = createUseStyles({
         "& .service-name-with-status": {
             display: "flex",
             alignItems: "center",
-            gap: 10
+            gap: 20
         },
         "& .service-name-with-status span": {
             position: "relative",
@@ -313,6 +314,20 @@ function ServiceDidntSetupped({service}) {
 }
 
 function ServiceHeader({service, updateService}) {
+    const [uptime, setUptime] = useState(null);
+    
+    useEffect(() => {
+        (async () => {
+            try {
+                const result = await axios.get(`/api/services/${service.serviceId}/uptime`);    
+                
+                setUptime(result.data.uptime);
+            } catch {
+                
+            }
+        })();
+    }, [])
+    
     const style = useStyles();
     
     const changedStatusAt = new Date(service.changedStatusAt + "Z");
@@ -407,9 +422,19 @@ function ServiceHeader({service, updateService}) {
         <div className="action-section">
             <div className="service-name-with-status">
                 <span className="to-bottom">{service.serviceName}</span>
-                <span className={style.status} style={{"--status-color": service.isOnline ? "#3CFB38" : "#FB4438"}}>
-                    {service.isOnline ? "Онлайн" : "Офлайн"} с {formatDate(changedStatusAt)}
-                </span>
+                <Stack className="justify-content-center" gap={2}>
+                    <span className={style.status} style={{"--status-color": service.isOnline ? "#3CFB38" : "#FB4438"}}>
+                        {service.isOnline ? "Онлайн" : "Офлайн"} с {formatDate(changedStatusAt)}
+                    </span>
+                    {
+                        uptime !== null &&
+                        <span title="Показывает сколько процентов времени сервис находится в сети. Больше - лучше"
+                                  className={style.status}
+                                  style={{"--status-color": `rgb(${250 * (1 - uptime)},${250 * uptime},80)`}}>
+                            Uptime: {uptime * 100}%
+                        </span>
+                    }
+                </Stack>
             </div>
             <Stack className="flex-grow-0 gap-2">
                 <Button onClick={handleClickOnReportButton} 
@@ -732,7 +757,7 @@ function TestResultContainer({service}) {
 function formatDate(date) {
     const month = date.getMonth();
     
-    return `${padTo2Digits(date.getHours())}:${padTo2Digits(date.getMinutes())} ${date.getDay()} ${monthNames[month]}`;
+    return `${padTo2Digits(date.getHours())}:${padTo2Digits(date.getMinutes())} ${date.getDate()} ${monthNames[month]}`;
 }
 
 function padTo2Digits(num) {

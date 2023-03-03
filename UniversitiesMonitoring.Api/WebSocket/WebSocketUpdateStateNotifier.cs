@@ -12,16 +12,22 @@ namespace UniversitiesMonitoring.Api.WebSocket;
 public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
 {
     private readonly IServiceProvider _serviceProvider;
+    private readonly ILogger<WebSocketUpdateStateNotifier> _logger;
     private readonly List<Tuple<WS, TaskCompletionSource<object>>> _webSockets = new();
 
-    public WebSocketUpdateStateNotifier(IServiceProvider serviceProvider)
+    private static readonly object CloseObject = new();
+    
+    public WebSocketUpdateStateNotifier(IServiceProvider serviceProvider,
+        ILogger<WebSocketUpdateStateNotifier> logger)
     {
         _serviceProvider = serviceProvider;
+        _logger = logger;
     }
     
     public void AppendWebSocket(WS webSocket, TaskCompletionSource<object> socketFinishedTcs)
     {
         _webSockets.Add(new Tuple<WS, TaskCompletionSource<object>>(webSocket, socketFinishedTcs));
+        _logger.LogDebug("New WS listener added");
     }
 
     public async Task NotifyAsync(ulong[] servicesIds)
@@ -32,19 +38,28 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
         var changes = await CreateChangeStatesReportsAsync(servicesIds);
         var changesJsonBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(changes));
 
+        void RemoveSocketFromPipeline(Tuple<WS, TaskCompletionSource<object>> webSocketTup)
+        {
+            badSockets.Add(webSocketTup);
+            webSocketTup.Item2.SetResult(new object());
+        }
+        
         foreach (var webSocketTup in _webSockets)
         {
             var webSocket = webSocketTup.Item1;
-            var tcs = webSocketTup.Item2;
-            
-            if (webSocket.CloseStatus.HasValue)
-            {
-                badSockets.Add(webSocketTup);
-                tcs.SetResult(new object());
-            }
 
-            await webSocket.SendAsync(changesJsonBytes, WebSocketMessageType.Text, 
-                                        WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
+            try
+            {
+                if (webSocket.CloseStatus.HasValue) RemoveSocketFromPipeline(webSocketTup);
+
+                await webSocket.SendAsync(changesJsonBytes, WebSocketMessageType.Text, 
+                WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
+            }
+            catch
+            {
+                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client disconnected", CancellationToken.None);
+                RemoveSocketFromPipeline(webSocketTup);
+            }
         }
 
         _webSockets.RemoveAll(x => badSockets.Contains(x));

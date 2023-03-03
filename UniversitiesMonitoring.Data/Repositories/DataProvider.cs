@@ -18,6 +18,7 @@ public class DataProvider : IDataProvider
         Subscribes = new Repository<UserSubscribeToService, ulong>(context);
         UniversityServiceStateChange = new Repository<UniversityServiceStateChange, ulong>(context);
         Rates = new Repository<UserRateOfService, ulong>(context);
+        MonitoringModules = new Repository<MonitoringModule, ulong>(context);
     }
 
     public IRepository<University, ulong> Universities { get; }
@@ -28,6 +29,9 @@ public class DataProvider : IDataProvider
     public IRepository<Moderator, ulong> Moderators { get; }
     public IRepository<UniversityServiceReport, ulong> Reports { get; }
     public IRepository<UserRateOfService, ulong> Rates { get; }
+
+    /// <inheritdoc />
+    public IRepository<MonitoringModule, ulong> MonitoringModules { get; }
 
     public Task SaveChangesAsync() => _context.SaveChangesAsync();
 

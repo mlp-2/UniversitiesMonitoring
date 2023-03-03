@@ -15,18 +15,28 @@ public class ServicesController : ControllerBase
     private readonly IServicesProvider _servicesProvider;
     private readonly IUsersProvider _usersProvider;
     private readonly IWebSocketUpdateStateNotifier _webSocketUpdateStateNotifier;
-
-    private bool IsLocalHostRequest => Request.Host.Host == "localhost";
+    private readonly IModulesProvider _modulesProvider;
+    private readonly string[] _trustedHosts;
     
-    public ServicesController(IServicesProvider servicesProvider, IUsersProvider usersProvider, IWebSocketUpdateStateNotifier webSocketUpdateStateNotifier)
+    private bool IsTrustedRequest => _trustedHosts.Contains(Request.Host.Host);
+
+    public ServicesController(IServicesProvider servicesProvider,
+        IUsersProvider usersProvider,
+        IWebSocketUpdateStateNotifier webSocketUpdateStateNotifier,
+        IModulesProvider modulesProvider,
+        IConfiguration configuration)
     {
         _servicesProvider = servicesProvider;
         _usersProvider = usersProvider;
         _webSocketUpdateStateNotifier = webSocketUpdateStateNotifier;
+        _modulesProvider = modulesProvider;
+        _trustedHosts = (Environment.GetEnvironmentVariable("TRUSTED_HOSTS") ??
+                         configuration["TrustedHosts"] ?? 
+                         string.Empty).Split(";");
     }
 
     [Authorize(Roles = JwtGenerator.UserRole)]
-    [HttpPost("{id:long}")]
+    [HttpGet("{id:long}")]
     public async Task<IActionResult> GetService([FromRoute] ulong id)
     {
         var service = await _servicesProvider.GetServiceAsync(id);
@@ -42,6 +52,34 @@ public class ServicesController : ControllerBase
         return Ok(serviceEntity);
     }
 
+    [Authorize(Roles = JwtGenerator.UserRole)]
+    [HttpGet("{id:long}/uptime")]
+    public IActionResult GetServiceUptime([FromRoute] ulong id)
+    {
+        var uptime = _servicesProvider.GetServiceUptime(id);
+
+        return Ok(new
+        {
+            uptime
+        });
+    }
+    
+    [Authorize(Roles = JwtGenerator.UserRole)]
+    [HttpGet("{id:long}/test")]
+    public async Task<IActionResult> Test([FromRoute] ulong id)
+    {
+        var service = await _servicesProvider.GetServiceAsync(id);
+
+        if (service == null)
+        {
+            return BadRequest("Сервис не найден");
+        }
+
+        var testResult = await _modulesProvider.TestServiceAsync(service);
+
+        return Ok(testResult);
+    }
+    
     [Authorize(Roles = JwtGenerator.UserRole)]
     [HttpPost("{id:long}/subscribe")]
     public async Task<IActionResult> SubscribeService([FromRoute] ulong id)
@@ -142,8 +180,10 @@ public class ServicesController : ControllerBase
         [FromQuery] ulong? universityId = null)
     {
         // Нужно, чтобы не сливать инфу
-        loadUsers = loadUsers && IsLocalHostRequest;
-        loadComments = loadComments && IsLocalHostRequest;
+        var trustedRequest = IsTrustedRequest || User.IsInRole(JwtGenerator.UserRole);
+        
+        loadUsers = loadUsers && trustedRequest;
+        loadComments = loadComments && trustedRequest;
         
         var services = (await _servicesProvider.GetAllServicesAsync(universityId)).ToArray();
 
@@ -170,7 +210,7 @@ public class ServicesController : ControllerBase
 
         var universityEntity = new UniversityEntity(university)
         {
-            IsSubscribed = User.IsInRole(JwtGenerator.UserRole) ? university.UniversityServices.All(service => 
+            IsSubscribed = User.IsInRole(JwtGenerator.UserRole) ? university.UniversityServices.Any(service => 
                 service.UserSubscribeToServices.Any(subscribe =>
                     subscribe.UserId.ToString() == User.Identity!.Name!)) : null
         };
@@ -182,12 +222,17 @@ public class ServicesController : ControllerBase
     public IActionResult GetAllUniversities() => Ok(
         from university in _servicesProvider.GetAllUniversities()
             .ToList()
-        select new UniversityEntity(university));
+        select new UniversityEntity(university)
+        {
+            IsSubscribed = User.IsInRole(JwtGenerator.UserRole) ? university.UniversityServices.Any(service => 
+                service.UserSubscribeToServices.Any(subscribe =>
+                    subscribe.UserId.ToString() == User.Identity!.Name!)) : null
+        });
 
     [HttpPut("update")]
     public async Task<IActionResult> UpdateService([FromBody] ChangeStateEntity[] updates)
     {
-        if (!IsLocalHostRequest) return Ok();
+        if (!IsTrustedRequest) return Ok();
 
         var updateSuccess = true;
 

@@ -2,18 +2,65 @@ import {useLocation} from "react-router-dom";
 import {Button} from "../components/Button";
 import {createUseStyles} from "react-jss";
 import Constants from "../Constants";
-import {faStar} from "@fortawesome/free-solid-svg-icons";
+import {faStar, faTreeCity} from "@fortawesome/free-solid-svg-icons";
 import MessagePart from "../assets/images/message-part.svg";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useEffect, useRef, useState} from "react";
 import {SubmitButton} from "../components/SubmitButton";
-import {GetReports, SendComment, SendReportToService, SubscribeToService, UnsubscribeToService} from "../ApiMethods";
+import {
+    GetReports, GetService,
+    SendComment,
+    SendReportToService,
+    SubscribeToService,
+    TestService,
+    UnsubscribeToService
+} from "../ApiMethods";
 import Swal from "sweetalert2";
-import {Carousel, Stack} from "react-bootstrap";
-import {generateUniqueID} from "web-vitals/dist/modules/lib/generateUniqueID";
+import {Carousel, Container, Stack} from "react-bootstrap";
 import {GenerateUUID} from "../Utils";
+import {FullscreenFrame} from "../components/FullScreenFrame";
+import {Navigate} from "react-router-dom";
+import {Query} from "../QueryHelper";
+import {Loading} from "../components/Loading";
+import axios from "axios";
 
 const useStyles = createUseStyles({
+    "@keyframes loading-animation": {
+        from: {
+            background: "#FFF"
+        },
+        to: {
+            background: "#ededed"
+        }
+    },
+    testResultContainerWrapper: {
+        background: "#f5f5f5",
+        padding: 30,
+        "& .test-result-container": {
+            background: "#FFF",
+            padding: 30,
+            borderRadius: 20,
+            "& .result-container": {
+                padding: "1rem",
+                borderRadius: 20,
+                justifyContent: "space-between",
+            }
+        },
+        "& .loading-container": {
+            animation: "$loading-animation 1s infinite alternate"
+        },
+        "& .results-list": {
+            maxHeight: "30vh",
+            overflowY: "auto"
+        }
+    },
+    status: {
+        background: "var(--status-color)",
+        borderRadius: 10,
+        fontSize: "24px !important",
+        textShadow: "0px 0px 2px #000",
+        padding: 10
+    },
     serviceHeader: {
         background: Constants.brandColor,
         color: "#FFF",
@@ -39,23 +86,14 @@ const useStyles = createUseStyles({
         },
         "& .service-name-with-status": {
             display: "flex",
-            alignItems: ""
+            alignItems: "center",
+            gap: 20
         },
         "& .service-name-with-status span": {
             position: "relative",
             fontSize: 64,
             height: "fit-content",
             verticalAlign: "bottom"
-        },
-        "& .service-name-with-status span::after": {
-            content: '""',
-            position: "absolute",
-            width: 64,
-            height: 64,
-            right: "-90px", 
-            top: "calc(50% - 12px)",
-            borderRadius: "50%",
-            background: "var(--service-status)"
         }
     },
     serviceBody: {
@@ -87,9 +125,6 @@ const useStyles = createUseStyles({
             zIndex: -1,
             left: 0,
             top: 0
-        },
-        "& .carousel-control-prev, .carousel-control-next": {
-            position: "fixed"
         }
     },
     comment: {
@@ -175,7 +210,8 @@ const useStyles = createUseStyles({
         background: "#FFF",
         transition: "background 0.3s",
         cursor: "pointer",
-        userSelect: "none"
+        userSelect: "none",
+        zIndex: 100000000000
     },
     commentFormMobileWrapper: {
         position: "absolute",
@@ -186,7 +222,7 @@ const useStyles = createUseStyles({
         justifyContent: "center",
         top: 0,
         left: 0,
-        zIndex: 10000000,
+        zIndex: 10000000000000,
         background: "rgba(88,88,88,0.5)"
     },
     "@media screen and (max-width: 1136px)": {
@@ -199,33 +235,102 @@ const useStyles = createUseStyles({
                 "& *": {
                     fontSize: 16  
                 }
-            },
-            "& .service-name-with-status span::after": {
-                width: 32,
-                height: 32,
-                right: "-32px",
-                top: "calc(50% - 16px)",
             }
         },
-    }
+        testResultContainerWrapper: {
+            "& .result-container": {
+                display: "flex",
+                flexDirection: "column !important",
+                
+            },
+            "& .header": {
+                justifyContent: "center"  
+            },
+            "& .fa-tree-city": {
+                display: "none"    
+            }
+        }
+    },
+    "@media screen and (max-width: 600px)": {
+        status: {
+            fontSize: "16px !important"
+        }
+    },
 });
+
+const monthNames = ["янв", "фев", "мар", "апр",
+                    "май", "июн", "июл", "авг", 
+                    "сен", "окт", "ноя", "дек"]
 
 export function ServicePage() {
     const location = useLocation();
-    const [service, setService] = useState(location.state.service)
+    const [service, setService] = useState(null);
+    const [smthgWentWrong, setRedirect] = useState(false);
     
     function updateService(service) {  
         setService(service);
-    }   
+    }
     
-    return <div className="h-100">
+    async function smthgFall() {
+        await Swal.fire({
+            title: "Что-то пошло не так",
+            text: "Мы переадресуем Вас на начальную страницу. Вы будете в полной безопасности",
+            icon: "error",
+            showConfirmButton: false,
+            timer: 2000
+        });
+        
+        setRedirect(true);
+    }
+    
+    useEffect(() => {
+        (async () => {
+            try {
+                setService(await GetService(location.state.serviceId ?? Query.serviceId));    
+            } catch {
+                await smthgFall();  
+            }
+        })();
+    }, []);
+    
+    if (smthgWentWrong) return <Navigate to="/universities-list"/>
+    if (service === null) return <Loading/>
+    if (service.changedStatusAt === null) return <ServiceDidntSetupped service={service}/>
+    
+    return <div className="h-100" style={{background: "#f5f5f5"}}>
         <ServiceHeader service={service} updateService={updateService}/>
+        <TestResultContainer service={service}/>
         <ServiceBody service={service} updateService={updateService}/>
     </div>
 }
 
+function ServiceDidntSetupped({service}) {
+    return <FullscreenFrame>
+        <h1 className="text-center w-75">
+            О сервисе "{service.serviceName}" ВУЗа "{service.universityName}" еще нет никакой информации. 
+            Возращайтесь сюда через 15-20 минут, когда она точно будет.
+        </h1>
+    </FullscreenFrame>
+}
+
 function ServiceHeader({service, updateService}) {
+    const [uptime, setUptime] = useState(null);
+    
+    useEffect(() => {
+        (async () => {
+            try {
+                const result = await axios.get(`/api/services/${service.serviceId}/uptime`);    
+                
+                setUptime(result.data.uptime);
+            } catch {
+                
+            }
+        })();
+    }, [])
+    
     const style = useStyles();
+    
+    const changedStatusAt = new Date(service.changedStatusAt + "Z");
     
     async function handleClickOnSubscribeButton() {
         if (!service.isSubscribed) {
@@ -261,12 +366,16 @@ function ServiceHeader({service, updateService}) {
             if(result) {
                 Swal.fire({
                     title: "Успешно. Ожидайте подтверждения Вашего обращения от администрации",
-                    icon: "success"
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 2000
                 });
             } else if(result === false) {
                 Swal.fire({
                     title: "Что-то пошло не так...",
-                    icon: "error"
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 2000
                 });
             }
         });
@@ -291,12 +400,16 @@ function ServiceHeader({service, updateService}) {
             if(result) {
                 Swal.fire({
                     title: `Спасибо большое за указание причины недоступности ${service.serviceName}!`,
-                    icon: "success"
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 2000
                 });
             } else if(result === false) {
                 Swal.fire({
                     title: "Что-то пошло не так...",
-                    icon: "error"
+                    icon: "error",
+                    showConfirmButton: false,
+                    timer: 2000
                 });
             }
         });
@@ -307,9 +420,21 @@ function ServiceHeader({service, updateService}) {
             <span>{service.universityName}</span>
         </div>
         <div className="action-section">
-            <div className="service-name-with-status" 
-                 style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438"}}>
-                <span className="to-bottom">{service.serviceName}</span>    
+            <div className="service-name-with-status">
+                <span className="to-bottom">{service.serviceName}</span>
+                <Stack className="justify-content-center" gap={2}>
+                    <span className={style.status} style={{"--status-color": service.isOnline ? "#3CFB38" : "#FB4438"}}>
+                        {service.isOnline ? "Онлайн" : "Офлайн"} с {formatDate(changedStatusAt)}
+                    </span>
+                    {
+                        uptime !== null &&
+                        <span title="Показывает сколько процентов времени сервис находится в сети. Больше - лучше"
+                                  className={style.status}
+                                  style={{"--status-color": `rgb(${250 * (1 - uptime)},${250 * uptime},80)`}}>
+                            Uptime: {uptime * 100}%
+                        </span>
+                    }
+                </Stack>
             </div>
             <Stack className="flex-grow-0 gap-2">
                 <Button onClick={handleClickOnReportButton} 
@@ -387,9 +512,18 @@ function CommentsColumn({comments}) {
     
     return <div className={style.commentsWrapper}>
         <span className="title">Комментарии</span>
-        <div className="comments-container">
-            {comments.map(comment => 
-                <Comment key={comment.id} from={comment.author.username} content={comment.content} stars={comment.rate}/>)}
+         <div className="comments-container">
+            {
+                comments.length > 0 ? comments.map(comment =>
+                <Comment key={comment.id}
+                         from={comment.author.username}
+                         content={comment.content}
+                         stars={comment.rate}
+                         addedAt={comment.addedAt}/>) : 
+                <Comment key="information-message"
+                         from="Администрации сайта"
+                         content="Никто пока что не оценивал этот сервис. Вы можете стать первым"/>
+            }
         </div>
     </div>
 }
@@ -404,25 +538,26 @@ function ReportsColumn({service}) {
         })();
     }, []);
     
-    if(reports === null)
-    {
-        return <span>ЗАГРУЗКА</span>
-    }
-    
     return <div className={style.commentsWrapper}>
         <span className="title">Сообщения о текущем сбое</span>
         {
             <div className="comments-container">
-                {reports.length > 0 ? reports.map(report =>
-                    <Comment key={report.id} from="Пользователя сервиса" content={report.content}/>) :  
-                    <span>Пока что нет никаких данных об этом сбое. Приходите сюда позже 👀</span>}
+                {reports === null ?
+                    <Comment key="information-message"
+                             from="Системы"
+                             content='Загружаем жалобы...'/> : 
+                    reports.length > 0 ? reports.map(report =>
+                        <Comment key={report.id} from="Пользователя сервиса" addedAt={report.addedAt} content={report.content}/>) :
+                        <Comment key="information-message"
+                                 from="Администрации сайта"
+                                 content='Никто еще сообщал о причинах этого сбоя. Если Вы что-нибудь знаете о нем, расскажите, пожалуйста, нажав на кнопку "Вы знаете почему сервис не работает?" 😁'/>}
             </div>
         }
     </div>
 }
 
 function SendCommentForm({reference, service, updateService, onEnded}) {
-    const [rate, setRate] = useState();
+    const [rate, setRate] = useState(1);
     const style = useStyles();
     
     async function handleSubmit(e) {
@@ -433,6 +568,10 @@ function SendCommentForm({reference, service, updateService, onEnded}) {
         formData.append("rate", rate);
 
         const apiData = Object.fromEntries(formData.entries());
+
+        if (apiData.content === "") {
+            return;
+        }
         
         if (await SendComment(service.serviceId, apiData)) {
             if(onEnded) onEnded();
@@ -449,8 +588,11 @@ function SendCommentForm({reference, service, updateService, onEnded}) {
                 author: {
                     username: "Вас"  
                 },
-                ...apiData
+                ...apiData,
+                rate: Number.parseInt(apiData.rate)
             });
+            
+            console.log(apiData)
             
             updateService({
                 ...service,
@@ -477,7 +619,7 @@ function SendCommentForm({reference, service, updateService, onEnded}) {
 
 function StarsBar({onChange}) {
     const style = useStyles();
-    const [countOfStars, setCountOfStars] = useState(-1);
+    const [countOfStars, setCountOfStars] = useState(1);
     
     useEffect(() => {
         onChange(countOfStars);
@@ -497,12 +639,14 @@ function RateStar({index, rate, onClick}) {
                             style={{"--star-color": index <= rate ? "#FDD64E" : "#046298"}}/>
 }
 
-function Comment({from, content, stars = -1}) {
+function Comment({from, content, addedAt = null, stars = -1}) {
     const style = useStyles();
     
     return <div className={style.comment}>  
         <div className="comment-header">
-            <span>от <span className="comment-author">{from}</span></span>
+            <span>
+                от <span className="comment-author">{from}</span> {addedAt !== null && <span className="text-muted">{formatDate(new Date(addedAt + "Z"))}</span>}
+            </span>
             {
                 stars > 0 &&
                     <div>{[...Array(stars).keys()].map(_ => <FontAwesomeIcon icon={faStar}/>)}</div> 
@@ -563,4 +707,59 @@ function SendCommentFormPopup({closePopup, service, updateService}) {
     return <div onClick={handleClick} className={style.commentFormMobileWrapper}>
         <SendCommentForm onEnded={() => endDialog()} service={service} reference={formElement} updateService={updateService}/>
     </div>
+}
+
+function LoadingContainer() {
+    return <div className="test-result-container loading-container">
+        <span className="text-muted fs-3 fw-bold">Собираем информацию из других городов для Вас</span>
+    </div>
+}
+
+function TestResultContainer({service}) {
+    const style = useStyles();
+    const [testResult, setTestResult] = useState(null);
+    
+    useEffect(() => {
+        (async () => {
+            setTestResult(await TestService(service.serviceId));
+        })();
+    }, []);
+    
+    if (testResult === null) {
+        return <Container className={style.testResultContainerWrapper}>
+            <LoadingContainer/>
+        </Container>;
+    }
+    
+    if (testResult.length === 0) return null;
+    
+    return <Container className={style.testResultContainerWrapper}>
+        <div className="test-result-container">
+            <h1>Статистика доступа из разных городов</h1>
+            <Stack className="results-list" gap={3}>
+                {
+                    testResult.map(result => <Stack className="result-container" style={{background: result.headTime !== null ? "rgb(175, 254, 159)" : "rgb(254, 159, 159)"}} direction="horizontal">
+                        <Stack direction="horizontal" className="header" gap={3}>
+                            <FontAwesomeIcon icon={faTreeCity} fontSize={64} color="#FFF"/>
+                            <span className="fw-bold fs-4">{result.testFrom}</span>
+                        </Stack>
+                        <div>
+                            {result.headTime !== null && <div><span><b>Время ответа сайта:</b> {result.headTime} мс</span></div>}
+                            {result.pingTime !== null && <div><span><b>Время ответа сервера:</b> {result.pingTime} мс</span></div>}
+                        </div>
+                    </Stack>)
+                }
+            </Stack>
+        </div>
+    </Container>
+}
+
+function formatDate(date) {
+    const month = date.getMonth();
+    
+    return `${padTo2Digits(date.getHours())}:${padTo2Digits(date.getMinutes())} ${date.getDate()} ${monthNames[month]}`;
+}
+
+function padTo2Digits(num) {
+    return num.toString().padStart(2, '0');
 }

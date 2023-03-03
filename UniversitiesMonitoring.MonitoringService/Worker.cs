@@ -19,25 +19,18 @@ internal class Worker : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var allServices = (await _universitiesServiceProvider.GetAllUniversitiesServicesAsync()).ToArray();
-
-        if (allServices.Length == 0)
-        {
-            _logger.LogCritical("No services found for monitoring");
-            return;
-        }
-        else
-        {
-            _logger.LogInformation("Found {CountOfServices} services for monitoring", allServices.Length);
-        }
-
         var inspectors = Array.Empty<UniversityServiceInspector>();
-        
-        _logger.LogTrace("Inspectors created");
-        
+
         while (true)
         {
-            inspectors = await RefreshServicesInspectorsList(inspectors);
+            inspectors = await RefreshServicesInspectorsList(inspectors, stoppingToken);
+
+            if (inspectors.Length == 0)
+            {
+                _logger.LogWarning("No inspectors found for monitoring. Retry to refresh list in 10 minutes");
+                await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
+                continue;
+            }
             
             var updateBuilder = new UpdateBuilder();
             await Task.WhenAll(inspectors.Select(inspector => inspector.UpdateStateAsync(updateBuilder)));
@@ -52,7 +45,7 @@ internal class Worker : BackgroundService
                 continue;
             }
 
-            await _universitiesServiceProvider.SendUpdateAsync(update.Changes);
+            await _universitiesServiceProvider.SendUpdateAsync(update.Changes, stoppingToken);
             
             _logger.LogTrace("Update sent");
             
@@ -60,9 +53,9 @@ internal class Worker : BackgroundService
         }
     }
 
-    private async Task<UniversityServiceInspector[]> RefreshServicesInspectorsList(UniversityServiceInspector[] inspectors)
+    private async Task<UniversityServiceInspector[]> RefreshServicesInspectorsList(UniversityServiceInspector[] inspectors, CancellationToken cancellationToken)
     {
-        var allServices = (await _universitiesServiceProvider.GetAllUniversitiesServicesAsync()).ToArray();
+        var allServices = (await _universitiesServiceProvider.GetAllUniversitiesServicesAsync(cancellationToken)).ToArray();
         var newInspectors = new UniversityServiceInspector[allServices.Length];
         var countAdded = allServices.Length;
         
@@ -84,5 +77,5 @@ internal class Worker : BackgroundService
         return newInspectors;
     }
 
-    private Task Wait5Minutes(CancellationToken token) => Task.Delay(TimeSpan.FromSeconds(30), token);
+    private Task Wait5Minutes(CancellationToken token) => Task.Delay(TimeSpan.FromMinutes(5), token);
 }

@@ -7,6 +7,9 @@ import axios from "axios";
 import {useEffect, useState} from "react";
 import {Loading} from "../components/Loading";
 import {Link} from "react-router-dom";
+import FormCheckInput from "react-bootstrap/FormCheckInput";
+import FormCheckLabel from "react-bootstrap/FormCheckLabel";
+import {Stack} from "react-bootstrap";
 
 const useStyles = createUseStyles({
     layout: {
@@ -31,13 +34,15 @@ const useStyles = createUseStyles({
     listing: {
         flex: 3,
         position: "relative",
-        "& .searchbar": {
-            display: "flex",
-            alignItems: "center",
+        "& .searchbar-wrapper": {
             position: "absolute",
             left: "10vw",
             right: "10vw",
             top: -25,
+        },
+        "& .searchbar": {
+            display: "flex",
+            alignItems: "center",
             background: "#FFF",
             boxShadow: "0px 3px 8px 3px rgba(0, 0, 0, 0.25)",
             borderRadius: "5em",
@@ -77,15 +82,7 @@ const useStyles = createUseStyles({
         background: "#FFF",
         width: "80%",
         padding: "20px 40px 20px 40px",
-        cursor: "pointer",
         userSelect: "none",
-        transition: "box-shadow 0.3s, transform 0.3s",
-        "&:hover": {
-            boxShadow: "0px 0px 18px 11px rgba(0, 0, 0, 0.25)"  
-        },
-        "&:active": {
-            transform: "scale(0.99)"
-        },
         "& .university-name": {
             fontWeight: "bold",
             fontSize: 25,
@@ -132,10 +129,25 @@ const useStyles = createUseStyles({
 
 export function UniversitiesList() {
     const style = useStyles();
+    const [universities, setUniversities] = useState(null)
+    
+    useEffect(()=> {
+        (async () => {
+            const universities = await getUniversities();
+
+            for(let i in universities) {
+                universities[i].nameQueryable = makeStringQueryable(universities[i].name);
+            }
+            
+            setUniversities(universities);
+        })();
+    }, []);
+    
+    if (universities === null) return <Loading/>
     
     return <div className={style.layout}>
         <Header/>
-        <Listing/>
+        <Listing universities={universities}/>
     </div>
 }
 
@@ -147,46 +159,44 @@ function Header() {
     </div>
 }
 
-function Listing() {
+function Listing({universities}) {
     const style = useStyles();
-    const [universities, setUniversities] = useState(null);
     const [query, setQuery] = useState("");
+    const [loading, setLoadingState] = useState(false);
+    const [showSub, setSub] = useState(false);
     
     function updateQuery(newQuery) {
         setQuery(makeStringQueryable(newQuery))
     }
     
-    useEffect(() => {
-        (async () => {
-            const universities = await getUniversities();
-            
-            for(let i in universities) {
-                universities[i].nameQueryable = makeStringQueryable(universities[i].name);
-            }
-            
-            setUniversities(universities);
-        })();
-    }, []);
-    
-    if (universities === null) return <Loading/>
+    if (universities === null && !loading) {
+        setLoadingState(true);
+        return null;
+    }
     
     return <div className={style.listing}>
-        <SearchBar updateSearch={updateQuery}/>
-        <Universities universities={universities.filter(university => query === "" || university.nameQueryable.startsWith(query))}/>
+        <SearchBar updateShowSub={(show) => setSub(show)} updateSearch={updateQuery}/>
+        <Universities universities={universities.filter(university => 
+            (showSub && university.isSubscribed || !showSub) &&
+            (query === "" || university.nameQueryable.startsWith(query)))}/>
     </div>
 }
 
-function SearchBar({updateSearch}) {
+function SearchBar({updateSearch, updateShowSub}) {
     function handleChangingOfText(e) {
         updateSearch(e.target.value);
     }
     
-    return <div>
+    return <Stack gap={2} className="searchbar-wrapper">
         <div className="searchbar">
             <FontAwesomeIcon icon={faMagnifyingGlass}/>
             <input onKeyUp={handleChangingOfText} type="text" placeholder="Название ВУЗа"/>
         </div>
-    </div>
+        <Stack direction="horizontal" gap={2}>
+            <FormCheckLabel htmlFor="subscribed">Показывать ВУЗ, на которые Вы подписаны</FormCheckLabel>
+            <FormCheckInput id="subscribed" onChange={(e) => updateShowSub(e.target.checked)}/>
+        </Stack>
+    </Stack>
 }
 
 function Universities(props) {

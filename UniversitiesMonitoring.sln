@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitiesMonitoring.Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitiesMonitoring.Api.Tests", "UniversitiesMonitoring.Api.Tests\UniversitiesMonitoring.Api.Tests.csproj", "{F3545A41-DBBC-439F-A525-DE2F28F15A69}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniversitiesMonitoring.Module", "UniversitiesMonitoring.Module\UniversitiesMonitoring.Module.csproj", "{215F85E8-3F65-4607-9CD4-F32399EFB65F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{F3545A41-DBBC-439F-A525-DE2F28F15A69}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F3545A41-DBBC-439F-A525-DE2F28F15A69}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F3545A41-DBBC-439F-A525-DE2F28F15A69}.Release|Any CPU.Build.0 = Release|Any CPU
+		{215F85E8-3F65-4607-9CD4-F32399EFB65F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{215F85E8-3F65-4607-9CD4-F32399EFB65F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{215F85E8-3F65-4607-9CD4-F32399EFB65F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{215F85E8-3F65-4607-9CD4-F32399EFB65F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

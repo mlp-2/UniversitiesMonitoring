@@ -2,6 +2,10 @@ version: '3'
 
 services:
   api:
+    depends_on:
+      - db
+    networks:
+      - um-network
     container_name: umapi
     image: "um-api"
     build:
@@ -11,9 +15,16 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - CONNECTION_STRING=Server=mysql;User=root;Password=denvot;Database=universities_monitoring
       - JWT_SECRET=bfbfd98b-2ccf-4f19-8025-b51c512cf2ca
+      - TRUSTED_HOSTS=umapi
+    restart: always
     ports:
       - "80:80"
   notify-service:
+    depends_on:
+      - api
+    restart: always
+    networks:
+      - um-network
     container_name: umnotify
     image: "um-notify"
     build:
@@ -25,7 +36,12 @@ services:
       - API_URL=http://umapi:80/
       - EMAIL_ADDRESS=universitiesmonitoring@denvot.dev
       - EMAIL_PASSWORD=universitiesmonitoring
-  monitoring-service: 
+  monitoring-service:
+    depends_on:
+      - api
+    networks:
+      - um-network
+    restart: always
     container_name: ummonitoring
     image: "um-mon"
     build:
@@ -35,6 +51,8 @@ services:
       - DOTNET_ENVIRONMENT=Development
       - API_URL=http://umapi:80/
   db:
+    networks:
+      - um-network
     container_name: mysql
     image: "mysql"
     restart: always
@@ -43,3 +61,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: denvot
       
+networks:
+  um-network:
+    name: um-network

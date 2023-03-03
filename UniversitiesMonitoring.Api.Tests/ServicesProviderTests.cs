@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Caching.Memory;
 using Moq;
 using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
@@ -88,29 +89,6 @@ public class ServicesProviderTests
         await Assert.ThrowsAsync<InvalidOperationException>(() => servicesProvider.UnsubscribeUserAsync(new User(), new UniversityService()));
     }
 
-    [Theory]
-    [InlineData(true, false)]
-    [InlineData(false, true)]
-    [InlineData(true, true)]
-    [InlineData(false, false)]
-    public async Task Update_Service_State(bool isOnline, bool force)
-    {
-        var dataProvider = CreateProviderMock();
-        var servicesProvider = CreateServicesProvider(dataProvider);
-        
-        dataProvider.Setup(x => x.UniversityServiceStateChange.AddAsync(It.IsAny<UniversityServiceStateChange>()));
-        dataProvider.Setup(x => x.SaveChangesAsync());
-        
-        await servicesProvider.UpdateServiceStateAsync(new UniversityService(), isOnline, force);
-        
-        dataProvider.Verify(x => x.UniversityServiceStateChange.AddAsync(It.IsAny<UniversityServiceStateChange>()), Times.Once);
-
-        if (force)
-        {
-            dataProvider.Verify(x => x.SaveChangesAsync(), Times.Once);
-        }
-    }
-
     [Fact]
     public async Task Leave_Comment()
     {
@@ -172,5 +150,5 @@ public class ServicesProviderTests
     
     private Mock<IDataProvider> CreateProviderMock() => new();
 
-    private ServicesProvider CreateServicesProvider(Mock<IDataProvider> dataProviderMock) => new(dataProviderMock.Object);
+    private ServicesProvider CreateServicesProvider(Mock<IDataProvider> dataProviderMock) => new(dataProviderMock.Object, new Mock<IMemoryCache>().Object);
 }

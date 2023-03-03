@@ -17,6 +17,7 @@ namespace UniversityMonitoring.Data.Models
         }
 
         public virtual DbSet<Moderator> Moderators { get; set; } = null!;
+        public virtual DbSet<MonitoringModule> MonitoringModules { get; set; } = null!;
         public virtual DbSet<University> Universities { get; set; } = null!;
         public virtual DbSet<UniversityService> UniversityServices { get; set; } = null!;
         public virtual DbSet<UniversityServiceReport> UniversityServiceReports { get; set; } = null!;
@@ -37,6 +38,17 @@ namespace UniversityMonitoring.Data.Models
                 entity.Property(e => e.PasswordSha256hash)
                     .HasColumnType("tinyblob")
                     .HasColumnName("PasswordSHA256Hash");
+            });
+
+            modelBuilder.Entity<MonitoringModule>(entity =>
+            {
+                entity.HasIndex(e => e.Url, "MonitoringModules_Url_uindex")
+                    .IsUnique();
+
+                entity.Property(e => e.Url)
+                    .HasMaxLength(1024)
+                    .UseCollation("utf8mb3_general_ci")
+                    .HasCharSet("utf8mb3");
             });
 
             modelBuilder.Entity<University>(entity =>
@@ -145,6 +157,10 @@ namespace UniversityMonitoring.Data.Models
 
                 entity.HasIndex(e => e.AuthorId, "UserRateOfService_User_Id_fk");
 
+                entity.Property(e => e.AddedAt)
+                    .HasColumnType("datetime")
+                    .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
                 entity.Property(e => e.Comment)
                     .HasMaxLength(4096)
                     .UseCollation("utf8mb3_general_ci")
@@ -179,6 +195,10 @@ namespace UniversityMonitoring.Data.Models
                     .HasForeignKey(d => d.UserId)
                     .HasConstraintName("UserSubscribeToService_User_Id_fk");
             });
+
+            OnModelCreatingPartial(modelBuilder);
         }
+
+        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }

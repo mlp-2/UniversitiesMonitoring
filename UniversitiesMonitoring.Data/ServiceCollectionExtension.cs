@@ -13,7 +13,12 @@ public static class ServiceCollectionExtension
             options.UseMySql(
                     Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? 
                         configuration.GetConnectionString("UniversitiesMonitoring"),
-                    new MySqlServerVersion(new Version(8, 0, 29)))
-                .UseLazyLoadingProxies())
-            .AddScoped<IDataProvider, DataProvider>();
+                    new MySqlServerVersion(new Version(8, 0, 29)),
+                    mySqlOptions => mySqlOptions.EnableRetryOnFailure(
+                        10, TimeSpan.FromSeconds(30), null))
+                .UseLazyLoadingProxies()
+#if DEBUG
+                .LogTo(Console.WriteLine)
+#endif
+            ).AddScoped<IDataProvider, DataProvider>();
 }

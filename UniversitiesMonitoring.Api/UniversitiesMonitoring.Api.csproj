@@ -17,7 +17,6 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNet.SignalR" Version="2.4.1" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.13" />
         <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="6.0.12" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
@@ -35,7 +34,7 @@
     <ItemGroup>
       <ProjectReference Include="..\UniversitiesMonitoring.Data\UniversitiesMonitoring.Data.csproj" />
     </ItemGroup>
-
+    
     <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
         <!-- Ensure Node.js is installed -->
         <Exec Command="node --version" ContinueOnError="true">

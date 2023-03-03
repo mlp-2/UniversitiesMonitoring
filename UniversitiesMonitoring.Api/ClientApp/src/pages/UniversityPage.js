@@ -100,7 +100,6 @@ const useStyles = createUseStyles({
 
 export function UniversityPage() {
     const location = useLocation();
-    const [university, setUniversity] = useState(location.state.university);
     const [services, setServices] = useState(null);
     const [isSubscribed, setSubscribed] = useState(false);
     
@@ -110,7 +109,7 @@ export function UniversityPage() {
     
     useEffect(() => {
         (async () => {
-            setServices(await getUniversityServices(university.id));
+            setServices(await getUniversityServices(location.state.university.id));
         })();
     }, []);
     
@@ -120,10 +119,11 @@ export function UniversityPage() {
         isSub &= services[i].isSubscribed;
     }
 
+    if (services === null) return <Loading/>
     if (isSubscribed !== isSub) setSubscribed(isSub);
     
     return <div>
-        <UniversityHeader university={university} services={services} isSubscribed={isSubscribed} updateServices={updateServices}/>
+        <UniversityHeader university={location.state.university} services={services} isSubscribed={isSubscribed} updateServices={updateServices}/>
         <ServicesList services={services} updateServices={updateServices}/>
     </div>
 }
@@ -155,8 +155,6 @@ function UniversityHeader({university, services, updateServices, isSubscribed}) 
 
 function ServicesList({services, updateServices}) {
     const style = useStyles();
-    
-    if (services === null) return <Loading/>
     
     return <div className={style.servicesBlock}>
         <span className="services-title">Сервисы</span>

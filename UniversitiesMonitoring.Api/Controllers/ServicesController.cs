@@ -210,7 +210,7 @@ public class ServicesController : ControllerBase
 
         var universityEntity = new UniversityEntity(university)
         {
-            IsSubscribed = User.IsInRole(JwtGenerator.UserRole) ? university.UniversityServices.All(service => 
+            IsSubscribed = User.IsInRole(JwtGenerator.UserRole) ? university.UniversityServices.Any(service => 
                 service.UserSubscribeToServices.Any(subscribe =>
                     subscribe.UserId.ToString() == User.Identity!.Name!)) : null
         };
@@ -222,7 +222,12 @@ public class ServicesController : ControllerBase
     public IActionResult GetAllUniversities() => Ok(
         from university in _servicesProvider.GetAllUniversities()
             .ToList()
-        select new UniversityEntity(university));
+        select new UniversityEntity(university)
+        {
+            IsSubscribed = User.IsInRole(JwtGenerator.UserRole) ? university.UniversityServices.Any(service => 
+                service.UserSubscribeToServices.Any(subscribe =>
+                    subscribe.UserId.ToString() == User.Identity!.Name!)) : null
+        });
 
     [HttpPut("update")]
     public async Task<IActionResult> UpdateService([FromBody] ChangeStateEntity[] updates)

@@ -1,3 +1,5 @@
+create database universities_monitoring;
+
 create table Moderator
 (
     Id                 bigint unsigned auto_increment

@@ -13,18 +13,20 @@ const useStyles = createUseStyles({
         width: 50,
         height: 50,
         borderRadius: "50%",
-        animationDelay: "calc(200ms * var(--i))",
+        animationDelay: "calc(300ms * var(--i))",
         animationName: "$circle-animation",
-        animationDuration: "1s",
+        animationDuration: "0.5s",
         animationDirection: "alternate",
         animationIterationCount: "infinite"
     },
     "@keyframes circle-animation": {
         from: {
-            transform: "translateY(0)"
+            opacity: "1",
+            transform: "scale(1)"
         },
         to: {
-            transform: "translateY(-50px)"
+            opacity: "0.75",
+            transform: "scale(0.8)"
         }
     }
 });

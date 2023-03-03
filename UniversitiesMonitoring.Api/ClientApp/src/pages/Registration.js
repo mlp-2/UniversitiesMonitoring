@@ -73,15 +73,10 @@ export function Registration() {
             const result = await axios.post(`/api/user/register`, apiEntity);
             
             if (result.status !== 200) return;
-            
-            await Swal.fire({
-               title: `Мы очень рады Вас видеть, ${apiEntity.username}!`,
-               icon: "success",
-                showConfirmButton: false,
-                timer: 2000
-            });
-            
+
             localStorage.setItem("token", result.data.jwt);
+            
+            await EmailDialog(apiEntity)
             setDialog(true);
         } catch (error) {
             console.log(error);
@@ -127,6 +122,45 @@ export function Registration() {
             </div>
         </div>
     </WelcomePage>
+}
+
+async function EmailDialog(user) {
+    const dialogResult = await Swal.fire({
+        title: `Мы очень рады Вас видеть, ${user.username}`,
+        text: "Мы предлагаем Вам установить email для мгновенного оповещения о каких-то изменениях у серверов, на которые Вы подпишетесь. Вы можете изменить эти настройки в любой момент в своем личном кабинете. Вы можете попасть в него, нажав на домик на панели справа сверху",
+        input: "email",
+        confirmButtonText: "Установить email",
+        cancelButtonText: "Я позже это сделаю",
+        showCancelButton: true,
+        confirmButtonColor: Constants.brandColor
+    });
+    
+    if (!dialogResult.isConfirmed) return;
+    
+    try {
+        const result = await axios.put("api/user/email/update", {
+            email: dialogResult.value,
+            canSend: true
+        });    
+        
+        if (result.status === 200) {
+            await Swal.fire({
+                title: "Email установлен",
+                icon: "success",
+                text: "Мы обещаем, что не подведем Вас",
+                showConfirmButton: false,
+                timer: 2000
+            });
+        }
+    } catch {
+        await Swal.fire({
+            title: "Не удалось установить email",
+            icon: "error",
+            text: "Повторите попытку через некоторое время в своем личном кабинете. Вы можете попасть в него, нажав на домик на панели справа сверху",
+            showConfirmButton: false,
+            timer: 2000
+        });
+    }
 }
 
 function throwError(text) {

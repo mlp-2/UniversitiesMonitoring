@@ -7,6 +7,9 @@ import axios from "axios";
 import {useEffect, useState} from "react";
 import {Loading} from "../components/Loading";
 import {Link} from "react-router-dom";
+import FormCheckInput from "react-bootstrap/FormCheckInput";
+import FormCheckLabel from "react-bootstrap/FormCheckLabel";
+import {Stack} from "react-bootstrap";
 
 const useStyles = createUseStyles({
     layout: {
@@ -31,13 +34,15 @@ const useStyles = createUseStyles({
     listing: {
         flex: 3,
         position: "relative",
-        "& .searchbar": {
-            display: "flex",
-            alignItems: "center",
+        "& .searchbar-wrapper": {
             position: "absolute",
             left: "10vw",
             right: "10vw",
             top: -25,
+        },
+        "& .searchbar": {
+            display: "flex",
+            alignItems: "center",
             background: "#FFF",
             boxShadow: "0px 3px 8px 3px rgba(0, 0, 0, 0.25)",
             borderRadius: "5em",
@@ -158,6 +163,7 @@ function Listing({universities}) {
     const style = useStyles();
     const [query, setQuery] = useState("");
     const [loading, setLoadingState] = useState(false);
+    const [showSub, setSub] = useState(false);
     
     function updateQuery(newQuery) {
         setQuery(makeStringQueryable(newQuery))
@@ -169,22 +175,28 @@ function Listing({universities}) {
     }
     
     return <div className={style.listing}>
-        <SearchBar updateSearch={updateQuery}/>
-        <Universities universities={universities.filter(university => query === "" || university.nameQueryable.startsWith(query))}/>
+        <SearchBar updateShowSub={(show) => setSub(show)} updateSearch={updateQuery}/>
+        <Universities universities={universities.filter(university => 
+            (showSub && university.isSubscribed || !showSub) &&
+            (query === "" || university.nameQueryable.startsWith(query)))}/>
     </div>
 }
 
-function SearchBar({updateSearch}) {
+function SearchBar({updateSearch, updateShowSub}) {
     function handleChangingOfText(e) {
         updateSearch(e.target.value);
     }
     
-    return <div>
+    return <Stack gap={2} className="searchbar-wrapper">
         <div className="searchbar">
             <FontAwesomeIcon icon={faMagnifyingGlass}/>
             <input onKeyUp={handleChangingOfText} type="text" placeholder="Название ВУЗа"/>
         </div>
-    </div>
+        <Stack direction="horizontal" gap={2}>
+            <FormCheckLabel htmlFor="subscribed">Показывать ВУЗ, на которые Вы подписаны</FormCheckLabel>
+            <FormCheckInput id="subscribed" onChange={(e) => updateShowSub(e.target.checked)}/>
+        </Stack>
+    </Stack>
 }
 
 function Universities(props) {

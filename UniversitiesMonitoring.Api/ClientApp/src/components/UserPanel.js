@@ -1,6 +1,6 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser, faHome, faDoorClosed} from "@fortawesome/free-solid-svg-icons";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Link, Navigate} from "react-router-dom";
 import {createUseStyles} from "react-jss";
 import Constants from "../Constants";
@@ -36,7 +36,7 @@ const useStyles = createUseStyles({
 
 export function UserPanel() {
     const [user, setUser] = useState(null);
-    const style = useStyles(); 
+    const style = useStyles();
     
     useEffect(() => {
         (async () => {
@@ -54,7 +54,12 @@ export function UserPanel() {
         </div>
         <div>
             <Link to="/universities-list" id="home-link"><FontAwesomeIcon icon={faHome}/></Link>
-            <Link to="/login" id="quit-link"><FontAwesomeIcon icon={faDoorClosed}/></Link>    
+            <a href="/login" id="quit-link" onClick={() => {
+                localStorage.setItem("token", undefined);
+                sessionStorage.setItem("user", undefined);
+            }}>
+                <FontAwesomeIcon icon={faDoorClosed}/>
+            </a>    
         </div>
     </div>
 }

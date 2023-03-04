@@ -7,7 +7,7 @@ export async function TestService(id) {
 }
 
 export async function GetUser() {
-    const userFromStorage = JSON.parse(sessionStorage.getItem("user")); 
+    const userFromStorage = JSON.parse(sessionStorage.getItem("user"));
     if (userFromStorage !== null) return userFromStorage;
     
     const result = await axios.get("/api/user");

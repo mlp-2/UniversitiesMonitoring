@@ -52,12 +52,19 @@ export function UniversitiesModerationPanel() {
             Добавить
         </Button>
         <Stack gap={3}>
-            {universities.map(university => <UniversityContainer removeUniversity={handleDelete} university={university}/>)}
+            {
+                universities.map(university => <UniversityContainer 
+                    removeUniversity={handleDelete} university={university}
+                    updateUniversityName={(universityName) => {
+                        university.name = universityName;
+                        setUniversities([...universities]);
+                    }}/>)
+            }
         </Stack>
     </div>
 }
 
-function UniversityContainer({university, removeUniversity, updateService}) {
+function UniversityContainer({university, removeUniversity, updateUniversityName}) {
     async function handleDelete() {
         await Swal.fire({
             title: "Вы уверены?",
@@ -87,8 +94,28 @@ function UniversityContainer({university, removeUniversity, updateService}) {
         })
     }
 
-    function handleRename() {
+    async function handleRename() {
+        await Swal.fire({
+            title: "Изменение названия ВУЗа",
+            input: "text",
+            inputPlaceholder: university.name,
+            confirmButtonText: "Изменить",
+            confirmButtonColor: "#1577ff"
+        }).then(async result => {
+            if (!result.isConfirmed || result.value === "") return;
 
+            const responseResult = await axios.put(`/api/moderator/universities/${university.id}/rename?newName=${result.value}`)
+
+            if (responseResult.status === 200) {
+                await Swal.fire({
+                    title: "Успешно",
+                    icon: "success",
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+                updateUniversityName(result.value);
+            }
+        });
     }
 
     return <Card className="p-3">

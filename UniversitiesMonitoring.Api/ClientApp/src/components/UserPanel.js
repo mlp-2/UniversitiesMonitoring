@@ -54,12 +54,12 @@ export function UserPanel() {
         </div>
         <div>
             <Link to="/universities-list" id="home-link"><FontAwesomeIcon icon={faHome}/></Link>
-            <a href="/login" id="quit-link" onClick={() => {
-                localStorage.setItem("token", undefined);
-                sessionStorage.setItem("user", undefined);
+            <Link to="/login" id="quit-link" onClick={() => {
+                localStorage.removeItem("token");
+                sessionStorage.removeItem("user");
             }}>
                 <FontAwesomeIcon icon={faDoorClosed}/>
-            </a>    
+            </Link>    
         </div>
     </div>
 }

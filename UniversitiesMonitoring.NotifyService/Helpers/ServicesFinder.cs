@@ -19,7 +19,7 @@ internal class ServicesFinder
     public async Task<IEnumerable<UniversityServiceEntity>> GetServicesEntityAsync(IEnumerable<ulong> servicesIds)
     {
         var servicesIdsQuery = "";
-        foreach (var id in servicesIds) servicesIdsQuery += $"ids={id}*";
+        foreach (var id in servicesIds) servicesIdsQuery += $"ids={id}&";
 
         var response = await _client.GetAsync("/api/services?loadUsers=true&" + servicesIdsQuery);
 

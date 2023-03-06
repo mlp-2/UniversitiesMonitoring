@@ -9,28 +9,26 @@ internal class Worker : BackgroundService
 {
     private readonly ILogger<Worker> _logger;
     private readonly IStateChangesListener _stateChangesListener;
-    private readonly IServiceProvider _serviceProvider;
     private readonly ServicesFinder _servicesFinder;
     private readonly EmailNotifier _emailNotifier;
-    
+    private readonly GlobalTelegramNotifying _telegramNotifying;
+
     public Worker(ILogger<Worker> logger,
         IStateChangesListener stateChangesListener,
-        IServiceProvider serviceProvider,
         ServicesFinder servicesFinder,
-        EmailNotifier emailNotifier)
+        EmailNotifier emailNotifier,
+        GlobalTelegramNotifying telegramNotifying)
     {
         _logger = logger;
         _stateChangesListener = stateChangesListener;
-        _serviceProvider = serviceProvider;
         _servicesFinder = servicesFinder;
         _emailNotifier = emailNotifier;
+        _telegramNotifying = telegramNotifying;
     }
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         await _stateChangesListener.ConnectAsync();
-
-        using var scope = _serviceProvider.CreateScope();
 
         while (true)
         {
@@ -38,10 +36,12 @@ internal class Worker : BackgroundService
             var dataFromSocketInArray = dataFromSocket as UniversityServiceChangeStateEntity[] ?? dataFromSocket.ToArray();
             if (!dataFromSocketInArray.Any()) continue;
 
-            var services = await _servicesFinder.GetServicesEntityAsync(from update in dataFromSocketInArray select update.Id);
+            var services = (await _servicesFinder.GetServicesEntityAsync(from update in dataFromSocketInArray select update.Id)).ToArray();
             var countSkipped = 0;
             
             _logger.LogInformation("New update information Got");
+
+            await _telegramNotifying.NotifyAsync(services);
             
             foreach (var service in services)
             {

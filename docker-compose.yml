@@ -36,6 +36,8 @@ services:
       - API_URL=http://umapi:80/
       - EMAIL_ADDRESS=universitiesmonitoring@denvot.dev
       - EMAIL_PASSWORD=universitiesmonitoring
+      - TELEGRAM_TOKEN=5783170351:AAExktrxhdaEjOx0BvffcLobS7MkjeJjXhY
+      - TELEGRAM_CHAT_ID=@ummonitoring
   monitoring-service:
     depends_on:
       - api

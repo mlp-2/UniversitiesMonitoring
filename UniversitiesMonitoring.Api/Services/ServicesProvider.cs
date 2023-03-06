@@ -116,7 +116,9 @@ public class ServicesProvider : IServicesProvider
             ChangedAt = updateTime ?? DateTime.UtcNow
         };
 
-        var lastUpdate = await _dataProvider.UniversityServiceStateChange.GetlAll().FirstOrDefaultAsync();
+        var lastUpdate = await _dataProvider.UniversityServiceStateChange.GetlAll().Where(x => x.ServiceId == service.Id)
+            .OrderByDescending(x => x.ChangedAt)
+            .FirstOrDefaultAsync();
 
         if (lastUpdate != null && lastUpdate.IsOnline == isOnline)
         {

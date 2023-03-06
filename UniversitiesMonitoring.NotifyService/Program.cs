@@ -8,6 +8,7 @@ var host = Host.CreateDefaultBuilder(args)
     {
         services.AddSingleton<ServicesFinder>()
             .AddSingleton<EmailNotifier>()
+            .AddSingleton<GlobalTelegramNotifying>()
             .AddSingleton<IStateChangesListener, WebSocketStateChangesListener>()
             .AddHostedService<Worker>();
     })

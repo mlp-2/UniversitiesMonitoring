@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.EntityFrameworkCore;
 using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
 using UniversitiesMonitoring.Api.WebSocket;
@@ -177,7 +176,8 @@ public class ServicesController : ControllerBase
     public async Task<IActionResult> GetAllServices(
         [FromQuery] bool loadUsers = false,
         [FromQuery] bool loadComments = false,
-        [FromQuery] ulong? universityId = null)
+        [FromQuery] ulong? universityId = null,
+        [FromQuery] ulong[]? ids = null)
     {
         // Нужно, чтобы не сливать инфу
         var trustedRequest = IsTrustedRequest || User.IsInRole(JwtGenerator.UserRole);
@@ -195,6 +195,11 @@ public class ServicesController : ControllerBase
             from service in services 
                 select new UniversityServiceEntity(service, loadUsers, loadComments);
 
+        if (ids != null)
+        {
+            servicesApiEntities = servicesApiEntities.Where(x => ids.Contains(x.ServiceId));
+        }
+        
         return Ok(servicesApiEntities);
     }
 

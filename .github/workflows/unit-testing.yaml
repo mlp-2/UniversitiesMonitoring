@@ -15,5 +15,5 @@ jobs:
           dotnet-version: '6.0.x'
       - name: Build API
         run: dotnet build ./UniversitiesMonitoring.Api/UniversitiesMonitoring.Api.csproj --configuration Debug
-      - name: Run API tests
+      - name: Run API's tests
         run: dotnet test ./UniversitiesMonitoring.Api.Tests/UniversitiesMonitoring.Api.Tests.csproj

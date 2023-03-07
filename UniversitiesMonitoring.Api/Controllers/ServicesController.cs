@@ -1,3 +1,4 @@
+using Castle.Core.Internal;
 using Microsoft.AspNetCore.Authorization;
 using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
@@ -195,9 +196,9 @@ public class ServicesController : ControllerBase
             from service in services 
                 select new UniversityServiceEntity(service, loadUsers, loadComments);
 
-        if (ids != null)
+        if (!ids.IsNullOrEmpty())
         {
-            servicesApiEntities = servicesApiEntities.Where(x => ids.Contains(x.ServiceId));
+            servicesApiEntities = servicesApiEntities.Where(x => ids!.Contains(x.ServiceId));
         }
         
         return Ok(servicesApiEntities);

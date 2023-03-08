@@ -13,6 +13,7 @@ public class DatabaseSetupHelper
     public DatabaseSetupHelper(UniversitiesMonitoringContext dbContext, ILogger<DatabaseSetupHelper> logger)
     {
         _dbContext = dbContext;
+        _dbContext.ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         _logger = logger;
     }
 

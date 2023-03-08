@@ -26,7 +26,7 @@ internal class ModulesProvider : IModulesProvider
                 entry.AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(20);
 
                 using var httpClient = new HttpClient();
-                var modules = await _dataProvider.MonitoringModules.GetlAll().ToArrayAsync();
+                var modules = await _dataProvider.MonitoringModules.GetlAll().AsNoTracking().ToArrayAsync();
                 var reports = new List<TestReport>();
                 
                 foreach (var module in modules)

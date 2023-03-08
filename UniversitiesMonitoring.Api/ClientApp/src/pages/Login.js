@@ -23,9 +23,6 @@ const useStyles = createUseStyles({
         "& div input": {
             margin: "10px 0 10px 0",
             width: "100%"
-        },
-        "& button": {
-            width: "50%"
         }
     },
     frameStyle: {

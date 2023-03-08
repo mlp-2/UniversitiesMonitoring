@@ -18,9 +18,6 @@ const useStyles = createUseStyles({
             flexDirection: "column",
             width: "100%"
         },
-        "& button": {
-            width: "50%"
-        }
     },
     frameStyle: {
         display: "flex",
@@ -154,9 +151,8 @@ async function EmailDialog(user) {
         }
     } catch {
         await Swal.fire({
-            title: "Не удалось установить email",
+            title: "Email занят",
             icon: "error",
-            text: "Повторите попытку через некоторое время в своем личном кабинете. Вы можете попасть в него, нажав на домик на панели справа сверху",
             showConfirmButton: false,
             timer: 2000
         });

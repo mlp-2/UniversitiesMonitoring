@@ -12,7 +12,7 @@ services:
       context: "."
       dockerfile: "UniversitiesMonitoring.Api/Dockerfile"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=Production
       - CONNECTION_STRING=Server=mysql;User=root;Password=denvot;Database=universities_monitoring
       - JWT_SECRET=bfbfd98b-2ccf-4f19-8025-b51c512cf2ca
       - TRUSTED_HOSTS=umapi
@@ -31,7 +31,7 @@ services:
       context: "."
       dockerfile: "UniversitiesMonitoring.NotifyService/Dockerfile"
     environment:
-      - DOTNET_ENVIRONMENT=Development
+      - DOTNET_ENVIRONMENT=Production
       - WS_URL=ws://umapi:80/api/updates-socket
       - API_URL=http://umapi:80/
       - EMAIL_ADDRESS=universitiesmonitoring@denvot.dev
@@ -50,7 +50,7 @@ services:
       context: "."
       dockerfile: "UniversitiesMonitoring.MonitoringService/Dockerfile"
     environment:
-      - DOTNET_ENVIRONMENT=Development
+      - DOTNET_ENVIRONMENT=Production
       - API_URL=http://umapi:80/
   db:
     networks:

@@ -35,5 +35,9 @@ internal class GlobalTelegramNotifying
         await _botClient.SendTextMessageAsync(_globalChatId, report, ParseMode.Markdown);
     }
 
-    private string GenerateStatus(UniversityServiceEntity serviceEntity) => $"- Сервис *\"{serviceEntity.ServiceName}\"* ВУЗа *\"{serviceEntity.UniversityName}\"* сменил свое состояние на {(serviceEntity.IsOnline ? "онлайн 🟢" : "оффлайн 🔴")}";
+    private string GenerateStatus(UniversityServiceEntity serviceEntity) => 
+        $"- Сервис [\"{serviceEntity.ServiceName}\"]({CreateServiceHref(serviceEntity)}) ВУЗа *\"{serviceEntity.UniversityName}\"* сменил свое состояние на {(serviceEntity.IsOnline ? "онлайн 🟢" : "оффлайн 🔴")}";
+    
+    private string CreateServiceHref(UniversityServiceEntity service) =>
+        $"http://univermonitoring.gym1551.ru/service?serviceId={service.ServiceId}";
 }

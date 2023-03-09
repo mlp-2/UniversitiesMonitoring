@@ -17,10 +17,6 @@ const useStyles = createUseStyles({
        flexDirection: "row",
        alignItems: "center",
        justifyContent: "space-around",
-       "& span": {
-           fontSize: 64,
-           fontWeight: "bolder"
-       },
        height: "25vh"
     },
     servicePanel: {
@@ -49,7 +45,7 @@ const useStyles = createUseStyles({
         "& a": {
             fontSize: 25,
             fontWeight: "bolder",
-            color: "#000"
+            color: "#000",
         },
         "& .additional-info": {
             display: "flex",
@@ -85,7 +81,7 @@ const useStyles = createUseStyles({
             flexDirection: "column",
             width: "80%",
             "& a": {
-                textAlign: "center"
+                textAlign: "left"
             },
             "& .service-actions": {
                 flexWrap: "wrap"
@@ -146,7 +142,7 @@ function UniversityHeader({university, services, updateServices, isSubscribed}) 
     }
     
     return <div className={style.universityHeader}>
-        <span>{university.name}</span>
+        <span className="display-1 fw-bold">{university.name}</span>
         <Button onClick={handleClickOnSubscribeButton} variant={isSubscribed ? "secondary" : "danger"}>
             {isSubscribed ? "Отписаться" : "Подписаться"}
         </Button>

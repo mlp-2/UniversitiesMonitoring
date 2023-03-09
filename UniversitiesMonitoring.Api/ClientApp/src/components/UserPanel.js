@@ -17,6 +17,7 @@ const useStyles = createUseStyles({
         display: "flex",
         flexDirection: "row",
         gap: 12,
+        zIndex: 100000000,
         '& svg': {
             marginLeft: 5,
             marginRight: 5

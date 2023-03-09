@@ -57,7 +57,6 @@ const useStyles = createUseStyles({
     status: {
         background: "var(--status-color)",
         borderRadius: 10,
-        fontSize: "24px !important",
         textShadow: "0px 0px 2px #000",
         padding: 10
     },
@@ -91,7 +90,6 @@ const useStyles = createUseStyles({
         },
         "& .service-name-with-status span": {
             position: "relative",
-            fontSize: 64,
             height: "fit-content",
             verticalAlign: "bottom"
         }
@@ -232,16 +230,12 @@ const useStyles = createUseStyles({
         serviceHeader: {
             "& .action-section": {
                 flexDirection: "column",
-                "& *": {
-                    fontSize: 16  
-                }
             }
         },
         testResultContainerWrapper: {
             "& .result-container": {
                 display: "flex",
-                flexDirection: "column !important",
-                
+                flexDirection: "column !important"
             },
             "& .header": {
                 justifyContent: "center"  
@@ -249,11 +243,6 @@ const useStyles = createUseStyles({
             "& .fa-tree-city": {
                 display: "none"    
             }
-        }
-    },
-    "@media screen and (max-width: 600px)": {
-        status: {
-            fontSize: "16px !important"
         }
     },
 });
@@ -307,7 +296,7 @@ export function ServicePage() {
 function ServiceDidntSetupped({service}) {
     return <FullscreenFrame>
         <h1 className="text-center w-75">
-            О сервисе "{service.serviceName}" ВУЗа "{service.universityName}" еще нет никакой информации. 
+            О сервисе <a className="text-white" href={service.url}>"{service.serviceName}"</a> ВУЗа "{service.universityName}" еще нет никакой информации. 
             Возращайтесь сюда через 15-20 минут, когда она точно будет.
         </h1>
     </FullscreenFrame>
@@ -419,9 +408,9 @@ function ServiceHeader({service, updateService}) {
         <div className="university-name">
             <span>{service.universityName}</span>
         </div>
-        <div className="action-section">
+        <Stack direction="horizontal" className="flex-wrap justify-content-sm-around" gap={3}>
             <div className="service-name-with-status">
-                <span className="to-bottom">{service.serviceName}</span>
+                <a href={service.url} className="text-white display-1 fw-bold">{service.serviceName}</a>
                 <Stack className="justify-content-center" gap={2}>
                     <span className={style.status} style={{"--status-color": service.isOnline ? "#3CFB38" : "#FB4438"}}>
                         {service.isOnline ? "Онлайн" : "Офлайн"} с {formatDate(changedStatusAt)}
@@ -453,7 +442,7 @@ function ServiceHeader({service, updateService}) {
                     {service.isSubscribed ? "Отписаться" : "Подписаться"}
                 </Button>
             </Stack>
-        </div>
+        </Stack>
     </div>
 }
 

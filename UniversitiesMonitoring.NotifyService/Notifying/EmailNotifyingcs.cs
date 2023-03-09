@@ -25,20 +25,22 @@ internal class EmailNotifier
     public async Task NotifyAsync(UserEntity userEntity, UniversityServiceEntity serviceEntity)
     {
         if (userEntity.Email == null) return;
-        var message = CreateMailMessage(serviceEntity.ServiceName, serviceEntity.IsOnline, serviceEntity.ServiceId);
+        var message = CreateMailMessage(serviceEntity);
         message.To.Add(userEntity.Email);
         
         await _emailClient.SendMailAsync(message);
     }
 
-    private MailMessage CreateMailMessage(string serviceName, bool isOnline, ulong serviceId) =>
+    private MailMessage CreateMailMessage(UniversityServiceEntity service) =>
         new()
         {
             From = _mailAddress,
             Subject = "Изменение состояния сервиса",
             Body =
-                $"<b>📢 Сервис {serviceName} изменил свое состояние на {(isOnline ? "онлайн 🟢" : "офлайн 🔴")}</b><br/>" +
-                (!isOnline ? $"Чтобы узнать про возможные причины, перейдите по  <a href=\"https://universitiesmonitoring.ru/services/{serviceId}\">ссылке</a>" : string.Empty),
-            IsBodyHtml = true
+                $"<b>📢 Сервис <a href=\"{CreateServiceHref(service)}\">{service.ServiceName}</a> ВУЗа {service.UniversityName} изменил свое состояние на {(service.IsOnline ? "онлайн 🟢" : "офлайн 🔴")}</b><br/>",
+                IsBodyHtml = true
         };
+
+    private string CreateServiceHref(UniversityServiceEntity service) =>
+        $"http://univermonitoring.gym1551.ru/service?serviceId={service.ServiceId}";
 }

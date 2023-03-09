@@ -286,7 +286,7 @@ export function ServicePage() {
     useEffect(() => {
         (async () => {
             try {
-                setService(await GetService(location.state.serviceId ?? Query.serviceId));    
+                setService(await GetService(location.state?.serviceId ?? Query.serviceId));    
             } catch {
                 await smthgFall();  
             }

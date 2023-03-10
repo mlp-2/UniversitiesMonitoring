@@ -14,16 +14,18 @@ public class ModeratorController : ControllerBase
     private readonly IServicesProvider _servicesProvider;
     private readonly IDataProvider _dataProvider;
     private readonly JwtGenerator _jwtGenerator;
+    private readonly IModulesProvider _modulesProvider;
 
     public ModeratorController(IModeratorsProvider moderatorsProvider,
         IServicesProvider servicesProvider,
         IDataProvider dataProvider,
-        JwtGenerator jwtGenerator)
+        JwtGenerator jwtGenerator, IModulesProvider modulesProvider)
     {
         _moderatorsProvider = moderatorsProvider;
         _servicesProvider = servicesProvider;
         _dataProvider = dataProvider;
         _jwtGenerator = jwtGenerator;
+        _modulesProvider = modulesProvider;
     }
     
     [HttpPost("auth")]
@@ -239,5 +241,24 @@ public class ModeratorController : ControllerBase
         {
             return BadRequest();
         }
+    }
+
+    [Authorize(Roles = JwtGenerator.AdminRole)]
+    [HttpGet("modules")]
+    public IActionResult GetModules() => Ok(_modulesProvider.GetModulesAsync());
+    
+    [Authorize(Roles = JwtGenerator.AdminRole)]
+    [HttpPost("modules")]
+    public async Task<IActionResult> CreateModule(string url) => Ok(new
+    {
+        id = await _modulesProvider.CreateModuleAsync(url) 
+    });
+
+    [Authorize(Roles = JwtGenerator.AdminRole)]
+    [HttpDelete("modules/{id:long}")]
+    public async Task<IActionResult> DeleteModule([FromRoute] ulong id)
+    {
+        await _modulesProvider.DeleteModuleAsync(id);
+        return Ok();
     }
 }

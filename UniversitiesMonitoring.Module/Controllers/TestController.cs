@@ -10,10 +10,13 @@ namespace UniversitiesMonitoring.Module.Controllers;
 public class TestController : ControllerBase
 {
     private readonly TestProvider _testProvider;
+    private readonly LocationProvider _locationProvider;
 
-    public TestController(TestProvider testProvider)
+    public TestController(TestProvider testProvider, 
+        LocationProvider locationProvider)
     {
         _testProvider = testProvider;
+        _locationProvider = locationProvider;
     }
 
     [HttpGet("/test")]

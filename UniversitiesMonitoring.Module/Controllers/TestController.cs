@@ -19,6 +19,12 @@ public class TestController : ControllerBase
         _locationProvider = locationProvider;
     }
 
+    [HttpGet("/location")]
+    public IActionResult Location() => Ok(new 
+    {
+        location = _locationProvider.Location
+    });
+    
     [HttpGet("/test")]
     public async Task<IActionResult> Test(
         [FromQuery] Uri url) => Ok(await _testProvider.TestAsync(url));

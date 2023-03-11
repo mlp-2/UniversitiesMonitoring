@@ -48,21 +48,23 @@ public class ModulesProvider : IModulesProvider
             });
 
     /// <inheritdoc />
-    public async Task<ulong> CreateModuleAsync(string url)
+    public async Task<Tuple<MonitoringModule, string>> CreateModuleAsync(string url)
     {
-        if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
+        if (!Uri.TryCreate(url, UriKind.Absolute, out var verifiedUri))
         {
             throw new InvalidOperationException("Invalid URI");
         }
 
+        var moduleLocation = await EnsureModuleStructureAsync(verifiedUri);
+        
         var module = new MonitoringModule()
         {
-            Url = url
+            Url = verifiedUri.AbsoluteUri[..^1]
         };
-        
+
         await _dataProvider.MonitoringModules.AddAsync(module);
         await _dataProvider.SaveChangesAsync();
-        return module.Id;
+        return new Tuple<MonitoringModule, string>(module, moduleLocation);
     }
 
     /// <inheritdoc />
@@ -119,5 +121,33 @@ public class ModulesProvider : IModulesProvider
         {
             return null;
         }   
+    }
+
+    private static async Task<string> EnsureModuleStructureAsync(Uri url)
+    {
+        using var httpClient = new HttpClient();
+        var locationRoute = url.AbsoluteUri[..^1] + "/location";
+        var result = await httpClient.GetAsync(locationRoute);
+
+        result.EnsureSuccessStatusCode();
+
+        var jsonDict = await result.Content.ReadFromJsonAsync<IDictionary<string, object?>>();
+
+        if (jsonDict == null)
+        {
+            throw new InvalidOperationException("Incorrect module");
+        }
+        
+        if (!jsonDict.TryGetValue("location", out var locationValue))
+        {
+            throw new InvalidOperationException("Incorrect module");
+        }
+
+        if (locationValue == null)
+        {
+            throw new InvalidOperationException("Incorrect module");
+        }
+
+        return locationValue.ToString()!;
     }
 }

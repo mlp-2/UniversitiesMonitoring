@@ -27,6 +27,10 @@ public class ModeratorController : ControllerBase
         _jwtGenerator = jwtGenerator;
         _modulesProvider = modulesProvider;
     }
+
+    [Authorize(Roles = JwtGenerator.AdminRole)]
+    [HttpGet("test")]
+    public IActionResult TestToken() => Ok();
     
     [HttpPost("auth")]
     public async Task<IActionResult> ModeratorAuth([FromBody] ModeratorAuthEntity auth)
@@ -249,10 +253,13 @@ public class ModeratorController : ControllerBase
     
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpPost("modules")]
-    public async Task<IActionResult> CreateModule(string url) => Ok(new
+    public async Task<IActionResult> CreateModule(
+        [FromQuery] string url)
     {
-        id = await _modulesProvider.CreateModuleAsync(url) 
-    });
+        var moduleData = await _modulesProvider.CreateModuleAsync(url); 
+        
+        return Ok(new ModuleEntity(moduleData.Item1, moduleData.Item2));
+    }
 
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpDelete("modules/{id:long}")]

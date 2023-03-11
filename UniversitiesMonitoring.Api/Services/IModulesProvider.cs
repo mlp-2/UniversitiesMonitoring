@@ -17,7 +17,7 @@ public interface IModulesProvider
     /// Регистрирует модуль
     /// </summary>
     /// <param name="url">URL, куда можно делать запросы</param>
-    Task<ulong> CreateModuleAsync(string url);
+    Task<Tuple<MonitoringModule, string>> CreateModuleAsync(string url);
     
     /// <summary>
     /// Удаляет модуль

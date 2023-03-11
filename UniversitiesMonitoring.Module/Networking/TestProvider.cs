@@ -9,10 +9,10 @@ public class TestProvider
     private readonly string _locationName;
 
     public TestProvider(IEnumerable<ITestStrategy> testStrategies,
-                        IConfiguration configuration)
+                        LocationProvider locationProvider)
     {
         _testStrategies = testStrategies;
-        _locationName = Environment.GetEnvironmentVariable("LOCATION_NAME") ?? configuration["LocationName"] ?? "Неизвестная локация";
+        _locationName = locationProvider.Location;
     }
 
     /// <summary>

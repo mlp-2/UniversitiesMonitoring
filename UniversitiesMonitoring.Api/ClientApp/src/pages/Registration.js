@@ -52,18 +52,22 @@ export function Registration() {
             apiEntity.password === "" ||
             apiEntity.retryPassword === "") {
             throwError("Ни одно поле не должно быть пустым");
+            return;
         }
         
         if (apiEntity.username.length < 6) {
-            throwError("Имя пользователя должно содержать как минимум 6 символов");   
+            throwError("Имя пользователя должно содержать как минимум 6 символов");
+            return;
         }
         
         if (apiEntity.password.length < 8) {
             throwError("Пароль должен быть как минимум из 8 символов");
+            return;
         }
         
         if (apiEntity.password !== apiEntity.retryPassword) {
             throwError("Пароли должны совпадать");
+            return;
         }
         
         try {

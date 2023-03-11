@@ -14,6 +14,8 @@ import {ReportsPage} from "./pages/ReportsPage";
 import {UniversitiesModerationPanel} from "./pages/UniversitiesModerationPanel";
 import {ServicesModerationPanel} from "./pages/ServicesModerationPanel";
 import {Moderation} from "./pages/Moderation";
+import {ModulesModeration} from "./pages/ModulesModeration";
+import {ModerationAuthRequiredContainer} from "./pages/ModerationAuthRequiredContainer";
 
 axios.interceptors.request.use(
     config => {
@@ -44,11 +46,14 @@ export default class App extends Component {
                 <Route key={6} path="universities-list" element={<UniversitiesList/>}/>
                 <Route key={7} path="service" element={<ServicePage/>}/>
             </Route>
-            <Route key={8} path="moderator" element={<Moderation/>}/>
+            <Route path="/" key={1111} element={<ModerationAuthRequiredContainer/>}>
+                <Route key={8} path="moderator" element={<Moderation/>}/>
+                <Route key={10} path="moderator/reports" element={<ReportsPage/>}/>
+                <Route key={11} path="moderator/universities" element={<UniversitiesModerationPanel/>}/>
+                <Route key={12} path="moderator/university" element={<ServicesModerationPanel/>}/>
+                <Route key={13} path="moderator/modules" element={<ModulesModeration/>}/>    
+            </Route>
             <Route key={9} path="moderator/login" element={<ModerationLoginPage/>}/>
-            <Route key={10} path="moderator/reports" element={<ReportsPage/>}/>
-            <Route key={11} path="moderator/universities" element={<UniversitiesModerationPanel/>}/>
-            <Route key={12} path="moderator/university" element={<ServicesModerationPanel/>}/>
             <Route key={1} index element={<Login/>}/>
             <Route key={1} path="*" element={<Login/>}/>
         </Routes>

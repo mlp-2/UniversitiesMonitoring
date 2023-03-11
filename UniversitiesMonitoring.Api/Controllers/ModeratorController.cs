@@ -14,17 +14,23 @@ public class ModeratorController : ControllerBase
     private readonly IServicesProvider _servicesProvider;
     private readonly IDataProvider _dataProvider;
     private readonly JwtGenerator _jwtGenerator;
+    private readonly IModulesProvider _modulesProvider;
 
     public ModeratorController(IModeratorsProvider moderatorsProvider,
         IServicesProvider servicesProvider,
         IDataProvider dataProvider,
-        JwtGenerator jwtGenerator)
+        JwtGenerator jwtGenerator, IModulesProvider modulesProvider)
     {
         _moderatorsProvider = moderatorsProvider;
         _servicesProvider = servicesProvider;
         _dataProvider = dataProvider;
         _jwtGenerator = jwtGenerator;
+        _modulesProvider = modulesProvider;
     }
+
+    [Authorize(Roles = JwtGenerator.AdminRole)]
+    [HttpGet("test")]
+    public IActionResult TestToken() => Ok();
     
     [HttpPost("auth")]
     public async Task<IActionResult> ModeratorAuth([FromBody] ModeratorAuthEntity auth)
@@ -239,5 +245,27 @@ public class ModeratorController : ControllerBase
         {
             return BadRequest();
         }
+    }
+
+    [Authorize(Roles = JwtGenerator.AdminRole)]
+    [HttpGet("modules")]
+    public IActionResult GetModules() => Ok(_modulesProvider.GetModulesAsync());
+    
+    [Authorize(Roles = JwtGenerator.AdminRole)]
+    [HttpPost("modules")]
+    public async Task<IActionResult> CreateModule(
+        [FromQuery] string url)
+    {
+        var moduleData = await _modulesProvider.CreateModuleAsync(url); 
+        
+        return Ok(new ModuleEntity(moduleData.Item1, moduleData.Item2));
+    }
+
+    [Authorize(Roles = JwtGenerator.AdminRole)]
+    [HttpDelete("modules/{id:long}")]
+    public async Task<IActionResult> DeleteModule([FromRoute] ulong id)
+    {
+        await _modulesProvider.DeleteModuleAsync(id);
+        return Ok();
     }
 }

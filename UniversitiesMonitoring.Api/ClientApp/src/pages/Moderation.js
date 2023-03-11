@@ -5,5 +5,6 @@ export function Moderation() {
     return <Stack>
         <Link to="/moderator/reports">Жалобы</Link>
         <Link to="/moderator/universities">Управление ВУЗами</Link>
+        <Link to="/moderator/modules">Управление модулями</Link>
     </Stack>
 }

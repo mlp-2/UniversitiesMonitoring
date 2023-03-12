@@ -12,7 +12,7 @@ internal class PingStrategy : ITestStrategy
     {
         DontFragment = true
     };
-    
+
     /// <inheritdoc />
     public async Task TestAsync(Uri url, TestReportBuilder reportBuilder)
     {
@@ -24,10 +24,10 @@ internal class PingStrategy : ITestStrategy
             var reply = await ping.SendPingAsync(ipEntry.AddressList[0], 1000, Data32Bytes, PingOptions);
 
             if (reply.Status != IPStatus.Success) return;
-        
+
             reportBuilder.WithPingResult(reply.RoundtripTime);
         }
-        catch 
+        catch
         {
             // ignored
         }

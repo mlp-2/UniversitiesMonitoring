@@ -18,6 +18,6 @@ const useStyle = createUseStyles({
 
 export function TextInput(props) {
     const style = useStyle();
-    
+
     return <input className={style.defaultTxtInput} {...props}/>
 }

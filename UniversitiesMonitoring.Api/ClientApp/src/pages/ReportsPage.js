@@ -23,12 +23,12 @@ const useStyles = createUseStyles({
 
 export function ReportsPage() {
     const [reports, setReports] = useState(null);
-    
+
     useEffect(() => {
         (async () => {
             try {
-                const result = await axios.get("/api/moderator/reports");    
-                
+                const result = await axios.get("/api/moderator/reports");
+
                 setReports(result.data);
             } catch (error) {
                 if (error.status === 401) {
@@ -38,7 +38,7 @@ export function ReportsPage() {
                         showConfirmButton: false,
                         timer: 2000
                     });
-                    
+
                     return <Navigate to="moderator/login"/>
                 } else {
                     await Swal.fire({
@@ -51,13 +51,13 @@ export function ReportsPage() {
             }
         })();
     }, []);
-    
+
     function removeReport(ctxReport) {
         setReports(reports.filter(report => report.service.serviceId !== ctxReport.service.serviceId))
     }
-    
+
     if (reports === null) return <span>Загружаем сообщения...</span>
-    
+
     return <Container>
         <h1>Сообщения</h1>
         {
@@ -65,25 +65,25 @@ export function ReportsPage() {
                 {reports.map(report => <ReportContainer key={report.id} removeReport={removeReport} report={report}/>)}
             </Stack> : <NoWork/>
         }
-        
+
     </Container>
 }
 
 function ReportContainer({report, removeReport}) {
     const date = new Date(report.timestamp + "Z");
     const [loading, setLoading] = useState(false);
-    
+
     async function handleAccept() {
         return sendChangeStatusOfReport("accept");
     }
-    
+
     function handleDeny() {
         return sendChangeStatusOfReport("deny");
     }
-    
+
     async function sendChangeStatusOfReport(statusName) {
         setLoading(true);
-        
+
         const result = await axios.post(`/api/moderator/reports/${report.id}/${statusName}`)
             .catch(_ => Swal.fire({
                 title: "Что-то пошло не так...",
@@ -91,10 +91,10 @@ function ReportContainer({report, removeReport}) {
                 showConfirmButton: false,
                 timer: 2000
             }));
-        
+
         if (result.status === 200) removeReport(report);
     }
-    
+
     return <Card>
         <Card.Body>
             <Card.Title>
@@ -106,8 +106,10 @@ function ReportContainer({report, removeReport}) {
                 {report.content}
             </Card.Text>
             <Stack direction="horizontal" gap={2}>
-                <Button disabled={loading} onClick={handleAccept}>Да, сервис {report.isOnline ? "онлайн" : "офлайн"}</Button>
-                <Button disabled={loading} onClick={handleDeny}>Нет, сервис {!report.isOnline ? "онлайн" : "офлайн"}</Button>
+                <Button disabled={loading} onClick={handleAccept}>Да,
+                    сервис {report.isOnline ? "онлайн" : "офлайн"}</Button>
+                <Button disabled={loading} onClick={handleDeny}>Нет,
+                    сервис {!report.isOnline ? "онлайн" : "офлайн"}</Button>
             </Stack>
         </Card.Body>
         <Card.Footer className="text-muted">
@@ -127,7 +129,7 @@ function padTo2Digits(num) {
 
 function NoWork() {
     const style = useStyles();
-    
+
     return <div className={style.noWork}>
         <span>Никто к нам с жалобами не обращался. Отдыхайте, дорогой модератор ☕</span>
     </div>

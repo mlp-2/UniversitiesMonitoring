@@ -6,7 +6,7 @@ using UniversitiesMonitoring.MonitoringService.Services.InspectingStrategies;
 var host = Host.CreateDefaultBuilder(args)
     .ConfigureServices(services => services.AddSingleton<IUniversitiesServiceProvider, UniversitiesServiceProvider>()
         .AddHostedService<Worker>()
-        .AddSingleton<IEnumerable<IInspectingStrategy>, IInspectingStrategy[]>(_ => new []
+        .AddSingleton<IEnumerable<IInspectingStrategy>, IInspectingStrategy[]>(_ => new[]
         {
             // Можно добавить еще варианты проверки
             new HeadInspectingStrategy(),

@@ -11,7 +11,7 @@ internal class UpdateBuilder
     /// </summary>
     /// <param name="serviceId">ID сервиса</param>
     /// <param name="isOnline">true, если сервис онлайн</param>
-    public void AddChangeState(ulong serviceId, bool isOnline) => 
+    public void AddChangeState(ulong serviceId, bool isOnline) =>
         _updates.Add(new ChangeStateEntity(serviceId, isOnline));
 
     /// <summary>

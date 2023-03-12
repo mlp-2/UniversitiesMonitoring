@@ -18,7 +18,7 @@ public class ModulesProvider : IModulesProvider
         _dataProvider = dataProvider;
         _cache = cache;
     }
-    
+
     /// <inheritdoc />
     public Task<IEnumerable<TestReport>> TestServiceAsync(UniversityService service) =>
         _cache.GetOrCreateAsync<IEnumerable<TestReport>>(GenerateCacheId(service),
@@ -29,16 +29,17 @@ public class ModulesProvider : IModulesProvider
                 using var httpClient = new HttpClient();
                 var modules = await _dataProvider.MonitoringModules.GetlAll().AsNoTracking().ToArrayAsync();
                 var reports = new List<TestReport>();
-                
+
                 foreach (var module in modules)
                 {
                     try
                     {
-                        var result = await httpClient.GetFromJsonAsync<TestReport>(GenerateTestUri(module.Url, service));
-                        
+                        var result =
+                            await httpClient.GetFromJsonAsync<TestReport>(GenerateTestUri(module.Url, service));
+
                         if (result != null) reports.Add(result);
                     }
-                    catch 
+                    catch
                     {
                         // ignored
                     }
@@ -56,7 +57,7 @@ public class ModulesProvider : IModulesProvider
         }
 
         var moduleLocation = await EnsureModuleStructureAsync(verifiedUri);
-        
+
         var module = new MonitoringModule()
         {
             Url = verifiedUri.AbsoluteUri[..^1]
@@ -76,7 +77,7 @@ public class ModulesProvider : IModulesProvider
         {
             throw new InvalidOperationException("Service hasn't found");
         }
-        
+
         _dataProvider.MonitoringModules.Remove(module);
         await _dataProvider.SaveChangesAsync();
     }
@@ -86,7 +87,7 @@ public class ModulesProvider : IModulesProvider
     {
         var allModules = _dataProvider.MonitoringModules.GetlAll().AsNoTracking();
         using var httpClient = new HttpClient();
-        
+
         foreach (var module in allModules)
         {
             var location = await _cache.GetOrCreateAsync(GenerateLocationId(module), async entry =>
@@ -104,7 +105,7 @@ public class ModulesProvider : IModulesProvider
     private static string GenerateCacheId(UniversityService service) => $"TEST_RESULT_{service.Id}";
     private static Uri GenerateTestUri(string url, UniversityService service) => new(url + $"/test?url={service.Url}");
     private static string GenerateLocationId(MonitoringModule module) => $"CACHED_LOCATION_{module.Id}";
-    
+
     private static async Task<string?> GetModuleNameAsync(string url, HttpClient client)
     {
         try
@@ -114,13 +115,13 @@ public class ModulesProvider : IModulesProvider
             var json = await result.Content.ReadFromJsonAsync<IDictionary<string, object>>();
 
             if (json == null) return null;
-            
+
             return json["location"].ToString();
         }
         catch
         {
             return null;
-        }   
+        }
     }
 
     private static async Task<string> EnsureModuleStructureAsync(Uri url)
@@ -137,7 +138,7 @@ public class ModulesProvider : IModulesProvider
         {
             throw new InvalidOperationException("Incorrect module");
         }
-        
+
         if (!jsonDict.TryGetValue("location", out var locationValue))
         {
             throw new InvalidOperationException("Incorrect module");

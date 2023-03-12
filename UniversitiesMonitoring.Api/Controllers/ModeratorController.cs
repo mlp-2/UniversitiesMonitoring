@@ -21,7 +21,7 @@ public class ModeratorController : ControllerBase
     public ModeratorController(IModeratorsProvider moderatorsProvider,
         IServicesProvider servicesProvider,
         IDataProvider dataProvider,
-        JwtGenerator jwtGenerator, 
+        JwtGenerator jwtGenerator,
         IModulesProvider modulesProvider,
         IWebSocketUpdateStateNotifier webSocketUpdateStateNotifier)
     {
@@ -36,7 +36,7 @@ public class ModeratorController : ControllerBase
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpGet("test")]
     public IActionResult TestToken() => Ok();
-    
+
     [HttpPost("auth")]
     public async Task<IActionResult> ModeratorAuth([FromBody] ModeratorAuthEntity auth)
     {
@@ -46,7 +46,7 @@ public class ModeratorController : ControllerBase
         {
             return BadRequest("Некорректное имя пользователя или пароль");
         }
-        
+
         var passwordHash = Sha256Computing.ComputeSha256(auth.Password);
 
         if (!moderator.PasswordSha256hash.IsSequenceEquals(passwordHash))
@@ -57,7 +57,7 @@ public class ModeratorController : ControllerBase
         var token = _jwtGenerator.GenerateTokenForUser(moderator.Id, false);
 
         Response.Cookies.Append("auth", token);
-        
+
         return Ok(new
         {
             jwt = token
@@ -66,7 +66,7 @@ public class ModeratorController : ControllerBase
 
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpGet("reports")]
-    public IActionResult GetReports() => Ok(from report in _servicesProvider.GetAllReports() 
+    public IActionResult GetReports() => Ok(from report in _servicesProvider.GetAllReports()
         select new ReportEntity(report));
 
     [Authorize(Roles = JwtGenerator.AdminRole)]
@@ -79,12 +79,12 @@ public class ModeratorController : ControllerBase
         {
             return BadRequest("Репорт не найден");
         }
-        
+
         await _moderatorsProvider.AcceptReportAsync(report);
         await _servicesProvider.SolveReportAsync(report);
-        
-        await _webSocketUpdateStateNotifier.NotifyAsync(new [] {report.ServiceId});
-        
+
+        await _webSocketUpdateStateNotifier.NotifyAsync(new[] {report.ServiceId});
+
         return Ok();
     }
 
@@ -98,7 +98,7 @@ public class ModeratorController : ControllerBase
         {
             return BadRequest("Репорт не найден");
         }
-        
+
         await _servicesProvider.SolveReportAsync(report);
         return Ok();
     }
@@ -114,7 +114,7 @@ public class ModeratorController : ControllerBase
             {
                 Name = name
             };
-            
+
             await _dataProvider.Universities.AddAsync(university);
             await _dataProvider.SaveChangesAsync();
             return Ok(university.Id);
@@ -124,7 +124,7 @@ public class ModeratorController : ControllerBase
             return BadRequest("ВУЗ с таким названием уже существует");
         }
     }
-    
+
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpDelete("universities/{id:long}/delete")]
     public async Task<IActionResult> DeleteUniversity(ulong id)
@@ -132,7 +132,7 @@ public class ModeratorController : ControllerBase
         var university = await _dataProvider.Universities.FindAsync(id);
 
         if (university == null) return BadRequest();
-        
+
         _dataProvider.Universities.Remove(university);
         await _dataProvider.SaveChangesAsync();
 
@@ -180,7 +180,7 @@ public class ModeratorController : ControllerBase
             {
                 return BadRequest("Некорректная ссылка");
             }
-            
+
             var service = new UniversityService()
             {
                 Name = serviceEntity.Name,
@@ -197,7 +197,7 @@ public class ModeratorController : ControllerBase
             return BadRequest();
         }
     }
-    
+
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpDelete("services/{id:long}/delete")]
     public async Task<IActionResult> DeleteService(ulong id)
@@ -210,7 +210,7 @@ public class ModeratorController : ControllerBase
 
         return Ok();
     }
-    
+
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpPut("services/{id:long}/rename")]
     public async Task<IActionResult> RenameService(
@@ -232,7 +232,7 @@ public class ModeratorController : ControllerBase
             return BadRequest();
         }
     }
-    
+
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpPut("services/{id:long}/change-url")]
     public async Task<IActionResult> ChangeUrlOfService(
@@ -258,14 +258,14 @@ public class ModeratorController : ControllerBase
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpGet("modules")]
     public IActionResult GetModules() => Ok(_modulesProvider.GetModulesAsync());
-    
+
     [Authorize(Roles = JwtGenerator.AdminRole)]
     [HttpPost("modules")]
     public async Task<IActionResult> CreateModule(
         [FromQuery] string url)
     {
-        var moduleData = await _modulesProvider.CreateModuleAsync(url); 
-        
+        var moduleData = await _modulesProvider.CreateModuleAsync(url);
+
         return Ok(new ModuleEntity(moduleData.Item1, moduleData.Item2));
     }
 

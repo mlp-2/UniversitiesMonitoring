@@ -5,6 +5,7 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
 [assembly: InternalsVisibleTo("UniversitiesMonitoring.Api.Tests")]
+
 namespace UniversitiesMonitoring.Api;
 
 public class JwtGenerator
@@ -15,12 +16,12 @@ public class JwtGenerator
     /// Роль обычного пользователя
     /// </summary>
     public const string UserRole = "USER_ROLE";
-    
+
     /// <summary>
     /// Роль администратора
     /// </summary>
     public const string AdminRole = "ADMIN_ROLE";
-    
+
     public JwtGenerator(IConfiguration configuration) =>
         _jwtSecret = new SymmetricSecurityKey(
             Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ?? configuration["JwtSecret"]));
@@ -32,11 +33,12 @@ public class JwtGenerator
     /// <param name="isRegularUser">True, если пользователь - не администратор</param>
     /// <param name="lifeTime">Время жизни токена в секундах</param>
     /// <returns>JWT токен</returns>
-    public string GenerateTokenForUser(ulong userId, bool isRegularUser, int lifeTime = 604800, DateTime? initializingTime = null)
+    public string GenerateTokenForUser(ulong userId, bool isRegularUser, int lifeTime = 604800,
+        DateTime? initializingTime = null)
     {
         var now = initializingTime ?? DateTime.UtcNow;
         var claims = GenerateIdentity(userId, isRegularUser);
-        
+
         var jwt = new JwtSecurityToken(
             issuer: "API_HOST",
             notBefore: now,
@@ -53,9 +55,9 @@ public class JwtGenerator
         var claims = new Claim[]
         {
             new("name", userId.ToString()),
-            new("role", isRegularUser ? UserRole: AdminRole)
+            new("role", isRegularUser ? UserRole : AdminRole)
         };
-        
+
         var claimsIdentity =
             new ClaimsIdentity(claims, "Token", "name",
                 "role");

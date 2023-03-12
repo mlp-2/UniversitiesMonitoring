@@ -9,7 +9,7 @@ public class TestProvider
     private readonly string _locationName;
 
     public TestProvider(IEnumerable<ITestStrategy> testStrategies,
-                        LocationProvider locationProvider)
+        LocationProvider locationProvider)
     {
         _testStrategies = testStrategies;
         _locationName = locationProvider.Location;
@@ -23,9 +23,9 @@ public class TestProvider
     public async Task<TestReport> TestAsync(Uri testUrl)
     {
         var reportBuilder = new TestReportBuilder();
-        
+
         reportBuilder.WithTestLocation(_locationName);
-        
+
         foreach (var testStrategy in _testStrategies)
         {
             await testStrategy.TestAsync(testUrl, reportBuilder);

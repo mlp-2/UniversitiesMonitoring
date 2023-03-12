@@ -10,7 +10,7 @@ public interface IWebSocketUpdateStateNotifier
     /// <param name="webSocket">Вебсокет</param>
     /// <param name="socketFinishedTcs">Обеспечение завершения работы вебсокета</param>
     void AppendWebSocket(WS webSocket, TaskCompletionSource<object> socketFinishedTcs);
-    
+
     /// <summary>
     /// Оповещает всех слушателей о том, что все указанные сервисы изменили свое состояние
     /// </summary>

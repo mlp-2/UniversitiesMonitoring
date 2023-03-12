@@ -1,6 +1,4 @@
-﻿
-
-using UniversityMonitoring.Data.Models;
+﻿using UniversityMonitoring.Data.Models;
 
 namespace UniversitiesMonitoring.Api.Services;
 
@@ -12,5 +10,3 @@ public interface IUsersProvider
     Task<bool> ModifyUserAsync(ulong userId, Action<User> modifyAction);
     Task<User?> CreateUserAsync(string username, string password);
 }
-
-

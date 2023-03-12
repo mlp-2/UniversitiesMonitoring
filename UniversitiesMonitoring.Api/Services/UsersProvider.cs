@@ -6,12 +6,12 @@ namespace UniversitiesMonitoring.Api.Services
     internal class UsersProvider : IUsersProvider
     {
         private readonly IDataProvider _dataProvider;
-        
+
         public UsersProvider(IDataProvider dataProvider)
         {
             _dataProvider = dataProvider;
         }
-        
+
         /// <summary>
         /// Получает пользователя
         /// </summary>
@@ -31,7 +31,8 @@ namespace UniversitiesMonitoring.Api.Services
         /// </summary>
         /// <param name="username">Имя пользователя</param>
         /// <returns>Полbьзователя. Null, если пользователь не найден</returns>
-        public User? GetUser(string username) => _dataProvider.Users.ExecuteSql($"SELECT * FROM universities_monitoring.User WHERE Username = '{username}'").FirstOrDefault();
+        public User? GetUser(string username) => _dataProvider.Users
+            .ExecuteSql($"SELECT * FROM universities_monitoring.User WHERE Username = '{username}'").FirstOrDefault();
 
         /// <summary>
         /// Изменяет пользователя по ID и методу
@@ -42,15 +43,15 @@ namespace UniversitiesMonitoring.Api.Services
         public async Task<bool> ModifyUserAsync(ulong userId, Action<User> modifyAction)
         {
             var user = await _dataProvider.Users.FindAsync(userId);
-            
+
             if (user == null) return false;
 
             modifyAction(user);
             await _dataProvider.SaveChangesAsync();
-            
+
             return true;
         }
-        
+
         /// <summary>
         /// Создает нового пользователя
         /// </summary>

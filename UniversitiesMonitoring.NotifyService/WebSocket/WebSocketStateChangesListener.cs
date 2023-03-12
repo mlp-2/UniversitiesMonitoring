@@ -9,14 +9,14 @@ internal class WebSocketStateChangesListener : IStateChangesListener, IDisposabl
 {
     private readonly ILogger<WebSocketStateChangesListener> _logger;
     private const int BufferSize = 1 << 9;
-    
+
     private readonly Uri _wsRoute;
     private ClientWebSocket _wsClient = new();
 
     public WebSocketStateChangesListener(IConfiguration configuration, ILogger<WebSocketStateChangesListener> logger)
     {
         _logger = logger;
-        var localhostUrl = Environment.GetEnvironmentVariable("WS_URL") ?? 
+        var localhostUrl = Environment.GetEnvironmentVariable("WS_URL") ??
                            configuration["LocalHostWsUrl"];
         _wsRoute = new Uri(localhostUrl);
     }
@@ -39,7 +39,7 @@ internal class WebSocketStateChangesListener : IStateChangesListener, IDisposabl
                 await Task.Delay(TimeSpan.FromSeconds(10));
             }
         }
-        
+
         _logger.LogInformation("Connected to WS");
     }
 
@@ -48,20 +48,21 @@ internal class WebSocketStateChangesListener : IStateChangesListener, IDisposabl
         _wsClient = new ClientWebSocket();
         await ConnectAsync();
     }
-    
+
     /// <summary>
     /// Получает все изменения состояний полученные по WS
     /// </summary>
     /// <param name="cancellationToken">Маркер отмены операции</param>
     /// <returns>Коллекция изменений состояний</returns>
     /// <exception cref="InvalidOperationException">Вызывается, если клиент не подключен к сокету или передан неверный тип WS сообщения</exception>
-    public async Task<IEnumerable<UniversityServiceChangeStateEntity>> TryGetChangesAsync(CancellationToken cancellationToken)
+    public async Task<IEnumerable<UniversityServiceChangeStateEntity>> TryGetChangesAsync(
+        CancellationToken cancellationToken)
     {
         if (_wsClient.State != WebSocketState.Open)
         {
             await ReconnectAsync();
         }
-        
+
         try
         {
             var buffer = new byte[BufferSize];

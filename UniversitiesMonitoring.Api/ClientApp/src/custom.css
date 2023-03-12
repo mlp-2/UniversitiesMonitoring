@@ -1,32 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap');
 
 * {
-  font-family: 'Inter', sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
 }
 
 h1 {
-  font-weight: bold;
+    font-weight: bold;
 }
 
 html {
-  background: #F5F5F5;
-  height: 100%;
+    background: #F5F5F5;
+    height: 100%;
 }
 
 ::-webkit-scrollbar {
-  width: 20px;
+    width: 20px;
 }
 
 ::-webkit-scrollbar-track {
-  background: transparent;
+    background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #0798EA;
-  border-radius: 3em;
+    background: #0798EA;
+    border-radius: 3em;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #5bbef4;
+    background: #5bbef4;
 }

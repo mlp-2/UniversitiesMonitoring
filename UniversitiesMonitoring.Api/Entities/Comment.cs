@@ -10,7 +10,7 @@ public class Comment
         Rate = rate;
         Content = content;
     }
-    
+
     public sbyte Rate { get; }
     public string? Content { get; }
 }

@@ -8,6 +8,7 @@ internal interface IStateChangesListener
     /// Подключается к вебсокету для получения информации об изменении состояния сервисов
     /// </summary>
     Task ConnectAsync();
+
     /// <summary>
     /// Запускает асинхронную операцию по получению данных из сокета
     /// </summary>

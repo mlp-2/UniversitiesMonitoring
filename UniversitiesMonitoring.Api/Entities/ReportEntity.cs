@@ -14,7 +14,7 @@ public class ReportEntity
         Service = new UniversityServiceEntity(report.Service, false, false);
         AddedAt = report.AddedAt;
     }
-    
+
     public ulong Id { get; }
     public string? Content { get; }
     public DateTime? Timestamp { get; }

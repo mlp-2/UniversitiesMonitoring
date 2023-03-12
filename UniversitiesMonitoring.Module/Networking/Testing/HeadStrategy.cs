@@ -11,13 +11,13 @@ internal class HeadStrategy : ITestStrategy
         {
             using var httpClient = new HttpClient();
             var stopwatch = new Stopwatch();
-        
+
             stopwatch.Start();
             var result = await httpClient.SendAsync(BuildRequestMessage(url));
             stopwatch.Stop();
-        
+
             if (!result.IsSuccessStatusCode) return;
-        
+
             reportBuilder.WithHeadResult(stopwatch.ElapsedMilliseconds);
         }
         catch

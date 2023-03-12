@@ -33,16 +33,19 @@ internal class Worker : BackgroundService
         while (true)
         {
             var dataFromSocket = await _stateChangesListener.TryGetChangesAsync(stoppingToken);
-            var dataFromSocketInArray = dataFromSocket as UniversityServiceChangeStateEntity[] ?? dataFromSocket.ToArray();
+            var dataFromSocketInArray =
+                dataFromSocket as UniversityServiceChangeStateEntity[] ?? dataFromSocket.ToArray();
             if (!dataFromSocketInArray.Any()) continue;
 
-            var services = (await _servicesFinder.GetServicesEntityAsync(from update in dataFromSocketInArray select update.Id)).ToArray();
+            var services =
+                (await _servicesFinder.GetServicesEntityAsync(from update in dataFromSocketInArray select update.Id))
+                .ToArray();
             var countSkipped = 0;
-            
+
             _logger.LogInformation("New update information Got");
 
             await _telegramNotifying.NotifyAsync(services);
-            
+
             foreach (var service in services)
             {
                 foreach (var serviceSubscriber in service.Subscribers)

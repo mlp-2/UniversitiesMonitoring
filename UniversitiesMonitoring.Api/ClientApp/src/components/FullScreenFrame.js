@@ -16,7 +16,7 @@ const useStyles = createUseStyles({
 
 export function FullscreenFrame(props) {
     const style = useStyles();
-    
+
     return <div className={style.fullScreenFrame}>
         {props.children}
     </div>

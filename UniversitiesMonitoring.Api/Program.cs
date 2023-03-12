@@ -28,8 +28,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidIssuer = "API_HOST",
         ValidateAudience = false,
         ValidateLifetime = true,
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET") ??
-                                                                            builder.Configuration["JwtSecret"])),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(
+            Environment.GetEnvironmentVariable("JWT_SECRET") ??
+            builder.Configuration["JwtSecret"])),
         ValidateIssuerSigningKey = true
     };
 });

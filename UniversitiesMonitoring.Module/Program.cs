@@ -10,7 +10,7 @@ builder.Services.AddSwaggerGen();
 
 builder.Services
     .AddSingleton<IEnumerable<ITestStrategy>>(
-        new[] { (ITestStrategy) new HeadStrategy(), new PingStrategy() })
+        new[] {(ITestStrategy) new HeadStrategy(), new PingStrategy()})
     .AddSingleton<LocationProvider>()
     .AddSingleton<TestProvider>();
 

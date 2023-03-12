@@ -4,12 +4,11 @@ namespace UniversitiesMonitoring.Api.Entities;
 
 public class ModuleEntity
 {
-    public ModuleEntity(MonitoringModule moduleModel, string locationName) 
+    public ModuleEntity(MonitoringModule moduleModel, string locationName)
         : this(moduleModel.Id, locationName, moduleModel.Url)
     {
-        
     }
-    
+
     public ModuleEntity(ulong id, string? locationName, string url)
     {
         Id = id;

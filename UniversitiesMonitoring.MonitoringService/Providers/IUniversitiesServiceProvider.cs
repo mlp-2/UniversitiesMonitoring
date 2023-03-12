@@ -8,7 +8,7 @@ internal interface IUniversitiesServiceProvider
     /// Получает все сервисы ВУЗов, которые есть
     /// </summary>
     Task<IEnumerable<UniversityServiceEntity>> GetAllUniversitiesServicesAsync(CancellationToken cancellationToken);
-    
+
     /// <summary>
     /// Отправляет изменения состояний
     /// </summary>

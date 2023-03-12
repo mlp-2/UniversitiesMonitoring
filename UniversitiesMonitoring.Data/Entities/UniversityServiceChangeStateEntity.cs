@@ -18,18 +18,13 @@ public class UniversityServiceChangeStateEntity
         IsOnline = isOnline;
     }
 
-    [JsonPropertyName("id")]
-    public ulong Id { get; }
-    
-    [JsonPropertyName("universityId")]
-    public ulong UniversityId { get; }
-    
-    [JsonPropertyName("serviceName")]
-    public string ServiceName { get; }
-    
-    [JsonPropertyName("universityName")]
-    public string UniversityName { get; }
-    
-    [JsonPropertyName("isOnline")]
-    public bool IsOnline { get; }
+    [JsonPropertyName("id")] public ulong Id { get; }
+
+    [JsonPropertyName("universityId")] public ulong UniversityId { get; }
+
+    [JsonPropertyName("serviceName")] public string ServiceName { get; }
+
+    [JsonPropertyName("universityName")] public string UniversityName { get; }
+
+    [JsonPropertyName("isOnline")] public bool IsOnline { get; }
 }

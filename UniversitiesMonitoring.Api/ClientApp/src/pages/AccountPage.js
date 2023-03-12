@@ -10,27 +10,27 @@ import {GetUser} from "../ApiMethods";
 
 const emailRegex = /[\w\d.]+@[a-z]+\.[a-z]{2,3}/
 const useStyles = createUseStyles({
-   editEmailForm: {
-       display: "flex",
-       flexDirection: "column",
-       width: "30vw",
-       "& input::placeholder": {
-            fontSize: 18  
-       },
-       "& div": {
-           display: "flex",
-           flexDirection: "column",
-           gap: 10
-       },
-       "& .checkbox-combo": {
-           flexDirection: "row",
-           fontSize: 15
-       },
-       "& input[type=submit]": {
-           width: "30%",
-           fontSize: 15
-       }
-   },
+    editEmailForm: {
+        display: "flex",
+        flexDirection: "column",
+        width: "30vw",
+        "& input::placeholder": {
+            fontSize: 18
+        },
+        "& div": {
+            display: "flex",
+            flexDirection: "column",
+            gap: 10
+        },
+        "& .checkbox-combo": {
+            flexDirection: "row",
+            fontSize: 15
+        },
+        "& input[type=submit]": {
+            width: "30%",
+            fontSize: 15
+        }
+    },
     layout: {
         display: "flex",
         flexDirection: "row",
@@ -40,7 +40,7 @@ const useStyles = createUseStyles({
         background: "#0798EA"
     },
     container: {
-       background: "#FFF",
+        background: "#FFF",
         padding: 20,
         borderRadius: 15
     },
@@ -61,11 +61,11 @@ const useStyles = createUseStyles({
         }
     },
     "@media screen and (max-width: 1000px)": {
-       layout: {
-           "& #fireball": {
-               display: "none"
-           }
-       }
+        layout: {
+            "& #fireball": {
+                display: "none"
+            }
+        }
     }
 });
 
@@ -74,7 +74,7 @@ export function AccountPage() {
     const checkboxRef = useRef();
     const emailRef = useRef();
     const style = useStyles();
-    
+
     async function updateEmailSettings(data) {
         if (data.email !== null && emailRegex.exec(data.email)[0] !== data.email) {
             await Swal.fire({
@@ -112,17 +112,17 @@ export function AccountPage() {
             });
         }
     }
-    
+
     async function handleEditEmailSettingsFormSubmit(e) {
         e.preventDefault();
         const target = e.target;
         const formData = new FormData(target);
         let data = Object.fromEntries(formData.entries());
-        
+
         data.canSend = checkboxRef.current.checked;
-        
+
         console.log(data);
-        
+
         if (data.email === "") {
             await updateEmailSettings({
                 email: null,
@@ -132,16 +132,16 @@ export function AccountPage() {
             await updateEmailSettings(data);
         }
     }
-    
+
     useEffect(() => {
         (async () => {
             const fetchedUser = await GetUser();
             setUser(fetchedUser);
         })();
     }, []);
-    
+
     if (user === null) return <span>Загрузка</span>
-    
+
     return <div className={style.layout}>
         <div className={style.formsWrapper}>
             <div className={style.container}>
@@ -152,11 +152,12 @@ export function AccountPage() {
                 <Form method="put" className={style.editEmailForm} onSubmit={handleEditEmailSettingsFormSubmit}>
                     <div>
                         <label htmlFor="email">Email для рассылки:</label>
-                        <Form.Control defaultValue={user.email} type="text" ref={emailRef} placeholder="name@domain.ru" name="email" id="email"/>    
+                        <Form.Control defaultValue={user.email} type="text" ref={emailRef} placeholder="name@domain.ru"
+                                      name="email" id="email"/>
                     </div>
                     <div className="checkbox-combo">
                         <label htmlFor="canSend">Присылайте мне уведомления</label>
-                        <Form.Check ref={checkboxRef} name="canSend" id="canSend" defaultChecked={user.sendToEmail}/>    
+                        <Form.Check ref={checkboxRef} name="canSend" id="canSend" defaultChecked={user.sendToEmail}/>
                     </div>
                     <Button type="submit">Отправить</Button>
                 </Form>

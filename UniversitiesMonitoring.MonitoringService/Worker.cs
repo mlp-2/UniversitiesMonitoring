@@ -10,7 +10,8 @@ internal class Worker : BackgroundService
     private readonly IUniversitiesServiceProvider _universitiesServiceProvider;
     private readonly IServiceInspector _defaultInspector;
 
-    public Worker(ILogger<Worker> logger, IUniversitiesServiceProvider universitiesServiceProvider, IServiceInspector defaultInspector)
+    public Worker(ILogger<Worker> logger, IUniversitiesServiceProvider universitiesServiceProvider,
+        IServiceInspector defaultInspector)
     {
         _logger = logger;
         _universitiesServiceProvider = universitiesServiceProvider;
@@ -31,7 +32,7 @@ internal class Worker : BackgroundService
                 await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken);
                 continue;
             }
-            
+
             var updateBuilder = new UpdateBuilder();
             await Task.WhenAll(inspectors.Select(inspector => inspector.UpdateStateAsync(updateBuilder)));
 
@@ -46,19 +47,21 @@ internal class Worker : BackgroundService
             }
 
             await _universitiesServiceProvider.SendUpdateAsync(update.Changes, stoppingToken);
-            
+
             _logger.LogTrace("Update sent");
-            
+
             await Wait5Minutes(stoppingToken);
         }
     }
 
-    private async Task<UniversityServiceInspector[]> RefreshServicesInspectorsList(UniversityServiceInspector[] inspectors, CancellationToken cancellationToken)
+    private async Task<UniversityServiceInspector[]> RefreshServicesInspectorsList(
+        UniversityServiceInspector[] inspectors, CancellationToken cancellationToken)
     {
-        var allServices = (await _universitiesServiceProvider.GetAllUniversitiesServicesAsync(cancellationToken)).ToArray();
+        var allServices = (await _universitiesServiceProvider.GetAllUniversitiesServicesAsync(cancellationToken))
+            .ToArray();
         var newInspectors = new UniversityServiceInspector[allServices.Length];
         var countAdded = allServices.Length;
-        
+
         for (var i = 0; i < allServices.Length; i++)
         {
             newInspectors[i] = inspectors.FirstOrDefault(inspector =>
@@ -73,7 +76,7 @@ internal class Worker : BackgroundService
         }
 
         _logger.LogTrace("Loaded new {ServicesCount} services", countAdded);
-        
+
         return newInspectors;
     }
 

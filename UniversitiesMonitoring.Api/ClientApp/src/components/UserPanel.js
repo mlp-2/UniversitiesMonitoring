@@ -38,20 +38,20 @@ const useStyles = createUseStyles({
 export function UserPanel() {
     const [user, setUser] = useState(null);
     const style = useStyles();
-    
+
     useEffect(() => {
         (async () => {
-            setUser(await GetUser());    
+            setUser(await GetUser());
         })();
     }, [])
-    
-    if(user === null) return <></>
-    else if(user === "ERROR") return <Navigate to="/login"/>
-    
+
+    if (user === null) return <></>
+    else if (user === "ERROR") return <Navigate to="/login"/>
+
     return <div className={style.userPanel}>
         <div>
             <FontAwesomeIcon icon={faUser}/>
-            <Link to="/account">@{user.username}</Link>    
+            <Link to="/account">@{user.username}</Link>
         </div>
         <div>
             <Link to="/universities-list" id="home-link"><FontAwesomeIcon icon={faHome}/></Link>
@@ -60,7 +60,7 @@ export function UserPanel() {
                 sessionStorage.removeItem("user");
             }}>
                 <FontAwesomeIcon icon={faDoorClosed}/>
-            </Link>    
+            </Link>
         </div>
     </div>
 }

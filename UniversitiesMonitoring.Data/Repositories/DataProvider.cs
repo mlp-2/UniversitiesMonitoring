@@ -9,7 +9,7 @@ public class DataProvider : IDataProvider
     public DataProvider(UniversitiesMonitoringContext context)
     {
         _context = context;
-        
+
         Universities = new Repository<University, ulong>(context);
         UniversityServices = new Repository<UniversityService, ulong>(context);
         Users = new Repository<User, ulong>(context);

@@ -9,7 +9,7 @@ import {GetUser} from "../ApiMethods";
 
 const useStyles = createUseStyles({
     userPanel: {
-        position: "absolute",
+        position: "fixed",
         right: 10,
         top: 10,
         background: "#FFF",

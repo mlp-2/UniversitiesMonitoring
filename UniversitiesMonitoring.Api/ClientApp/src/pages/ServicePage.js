@@ -1,4 +1,4 @@
-import {useLocation} from "react-router-dom";
+import {Navigate, useLocation} from "react-router-dom";
 import {Button} from "../components/Button";
 import {createUseStyles} from "react-jss";
 import Constants from "../Constants";
@@ -8,7 +8,8 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useEffect, useRef, useState} from "react";
 import {SubmitButton} from "../components/SubmitButton";
 import {
-    GetReports, GetService,
+    GetReports,
+    GetService,
     SendComment,
     SendReportToService,
     SubscribeToService,
@@ -19,7 +20,6 @@ import Swal from "sweetalert2";
 import {Carousel, Container, Stack} from "react-bootstrap";
 import {GenerateUUID} from "../Utils";
 import {FullscreenFrame} from "../components/FullScreenFrame";
-import {Navigate} from "react-router-dom";
 import {Query} from "../QueryHelper";
 import {Loading} from "../components/Loading";
 import axios from "axios";
@@ -421,7 +421,7 @@ function ServiceHeader({service, updateService}) {
                         <span title="Показывает сколько процентов времени сервис находится в сети. Больше - лучше"
                               className={style.status}
                               style={{"--status-color": `rgb(${250 * (1 - uptime)},${250 * uptime},80)`}}>
-                            Uptime: {uptime * 100}%
+                            Uptime: {Math.round(uptime * 100)}%
                         </span>
                     }
                 </Stack>
@@ -537,6 +537,7 @@ function ReportsColumn({service}) {
                              from="Системы"
                              content='Загружаем жалобы...'/> :
                     reports.length > 0 ? reports.map(report =>
+                            report.content !== "" &&
                             <Comment key={report.id} from="Пользователя сервиса" addedAt={report.addedAt}
                                      content={report.content}/>) :
                         <Comment key="information-message"

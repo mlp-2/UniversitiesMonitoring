@@ -1,4 +1,4 @@
-import {Link, useLocation} from "react-router-dom";
+import {Link} from "react-router-dom";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {Button, Card, Stack} from "react-bootstrap";

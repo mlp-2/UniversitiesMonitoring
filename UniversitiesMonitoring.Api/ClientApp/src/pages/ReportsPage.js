@@ -120,7 +120,7 @@ function ReportContainer({report, removeReport}) {
 
 function formatDate(date) {
     return `${padTo2Digits(date.getHours())}:${padTo2Digits(date.getMinutes())} 
-        ${padTo2Digits(date.getDay())}.${padTo2Digits(date.getMonth())}.${date.getFullYear()}`
+        ${padTo2Digits(date.getDate())}.${padTo2Digits(date.getMonth() + 1)}.${date.getFullYear()}`
 }
 
 function padTo2Digits(num) {

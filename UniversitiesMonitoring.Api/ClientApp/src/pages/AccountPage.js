@@ -13,7 +13,7 @@ const useStyles = createUseStyles({
     editEmailForm: {
         display: "flex",
         flexDirection: "column",
-        width: "30vw",
+        width: "100%",
         "& input::placeholder": {
             fontSize: 18
         },

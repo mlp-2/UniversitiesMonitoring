@@ -1,8 +1,7 @@
-import {Outlet} from 'react-router-dom';
+import {Navigate, Outlet} from 'react-router-dom';
 import {UserPanel} from "../components/UserPanel";
 import {useEffect, useState} from "react";
 import {GetUser} from "../ApiMethods";
-import {Navigate} from "react-router-dom";
 import Swal from "sweetalert2";
 
 export function LoginPanel() {

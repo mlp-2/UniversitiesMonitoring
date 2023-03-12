@@ -1,5 +1,5 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faUser, faHome, faDoorClosed} from "@fortawesome/free-solid-svg-icons";
+import {faDoorClosed, faHome, faUser} from "@fortawesome/free-solid-svg-icons";
 import {faTelegram} from '@fortawesome/free-brands-svg-icons'
 import {useEffect, useState} from "react";
 import {Link, Navigate} from "react-router-dom";

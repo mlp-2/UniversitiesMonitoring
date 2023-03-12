@@ -1,7 +1,7 @@
 import {createUseStyles} from "react-jss";
 import HeaderBackground from "../assets/images/figures.png";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faStar, faComment, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
+import {faComment, faMagnifyingGlass, faStar} from "@fortawesome/free-solid-svg-icons";
 import Constants from "../Constants";
 import axios from "axios";
 import {useEffect, useState} from "react";

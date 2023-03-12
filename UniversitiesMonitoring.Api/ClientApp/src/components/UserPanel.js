@@ -1,6 +1,7 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser, faHome, faDoorClosed} from "@fortawesome/free-solid-svg-icons";
-import {useEffect, useRef, useState} from "react";
+import {faTelegram} from '@fortawesome/free-brands-svg-icons'
+import {useEffect, useState} from "react";
 import {Link, Navigate} from "react-router-dom";
 import {createUseStyles} from "react-jss";
 import Constants from "../Constants";
@@ -55,6 +56,7 @@ export function UserPanel() {
         </div>
         <div>
             <Link to="/universities-list" id="home-link"><FontAwesomeIcon icon={faHome}/></Link>
+            <Link to="https://t.me/ummonitoring"><FontAwesomeIcon icon={faTelegram}/></Link>
             <Link to="/login" id="quit-link" onClick={() => {
                 localStorage.removeItem("token");
                 sessionStorage.removeItem("user");

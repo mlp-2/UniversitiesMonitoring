@@ -12,9 +12,9 @@ services:
       context: "."
       dockerfile: "UniversitiesMonitoring.Api/Dockerfile"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - CONNECTION_STRING=Server=mysql;User=root;Password=denvot;Database=universities_monitoring
-      - JWT_SECRET=bfbfd98b-2ccf-4f19-8025-b51c512cf2ca
+      - ASPNETCORE_ENVIRONMENT=${RUNTIME_ENV}
+      - CONNECTION_STRING=Server=mysql;User=root;Password=${MYSQL_PASSWORD};Database=universities_monitoring
+      - JWT_SECRET=${JWT_SECRET}
       - TRUSTED_HOSTS=umapi
     restart: always
     ports:
@@ -31,13 +31,13 @@ services:
       context: "."
       dockerfile: "UniversitiesMonitoring.NotifyService/Dockerfile"
     environment:
-      - DOTNET_ENVIRONMENT=Production
+      - DOTNET_ENVIRONMENT=${RUNTIME_ENV}
       - WS_URL=ws://umapi:80/api/updates-socket
       - API_URL=http://umapi:80/
-      - EMAIL_ADDRESS=universitiesmonitoring@denvot.dev
-      - EMAIL_PASSWORD=universitiesmonitoring
-      - TELEGRAM_TOKEN=5783170351:AAExktrxhdaEjOx0BvffcLobS7MkjeJjXhY
-      - TELEGRAM_CHAT_ID=@ummonitoring
+      - EMAIL_ADDRESS=${EMAIL_ADDRESS}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD}
+      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
   monitoring-service:
     depends_on:
       - api
@@ -50,7 +50,7 @@ services:
       context: "."
       dockerfile: "UniversitiesMonitoring.MonitoringService/Dockerfile"
     environment:
-      - DOTNET_ENVIRONMENT=Production
+      - DOTNET_ENVIRONMENT=${RUNTIME_ENV}
       - API_URL=http://umapi:80/
   db:
     networks:
@@ -61,7 +61,7 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: denvot
+      MYSQL_ROOT_PASSWORD: ${MYSQL_PASSWORD}
       
 networks:
   um-network:

@@ -8,7 +8,7 @@ internal class EmailNotifier
 {
     private readonly SmtpClient _emailClient;
     private readonly MailAddress _mailAddress;
-    
+
     public EmailNotifier(IConfiguration configuration)
     {
         var address = Environment.GetEnvironmentVariable("EMAIL_ADDRESS") ?? configuration["Email:Username"];
@@ -17,17 +17,18 @@ internal class EmailNotifier
         {
             Host = Environment.GetEnvironmentVariable("SMTP_HOST")!,
             Port = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT")!),
-            Credentials = new NetworkCredential(address, Environment.GetEnvironmentVariable("EMAIL_PASSWORD") ?? configuration["Email:Password"]),
+            Credentials = new NetworkCredential(address,
+                Environment.GetEnvironmentVariable("EMAIL_PASSWORD") ?? configuration["Email:Password"]),
             EnableSsl = false
         };
     }
-    
+
     public async Task NotifyAsync(UserEntity userEntity, UniversityServiceEntity serviceEntity)
     {
         if (userEntity.Email == null) return;
         var message = CreateMailMessage(serviceEntity);
         message.To.Add(userEntity.Email);
-        
+
         await _emailClient.SendMailAsync(message);
     }
 
@@ -38,7 +39,7 @@ internal class EmailNotifier
             Subject = "Изменение состояния сервиса",
             Body =
                 $"<b>📢 Сервис <a href=\"{CreateServiceHref(service)}\">{service.ServiceName}</a> ВУЗа {service.UniversityName} изменил свое состояние на {(service.IsOnline ? "онлайн 🟢" : "офлайн 🔴")}</b><br/>",
-                IsBodyHtml = true
+            IsBodyHtml = true
         };
 
     private string CreateServiceHref(UniversityServiceEntity service) =>

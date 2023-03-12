@@ -21,7 +21,7 @@ public class Report
         IsOnline = report.IsOnline;
         ServiceId = report.ServiceId;
     }
-    
+
     public ulong Id { get; }
     public string? Content { get; }
     public bool IsOnline { get; }

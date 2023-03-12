@@ -16,14 +16,14 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
     private readonly List<Tuple<WS, TaskCompletionSource<object>>> _webSockets = new();
 
     private static readonly object CloseObject = new();
-    
+
     public WebSocketUpdateStateNotifier(IServiceProvider serviceProvider,
         ILogger<WebSocketUpdateStateNotifier> logger)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
     }
-    
+
     public void AppendWebSocket(WS webSocket, TaskCompletionSource<object> socketFinishedTcs)
     {
         _webSockets.Add(new Tuple<WS, TaskCompletionSource<object>>(webSocket, socketFinishedTcs));
@@ -34,7 +34,7 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
     {
         await using var changesDataStream = new MemoryStream();
         var badSockets = new List<Tuple<WS, TaskCompletionSource<object>>>();
-        
+
         var changes = await CreateChangeStatesReportsAsync(servicesIds);
         var changesJsonBytes = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(changes));
 
@@ -43,7 +43,7 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
             badSockets.Add(webSocketTup);
             webSocketTup.Item2.SetResult(new object());
         }
-        
+
         foreach (var webSocketTup in _webSockets)
         {
             var webSocket = webSocketTup.Item1;
@@ -52,12 +52,13 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
             {
                 if (webSocket.CloseStatus.HasValue) RemoveSocketFromPipeline(webSocketTup);
 
-                await webSocket.SendAsync(changesJsonBytes, WebSocketMessageType.Text, 
-                WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
+                await webSocket.SendAsync(changesJsonBytes, WebSocketMessageType.Text,
+                    WebSocketMessageFlags.EndOfMessage, CancellationToken.None);
             }
             catch
             {
-                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client disconnected", CancellationToken.None);
+                await webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "Client disconnected",
+                    CancellationToken.None);
                 RemoveSocketFromPipeline(webSocketTup);
             }
         }
@@ -70,7 +71,7 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
         var changes = new UniversityServiceChangeStateEntity[servicesIds.Length];
         using var scope = _serviceProvider.CreateScope();
         var universitiesServices = scope.ServiceProvider.GetRequiredService<IDataProvider>().UniversityServices;
-        
+
         for (var serviceIndex = 0; serviceIndex < servicesIds.Length; serviceIndex++)
         {
             var serviceId = servicesIds[serviceIndex];
@@ -81,8 +82,10 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
                 throw new InvalidOperationException($"Service with {service} hasn't found");
             }
 
-            var serviceStatus = service.UniversityServiceStateChanges.OrderByDescending(x => x.ChangedAt).FirstOrDefault()?.IsOnline ?? false;
-            changes[serviceIndex] = new UniversityServiceChangeStateEntity(serviceId, service.UniversityId, service.Name, service.University.Name, serviceStatus);
+            var serviceStatus = service.UniversityServiceStateChanges.OrderByDescending(x => x.ChangedAt)
+                .FirstOrDefault()?.IsOnline ?? false;
+            changes[serviceIndex] = new UniversityServiceChangeStateEntity(serviceId, service.UniversityId,
+                service.Name, service.University.Name, serviceStatus);
         }
 
         return changes;

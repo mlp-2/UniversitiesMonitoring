@@ -57,7 +57,7 @@ const useStyles = createUseStyles({
 export function Login() {
     const style = useStyles();
     const [user, setUser] = useState(null);
-    
+
     useEffect(() => {
         async function getLogin() {
             try {
@@ -72,14 +72,15 @@ export function Login() {
                 console.info("Default user not found. Using form auth strategy")
             }
         }
+
         getLogin();
     }, []);
-    
+
     return <WelcomePage>
         <div className={style.frameStyle}>
             {
-                user !== null ?  <DefaultAuth user={user} 
-                                              throwNotThisUser={() => setUser(null)}/> :
+                user !== null ? <DefaultAuth user={user}
+                                             throwNotThisUser={() => setUser(null)}/> :
                     <FormAuth/>
             }
             <div>
@@ -93,10 +94,10 @@ export function Login() {
 
 function DefaultAuth({user, throwNotThisUser}) {
     const [accepted, setAccepted] = useState(false);
-    
+
     const style = useStyles();
     const globalStyle = useGlobalStyles();
-    
+
     function handleResult(res) {
         if (res) {
             setAccepted(true);
@@ -104,10 +105,10 @@ function DefaultAuth({user, throwNotThisUser}) {
             throwNotThisUser();
         }
     }
-    
+
     if (accepted) return <Navigate to="/universities-list"/>;
-    
-    return  <div className={style.defaultAuthContainer}>
+
+    return <div className={style.defaultAuthContainer}>
         <Container className="d-flex flex-column align-items-center justify-content-center gap-2">
             <span>Это Вы, <b><span className={globalStyle.brandFontColored}>@{user.username}</span></b>?</span>
             <Button onClick={() => handleResult(true)}>Да</Button>
@@ -120,7 +121,7 @@ function FormAuth() {
     const [formDialogFinished, setFinished] = useState(false);
     const [loading, setLoading] = useState(false);
     const style = useStyles();
-    
+
     async function handleSubmit(e) {
         e.preventDefault();
 
@@ -145,12 +146,12 @@ function FormAuth() {
                 timer: 2000
             });
         }
-        
+
         setLoading(false);
     }
-    
+
     if (formDialogFinished) return <Navigate to="/universities-list"/>;
-    
+
     return <Form method="post" className={style.formStyle} onSubmit={handleSubmit}>
         <Form.Control disabled={loading} className="mb-3" type="text" placeholder="Логин" name="username"/>
         <Form.Control disabled={loading} className="mb-3" type="password" placeholder="Пароль" name="password"/>

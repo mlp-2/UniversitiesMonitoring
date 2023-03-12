@@ -10,7 +10,7 @@ public class HandlingExceptionsMiddleware
         _next = next;
         _logger = logger;
     }
-    
+
     public async Task InvokeAsync(HttpContext context)
     {
         _logger.LogInformation("Request. Route: {Route}. Method: {HttpMethod}. From: {Host}:{HostPort}",

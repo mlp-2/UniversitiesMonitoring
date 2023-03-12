@@ -33,7 +33,7 @@ const useStyles = createUseStyles({
 
 export function Loading() {
     const style = useStyles();
-    
+
     return <FullscreenFrame>
         <div className={style.circleContainer}>
             <span className={style.circle} style={{"--i": 0}}/>

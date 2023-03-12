@@ -10,10 +10,8 @@ public class ChangeStateEntity
         ServiceId = serviceId;
         IsOnline = isOnline;
     }
-    
-    [JsonPropertyName("serviceId")]
-    public ulong ServiceId { get; }
-    
-    [JsonPropertyName("isOnline")]
-    public bool IsOnline { get; }
+
+    [JsonPropertyName("serviceId")] public ulong ServiceId { get; }
+
+    [JsonPropertyName("isOnline")] public bool IsOnline { get; }
 }

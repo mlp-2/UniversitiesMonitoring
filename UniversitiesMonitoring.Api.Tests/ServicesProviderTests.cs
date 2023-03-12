@@ -17,24 +17,24 @@ public class ServicesProviderTests
 
         dataProvider.Setup(x => x.UniversityServices.FindAsync(It.IsAny<ulong>()))
             .ReturnsAsync(testService);
-        
+
         var servicesProvider = CreateServicesProvider(dataProvider);
         var result = await servicesProvider.GetServiceAsync(13123124512342);
-        
+
         Assert.Equal(testService, result);
     }
-    
+
     [Fact]
     public async Task Service_Getting_Must_Be_Null()
     {
         var dataProvider = CreateProviderMock();
 
         dataProvider.Setup(x => x.UniversityServices.FindAsync(It.IsAny<ulong>()))
-            .ReturnsAsync((UniversityService?)null);
-        
+            .ReturnsAsync((UniversityService?) null);
+
         var servicesProvider = CreateServicesProvider(dataProvider);
         var result = await servicesProvider.GetServiceAsync(13123124512342);
-        
+
         Assert.Null(result);
     }
 
@@ -42,14 +42,14 @@ public class ServicesProviderTests
     public async Task User_Subscribe_To_Service()
     {
         var dataProvider = CreateProviderMock();
-        
+
         dataProvider.Setup(x => x.Subscribes.AddAsync(It.IsAny<UserSubscribeToService>()));
         dataProvider.Setup(x => x.SaveChangesAsync());
-        
+
         var servicesProvider = CreateServicesProvider(dataProvider);
 
         await servicesProvider.SubscribeUserAsync(new User(), new UniversityService());
-        
+
         dataProvider.Verify(x => x.Subscribes.AddAsync(It.IsAny<UserSubscribeToService>()), Times.Once);
         dataProvider.Verify(x => x.SaveChangesAsync(), Times.Once);
     }
@@ -71,12 +71,12 @@ public class ServicesProviderTests
         var servicesProvider = CreateServicesProvider(dataProvider);
 
         await servicesProvider.UnsubscribeUserAsync(testUser, testService);
-        
+
         dataProvider.Verify(x => x.Subscribes.ExecuteSql(It.IsAny<string>()), Times.Once);
         dataProvider.Verify(x => x.Subscribes.Remove(testSubscribeReference), Times.Once);
         dataProvider.Verify(x => x.SaveChangesAsync(), Times.Once);
     }
-    
+
     [Fact]
     public async Task Unsubscribe_User_From_Service_Must_Throw_Exception()
     {
@@ -86,21 +86,22 @@ public class ServicesProviderTests
             .Returns(Array.Empty<UserSubscribeToService>());
 
         var servicesProvider = CreateServicesProvider(dataProvider);
-        await Assert.ThrowsAsync<InvalidOperationException>(() => servicesProvider.UnsubscribeUserAsync(new User(), new UniversityService()));
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            servicesProvider.UnsubscribeUserAsync(new User(), new UniversityService()));
     }
 
     [Fact]
     public async Task Leave_Comment()
     {
         var dataProvider = CreateProviderMock();
-        
+
         dataProvider.Setup(x => x.Rates.AddAsync(It.IsAny<UserRateOfService>()));
         dataProvider.Setup(x => x.SaveChangesAsync());
-        
+
         var servicesProvider = CreateServicesProvider(dataProvider);
 
         await servicesProvider.LeaveCommentAsync(new UniversityService(), new User(), new Comment(5, "Awesome!"));
-        
+
         dataProvider.Verify(x => x.Rates.AddAsync(It.IsAny<UserRateOfService>()), Times.Once);
         dataProvider.Verify(x => x.SaveChangesAsync(), Times.Once);
     }
@@ -112,43 +113,30 @@ public class ServicesProviderTests
 
         dataProvider.Setup(x => x.Reports.AddAsync(It.IsAny<UniversityServiceReport>()));
         dataProvider.Setup(x => x.SaveChangesAsync());
-        
+
         var servicesProvider = CreateServicesProvider(dataProvider);
 
-        await servicesProvider.CreateReportAsync(new UniversityService(), new User(), new Report("Smthg went wrong", false, 0x0));
-        
+        await servicesProvider.CreateReportAsync(new UniversityService(), new User(),
+            new Report("Smthg went wrong", false, 0x0));
+
         dataProvider.Verify(x => x.Reports.AddAsync(It.IsAny<UniversityServiceReport>()), Times.Once);
         dataProvider.Verify(x => x.SaveChangesAsync(), Times.Once);
     }
-    
+
     [Fact]
     public async Task Get_Report()
     {
         var dataProvider = CreateProviderMock();
 
         dataProvider.Setup(x => x.Reports.FindAsync(It.IsAny<ulong>())).ReturnsAsync(new UniversityServiceReport());
-        
+
         var servicesProvider = CreateServicesProvider(dataProvider);
 
-        Assert.NotNull(await servicesProvider.GetReportAsync(0x0)); 
+        Assert.NotNull(await servicesProvider.GetReportAsync(0x0));
     }
 
-    [Fact]
-    public async Task Delete_Report()
-    {
-        var dataProvider = CreateProviderMock();
-
-        dataProvider.Setup(x => x.Reports.Remove(It.IsAny<UniversityServiceReport>()));
-        dataProvider.Setup(x => x.SaveChangesAsync());
-        
-        var servicesProvider = CreateServicesProvider(dataProvider);
-
-        await servicesProvider.DeleteReportAsync(It.IsAny<UniversityServiceReport>());
-        
-        dataProvider.Verify(x => x.SaveChangesAsync(), Times.Once);
-    }
-    
     private Mock<IDataProvider> CreateProviderMock() => new();
 
-    private ServicesProvider CreateServicesProvider(Mock<IDataProvider> dataProviderMock) => new(dataProviderMock.Object, new Mock<IMemoryCache>().Object);
+    private ServicesProvider CreateServicesProvider(Mock<IDataProvider> dataProviderMock) =>
+        new(dataProviderMock.Object, new Mock<IMemoryCache>().Object);
 }

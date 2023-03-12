@@ -6,7 +6,7 @@ namespace UniversitiesMonitoring.NotifyService.Helpers;
 internal class ServicesFinder
 {
     private readonly HttpClient _client;
-    
+
     public ServicesFinder(IConfiguration configuration)
     {
         _client = new HttpClient()
@@ -25,6 +25,7 @@ internal class ServicesFinder
 
         response.EnsureSuccessStatusCode();
 
-        return await response.Content.ReadFromJsonAsync<UniversityServiceEntity[]>() ?? Array.Empty<UniversityServiceEntity>();
+        return await response.Content.ReadFromJsonAsync<UniversityServiceEntity[]>() ??
+               Array.Empty<UniversityServiceEntity>();
     }
 }

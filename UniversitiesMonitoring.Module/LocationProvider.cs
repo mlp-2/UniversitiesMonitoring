@@ -8,7 +8,7 @@ public class LocationProvider
     {
         _configuration = configuration;
     }
-    
+
     public string Location => Environment.GetEnvironmentVariable("LOCATION_NAME") ??
                               _configuration["LocationName"] ??
                               "Неизвестная локация";

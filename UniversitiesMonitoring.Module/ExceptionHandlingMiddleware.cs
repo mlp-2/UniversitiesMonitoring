@@ -10,7 +10,7 @@ public class ExceptionHandlingMiddleware
         _next = next;
         _logger = logger;
     }
-    
+
     public async Task InvokeAsync(HttpContext context)
     {
         _logger.LogInformation("Request. Route: {Route}. Method: {HttpMethod}. From: {Host}:{HostPort}",
@@ -21,7 +21,8 @@ public class ExceptionHandlingMiddleware
         }
         catch (Exception exception)
         {
-            _logger.LogWarning("Exception thrown due request. Name: {ExceptionName}. Stacktrace:\n{Stacktrace}", exception.GetType().Name, exception.StackTrace);
+            _logger.LogWarning("Exception thrown due request. Name: {ExceptionName}. Stacktrace:\n{Stacktrace}",
+                exception.GetType().Name, exception.StackTrace);
         }
     }
 }

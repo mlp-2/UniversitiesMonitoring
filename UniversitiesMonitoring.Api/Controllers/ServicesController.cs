@@ -17,7 +17,7 @@ public class ServicesController : ControllerBase
     private readonly IWebSocketUpdateStateNotifier _webSocketUpdateStateNotifier;
     private readonly IModulesProvider _modulesProvider;
     private readonly string[] _trustedHosts;
-    
+
     private bool IsTrustedRequest => _trustedHosts.Contains(Request.Host.Host);
 
     public ServicesController(IServicesProvider servicesProvider,
@@ -31,7 +31,7 @@ public class ServicesController : ControllerBase
         _webSocketUpdateStateNotifier = webSocketUpdateStateNotifier;
         _modulesProvider = modulesProvider;
         _trustedHosts = (Environment.GetEnvironmentVariable("TRUSTED_HOSTS") ??
-                         configuration["TrustedHosts"] ?? 
+                         configuration["TrustedHosts"] ??
                          string.Empty).Split(";");
     }
 
@@ -63,7 +63,7 @@ public class ServicesController : ControllerBase
             uptime
         });
     }
-    
+
     [Authorize(Roles = JwtGenerator.UserRole)]
     [HttpGet("{id:long}/test")]
     public async Task<IActionResult> Test([FromRoute] ulong id)
@@ -79,14 +79,14 @@ public class ServicesController : ControllerBase
 
         return Ok(testResult);
     }
-    
+
     [Authorize(Roles = JwtGenerator.UserRole)]
     [HttpPost("{id:long}/subscribe")]
     public async Task<IActionResult> SubscribeService([FromRoute] ulong id)
     {
         var service = await _servicesProvider.GetServiceAsync(id);
         var user = await _usersProvider.GetUserAsync(User.Identity!.Name!);
-        
+
         if (service == null || user == null)
         {
             return BadRequest("Сервис или пользователь не найден");
@@ -96,7 +96,7 @@ public class ServicesController : ControllerBase
         {
             return BadRequest("Вы уже подписаны на этот сервис");
         }
-        
+
         await _servicesProvider.SubscribeUserAsync(user, service);
         return Ok();
     }
@@ -107,7 +107,7 @@ public class ServicesController : ControllerBase
     {
         var service = await _servicesProvider.GetServiceAsync(id);
         var user = await _usersProvider.GetUserAsync(User.Identity!.Name!);
-    
+
         if (service == null || user == null)
         {
             return BadRequest("Сервис или пользователь не найден");
@@ -117,7 +117,7 @@ public class ServicesController : ControllerBase
         {
             return BadRequest("Вы не подписаны на данный сервис");
         }
-        
+
         await _servicesProvider.UnsubscribeUserAsync(user, service);
         return Ok();
     }
@@ -130,7 +130,7 @@ public class ServicesController : ControllerBase
     {
         var service = await _servicesProvider.GetServiceAsync(id);
         var user = await _usersProvider.GetUserAsync(User.Identity!.Name!);
-        
+
         if (service == null || user == null)
         {
             return BadRequest("Сервис или пользователь не найден");
@@ -148,7 +148,7 @@ public class ServicesController : ControllerBase
     {
         var service = await _servicesProvider.GetServiceAsync(id);
         var user = await _usersProvider.GetUserAsync(User.Identity!.Name!);
-        
+
         if (service == null || user == null)
         {
             return BadRequest("Сервис или пользователь не найдены");
@@ -172,7 +172,7 @@ public class ServicesController : ControllerBase
 
         return Ok(from report in _servicesProvider.GetReportsByOffline(service) select new ReportEntity(report));
     }
-    
+
     [HttpGet]
     public async Task<IActionResult> GetAllServices(
         [FromQuery] bool loadUsers = false,
@@ -182,25 +182,27 @@ public class ServicesController : ControllerBase
     {
         // Нужно, чтобы не сливать инфу
         var trustedRequest = IsTrustedRequest || User.IsInRole(JwtGenerator.UserRole);
-        
+
         loadUsers = loadUsers && trustedRequest;
         loadComments = loadComments && trustedRequest;
-        
+
         var services = (await _servicesProvider.GetAllServicesAsync(universityId)).ToArray();
 
-        var servicesApiEntities = User.IsInRole(JwtGenerator.UserRole) ? from service in services select new UniversityServiceEntity(
+        var servicesApiEntities = User.IsInRole(JwtGenerator.UserRole)
+            ? from service in services
+            select new UniversityServiceEntity(
                 service,
                 loadUsers,
                 loadComments,
-                CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!))) : 
-            from service in services 
-                select new UniversityServiceEntity(service, loadUsers, loadComments);
+                CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!)))
+            : from service in services
+            select new UniversityServiceEntity(service, loadUsers, loadComments);
 
         if (!ids.IsNullOrEmpty())
         {
             servicesApiEntities = servicesApiEntities.Where(x => ids!.Contains(x.ServiceId));
         }
-        
+
         return Ok(servicesApiEntities);
     }
 
@@ -216,9 +218,11 @@ public class ServicesController : ControllerBase
 
         var universityEntity = new UniversityEntity(university)
         {
-            IsSubscribed = User.IsInRole(JwtGenerator.UserRole) ? university.UniversityServices.Any(service => 
-                service.UserSubscribeToServices.Any(subscribe =>
-                    subscribe.UserId.ToString() == User.Identity!.Name!)) : null
+            IsSubscribed = User.IsInRole(JwtGenerator.UserRole)
+                ? university.UniversityServices.Any(service =>
+                    service.UserSubscribeToServices.Any(subscribe =>
+                        subscribe.UserId.ToString() == User.Identity!.Name!))
+                : null
         };
 
         return Ok(universityEntity);
@@ -230,9 +234,11 @@ public class ServicesController : ControllerBase
             .ToList()
         select new UniversityEntity(university)
         {
-            IsSubscribed = User.IsInRole(JwtGenerator.UserRole) ? university.UniversityServices.Any(service => 
-                service.UserSubscribeToServices.Any(subscribe =>
-                    subscribe.UserId.ToString() == User.Identity!.Name!)) : null
+            IsSubscribed = User.IsInRole(JwtGenerator.UserRole)
+                ? university.UniversityServices.Any(service =>
+                    service.UserSubscribeToServices.Any(subscribe =>
+                        subscribe.UserId.ToString() == User.Identity!.Name!))
+                : null
         });
 
     [HttpPut("update")]
@@ -260,11 +266,11 @@ public class ServicesController : ControllerBase
         }
 
         await _webSocketUpdateStateNotifier.NotifyAsync(servicesId);
-        
+
         if (updateSuccess) return Ok();
         return BadRequest("Часть сервисов не найдены");
     }
-    
+
     private static bool CheckIfUserSubscribed(UniversityService service, ulong userId) =>
         service.UserSubscribeToServices.Any(x => x.UserId == userId);
 }

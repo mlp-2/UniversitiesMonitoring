@@ -13,12 +13,12 @@ public class UniversityEntity
 
         foreach (var service in university.UniversityServices)
         {
-            IsOnline &= service.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false; 
-            
+            IsOnline &= service.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false;
+
             foreach (var rate in service.UserRateOfServices)
             {
                 Rating += rate.Rate;
-                CommentsCount += 1;    
+                CommentsCount += 1;
             }
         }
 
@@ -26,21 +26,16 @@ public class UniversityEntity
         else Rating = 0;
     }
 
-    [JsonPropertyName("id")]
-    public ulong Id { get; }
-    
-    [JsonPropertyName("name")]
-    public string Name { get; }
-    
-    [JsonPropertyName("commentsCount")]
-    public int CommentsCount { get; }
-    
-    [JsonPropertyName("rating")]
-    public double Rating { get; }
-    
-    [JsonPropertyName("isOnline")]
-    public bool IsOnline { get; }
-    
+    [JsonPropertyName("id")] public ulong Id { get; }
+
+    [JsonPropertyName("name")] public string Name { get; }
+
+    [JsonPropertyName("commentsCount")] public int CommentsCount { get; }
+
+    [JsonPropertyName("rating")] public double Rating { get; }
+
+    [JsonPropertyName("isOnline")] public bool IsOnline { get; }
+
     [JsonPropertyName("isSubscribed")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public bool? IsSubscribed { get; set; }

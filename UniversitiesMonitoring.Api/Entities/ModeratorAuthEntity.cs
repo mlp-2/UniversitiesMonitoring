@@ -12,5 +12,5 @@ public class ModeratorAuthEntity
     }
 
     public ulong Id { get; }
-    public string Password { get; } 
+    public string Password { get; }
 }

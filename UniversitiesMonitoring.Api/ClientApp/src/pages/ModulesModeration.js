@@ -8,12 +8,12 @@ export function ModulesModeration() {
     return <Container>
         <h1>Управление модулями</h1>
         <ModulesActions/>
-    </Container>    
+    </Container>
 }
 
 function ModulesActions() {
     const [modules, setModules] = useState(null);
-    
+
     async function handleAdd() {
         try {
             const dialogResult = await Swal.fire({
@@ -29,7 +29,7 @@ function ModulesActions() {
 
             const result = await axios.post(`/api/moderator/modules?url=${dialogResult.value}`);
 
-            setModules([result.data, ...modules]);    
+            setModules([result.data, ...modules]);
         } catch {
             await Swal.fire({
                 customClass: "text-lg-start",
@@ -48,17 +48,17 @@ function ModulesActions() {
             })
         }
     }
-    
+
     useEffect(() => {
         (async () => {
             const result = await axios.get(`/api/moderator/modules`);
-            
+
             setModules(result.data);
         })();
     }, []);
-    
+
     if (modules === null) return <span>ЗАГРУЗКА МОДУЛЕЙ...</span>
-    
+
     return <>
         <Button onClick={handleAdd} className="mb-3">Добавить</Button>
         <Stack gap={3}>
@@ -67,7 +67,7 @@ function ModulesActions() {
                                                         setModules(modules.filter(mod => mod.id !== module.id))
                                                     }}/>)}
         </Stack>
-    </> 
+    </>
 }
 
 function ModuleContainer({module, deleteModule}) {
@@ -81,11 +81,11 @@ function ModuleContainer({module, deleteModule}) {
                 showCancelButton: true,
                 cancelButtonText: "Нет"
             })
-            
+
             if (!dialogResult.isConfirmed) return;
-            
+
             const res = await axios.delete(`/api/moderator/modules/${module.id}`);
-            
+
             if (res.status === 200) {
                 await Swal.fire({
                     title: "Успешно",
@@ -104,11 +104,11 @@ function ModuleContainer({module, deleteModule}) {
             })
         }
     }
-    
+
     return <Card>
         <Card.Body>
             <Card.Title>
-                {module.locationName ?? "Локация не определена"} ({module.url})            
+                {module.locationName ?? "Локация не определена"} ({module.url})
             </Card.Title>
             <Stack direction="horizontal" gap={2}>
                 <Button onClick={handleDelete} variant="danger">Удалить</Button>

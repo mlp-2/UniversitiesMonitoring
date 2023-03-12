@@ -11,17 +11,17 @@ public class UpdatesSocketController : ControllerBase
     {
         _webSocketUpdateStateNotifier = webSocketUpdateStateNotifier;
     }
-    
+
     [HttpGet]
     [Route("/api/updates-socket")]
     public async Task UpdatesSocket()
     {
         if (!HttpContext.WebSockets.IsWebSocketRequest)
-        {              
+        {
             HttpContext.Response.StatusCode = 400;
-            return;    
+            return;
         }
-        
+
         using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
         var socketFinishedTcs = new TaskCompletionSource<object>();
         _webSocketUpdateStateNotifier.AppendWebSocket(webSocket, socketFinishedTcs);

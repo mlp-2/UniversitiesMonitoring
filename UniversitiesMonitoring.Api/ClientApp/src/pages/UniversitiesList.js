@@ -1,7 +1,7 @@
 import {createUseStyles} from "react-jss";
 import HeaderBackground from "../assets/images/figures.png";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { faStar, faComment, faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import {faStar, faComment, faMagnifyingGlass} from "@fortawesome/free-solid-svg-icons";
 import Constants from "../Constants";
 import axios from "axios";
 import {useEffect, useState} from "react";
@@ -130,21 +130,21 @@ const useStyles = createUseStyles({
 export function UniversitiesList() {
     const style = useStyles();
     const [universities, setUniversities] = useState(null)
-    
-    useEffect(()=> {
+
+    useEffect(() => {
         (async () => {
             const universities = await getUniversities();
 
-            for(let i in universities) {
+            for (let i in universities) {
                 universities[i].nameQueryable = makeStringQueryable(universities[i].name);
             }
-            
+
             setUniversities(universities);
         })();
     }, []);
-    
+
     if (universities === null) return <Loading/>
-    
+
     return <div className={style.layout}>
         <Header/>
         <Listing universities={universities}/>
@@ -153,7 +153,7 @@ export function UniversitiesList() {
 
 function Header() {
     const style = useStyles();
-    
+
     return <div className={style.header}>
         <h1>Выберите ВУЗ</h1>
     </div>
@@ -164,19 +164,19 @@ function Listing({universities}) {
     const [query, setQuery] = useState("");
     const [loading, setLoadingState] = useState(false);
     const [showSub, setSub] = useState(false);
-    
+
     function updateQuery(newQuery) {
         setQuery(makeStringQueryable(newQuery))
     }
-    
+
     if (universities === null && !loading) {
         setLoadingState(true);
         return null;
     }
-    
+
     return <div className={style.listing}>
         <SearchBar updateShowSub={(show) => setSub(show)} updateSearch={updateQuery}/>
-        <Universities universities={universities.filter(university => 
+        <Universities universities={universities.filter(university =>
             (showSub && university.isSubscribed || !showSub) &&
             (query === "" || university.nameQueryable.startsWith(query)))}/>
     </div>
@@ -186,7 +186,7 @@ function SearchBar({updateSearch, updateShowSub}) {
     function handleChangingOfText(e) {
         updateSearch(e.target.value);
     }
-    
+
     return <Stack gap={2} className="searchbar-wrapper">
         <div className="searchbar">
             <FontAwesomeIcon icon={faMagnifyingGlass}/>
@@ -201,7 +201,7 @@ function SearchBar({updateSearch, updateShowSub}) {
 
 function Universities(props) {
     const style = useStyles();
-    
+
     return <div className={style.universitiesWrapper}>
         {props.universities.map(university => <UniversityContainer key={university.id} university={university}/>)}
     </div>
@@ -209,28 +209,28 @@ function Universities(props) {
 
 function UniversityContainer(props) {
     const style = useStyles();
-    
+
     return <div className={style.universityContainer}
                 style={{"--status-color": props.university.isOnline ? "#3CFB38" : "#FB4438"}}>
         <div>
-            <Link to="/university" 
+            <Link to="/university"
                   state={{university: props.university}}
                   className="university-name">
                 {props.university.name}
-            </Link>    
+            </Link>
         </div>
         <div className={style.informationCombo}>
             <div>
                 <div className="additional-information">
-                    <FontAwesomeIcon icon={faStar} />
+                    <FontAwesomeIcon icon={faStar}/>
                     <span>{props.university.rating.toFixed(1)}/5.0</span>
                 </div>
                 <div className="additional-information">
-                    <FontAwesomeIcon icon={faComment} />
+                    <FontAwesomeIcon icon={faComment}/>
                     <span>{props.university.commentsCount}</span>
                 </div>
             </div>
-            <div className={style.mark} 
+            <div className={style.mark}
                  style={{"--status-color": props.university.isOnline ? "#3CFB38" : "#FB4438"}}/>
         </div>
     </div>

@@ -52,7 +52,7 @@ const useStyles = createUseStyles({
 
 export function WelcomePage(props) {
     const ctxStyle = useStyles();
-    
+
     return <div className={ctxStyle.layout}>
         <LeftPanel>
             {props.children}
@@ -64,11 +64,12 @@ export function WelcomePage(props) {
 function LeftPanel(props) {
     const globalStyle = useGlobalStyles();
     const ctxStyle = useStyles();
-    
+
     return <Container className={ctxStyle.leftPanel}>
         <div className={ctxStyle.headerOfLeftPanel}>
             <h1>
-                Контролируйте доступность ВУЗов с помощью <span className={globalStyle.brandFontColored}>UniversitiesMonitoring</span>
+                Контролируйте доступность ВУЗов с помощью <span
+                className={globalStyle.brandFontColored}>UniversitiesMonitoring</span>
             </h1>
         </div>
         <div className={ctxStyle.contentOfLeftPanel}>
@@ -79,6 +80,6 @@ function LeftPanel(props) {
 
 function RightPanel() {
     const styles = useStyles();
-    
+
     return <div className={styles.rightPanel}/>
 }

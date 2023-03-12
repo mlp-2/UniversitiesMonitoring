@@ -11,13 +11,13 @@ import {Button} from "react-bootstrap";
 
 const useStyles = createUseStyles({
     universityHeader: {
-       background: Constants.brandColor,
-       color: "#FFF",
-       display: "flex",
-       flexDirection: "row",
-       alignItems: "center",
-       justifyContent: "space-around",
-       height: "25vh"
+        background: Constants.brandColor,
+        color: "#FFF",
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-around",
+        height: "25vh"
     },
     servicePanel: {
         display: "flex",
@@ -28,7 +28,7 @@ const useStyles = createUseStyles({
             flexDirection: "row",
             alignItems: "center",
             gap: 20
-        },  
+        },
         width: "80%",
         background: "#FFF",
         padding: 30,
@@ -98,35 +98,36 @@ export function UniversityPage() {
     const location = useLocation();
     const [services, setServices] = useState(null);
     const [isSubscribed, setSubscribed] = useState(false);
-    
+
     function updateServices(servicesToChange) {
         setServices([...(servicesToChange ?? services)]);
     }
-    
+
     useEffect(() => {
         (async () => {
             setServices(await getUniversityServices(location.state.university.id));
         })();
     }, []);
-    
+
     let isSub = true;
-    
+
     for (let i in services) {
         isSub &= services[i].isSubscribed;
     }
 
     if (services === null) return <Loading/>
     if (isSubscribed !== isSub) setSubscribed(isSub);
-    
+
     return <div>
-        <UniversityHeader university={location.state.university} services={services} isSubscribed={isSubscribed} updateServices={updateServices}/>
+        <UniversityHeader university={location.state.university} services={services} isSubscribed={isSubscribed}
+                          updateServices={updateServices}/>
         <ServicesList services={services} updateServices={updateServices}/>
     </div>
 }
 
 function UniversityHeader({university, services, updateServices, isSubscribed}) {
     const style = useStyles();
-    
+
     async function handleClickOnSubscribeButton() {
         for (let i in services) {
             if (isSubscribed) { // Отписываемся от всего
@@ -137,47 +138,48 @@ function UniversityHeader({university, services, updateServices, isSubscribed}) 
                 services[i].isSubscribed = true;
             }
         }
-        
+
         updateServices(services);
     }
-    
+
     return <div className={style.universityHeader}>
         <span className="display-1 fw-bold">{university.name}</span>
         <Button onClick={handleClickOnSubscribeButton} variant={isSubscribed ? "secondary" : "danger"}>
             {isSubscribed ? "Отписаться" : "Подписаться"}
         </Button>
-    </div>    
-} 
+    </div>
+}
 
 function ServicesList({services, updateServices}) {
     const style = useStyles();
-    
+
     return <div className={style.servicesBlock}>
         <span className="services-title">Сервисы</span>
         <div className={style.servicesWrapper}>
-            {services.map(service => <ServiceContainer updateServices={updateServices} key={service.serviceId} service={service}/>)}
+            {services.map(service => <ServiceContainer updateServices={updateServices} key={service.serviceId}
+                                                       service={service}/>)}
         </div>
     </div>
 }
 
 function ServiceContainer({service, updateServices}) {
     const style = useStyles();
-    
+
     async function handleClickSubscribe() {
         service.isSubscribed = !service.isSubscribed;
-        
+
         if (service.isSubscribed) {
             await axios.post(`/api/services/${service.serviceId}/subscribe`);
         } else {
             await axios.delete(`/api/services/${service.serviceId}/unsubscribe`);
         }
-        
+
         updateServices(null);
     }
-    
+
     let rateAvg = 0;
-    
-    if(service.comments.length === 0) rateAvg = -1;
+
+    if (service.comments.length === 0) rateAvg = -1;
     else {
         for (let i in service.comments) {
             rateAvg += service.comments[i].rate;
@@ -185,37 +187,37 @@ function ServiceContainer({service, updateServices}) {
 
         rateAvg /= service.comments.length;
     }
-    
-    return <div className={style.servicePanel} 
-                style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438" }}>
-            <Link to="/service" state={{ serviceId: service.serviceId }}>
-                {service.serviceName}
-            </Link>
-            <div className="service-actions">
-                <Button onClick={handleClickSubscribe} variant={service.isSubscribed ? "secondary" : "danger"}>
-                    {service.isSubscribed ? "Отписаться" : "Подписаться"}
-                </Button>
-                <div>
-                    <div className="additional-info">
-                        <FontAwesomeIcon icon={faComment}/>
-                        <span>{service.comments.length}</span>
-                    </div>
-                    {
-                        rateAvg > 0 &&
-                        <div className="additional-info">
-                            <FontAwesomeIcon icon={faStar}/>
-                            <span>{rateAvg.toFixed(1)}/5.0</span>
-                        </div>
-                    }
+
+    return <div className={style.servicePanel}
+                style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438"}}>
+        <Link to="/service" state={{serviceId: service.serviceId}}>
+            {service.serviceName}
+        </Link>
+        <div className="service-actions">
+            <Button onClick={handleClickSubscribe} variant={service.isSubscribed ? "secondary" : "danger"}>
+                {service.isSubscribed ? "Отписаться" : "Подписаться"}
+            </Button>
+            <div>
+                <div className="additional-info">
+                    <FontAwesomeIcon icon={faComment}/>
+                    <span>{service.comments.length}</span>
                 </div>
-                <div className="service-status"
-                     style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438" }}/>
+                {
+                    rateAvg > 0 &&
+                    <div className="additional-info">
+                        <FontAwesomeIcon icon={faStar}/>
+                        <span>{rateAvg.toFixed(1)}/5.0</span>
+                    </div>
+                }
             </div>
-        </div>;
+            <div className="service-status"
+                 style={{"--service-status": service.isOnline ? "#3CFB38" : "#FB4438"}}/>
+        </div>
+    </div>;
 }
 
 async function getUniversityServices(universityId) {
     const requestResult = await axios.get(`/api/services?loadComments=true&universityId=${universityId}`);
-    
+
     return requestResult.data;
 }

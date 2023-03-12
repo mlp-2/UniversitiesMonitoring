@@ -16,7 +16,7 @@ public class UsersProviderTests
 
         dataProviderMock.Setup(x => x.Users.FindAsync(It.IsAny<ulong>())).ReturnsAsync(userRef);
         var usersProvider = new UsersProvider(dataProviderMock.Object);
-        
+
         Assert.Equal(userRef, await usersProvider.GetUserAsync(0x0));
     }
 
@@ -28,20 +28,20 @@ public class UsersProviderTests
         {
             Id = 0,
             Username = "DenVot",
-            PasswordSha256hash = new byte[] { 0x0, 0x1, 0xf },
+            PasswordSha256hash = new byte[] {0x0, 0x1, 0xf},
             Email = null,
             SendEmailNotification = false,
         };
-        
+
         var dataProviderMock = new Mock<IDataProvider>();
 
         dataProviderMock.Setup(x => x.Users.FindAsync(It.IsAny<ulong>())).ReturnsAsync(userRef);
         dataProviderMock.Setup(x => x.SaveChangesAsync());
-        
+
         var usersProvider = new UsersProvider(dataProviderMock.Object);
 
         var result = await usersProvider.ModifyUserAsync(0x0, modifyAction);
-        
+
         Assert.True(result);
         Assert.True(checkAction(userRef));
     }
@@ -56,7 +56,7 @@ public class ModifyUserTestData : IEnumerable<object[]>
             new Action<User>(user => user.Username = "NewName"),
             new Func<User, bool>(user => user.Username == "NewName")
         };
-        
+
         yield return new object[]
         {
             new Action<User>(user => user.SendEmailNotification = true),
@@ -76,7 +76,7 @@ public class ModifyUserTestData : IEnumerable<object[]>
         };
 
         var newSha256 = Array.Empty<byte>();
-        
+
         yield return new object[]
         {
             new Action<User>(user => user.PasswordSha256hash = newSha256),
@@ -89,4 +89,3 @@ public class ModifyUserTestData : IEnumerable<object[]>
         return GetEnumerator();
     }
 }
-

@@ -6,16 +6,16 @@ import {Navigate} from "react-router-dom";
 
 export function ModerationLoginPage() {
     const [passedAuth, setPassed] = useState(false);
-    
+
     async function handleSubmitForm(e) {
         e.preventDefault();
-        
+
         const form = e.target;
         const formData = new FormData(form);
         const apiEntity = Object.fromEntries(formData.entries());
 
         if (apiEntity.id === "" || apiEntity.password === "") return;
-        
+
         try {
             const response = await axios.post("/api/moderator/auth", apiEntity);
             localStorage.setItem("modToken", response.data.jwt);
@@ -29,9 +29,9 @@ export function ModerationLoginPage() {
             })
         }
     }
-    
+
     if (passedAuth) return <Navigate to="/moderator"/>
-    
+
     return <Container>
         <h1>Панель модератора</h1>
         <Form onSubmit={handleSubmitForm}>
@@ -42,7 +42,7 @@ export function ModerationLoginPage() {
                 </Form.Text>
             </Form.Group>
             <Form.Group className="mb-3">
-                <Form.Control name="password" type="password" placeholder="Введите Ваш пароль"/>     
+                <Form.Control name="password" type="password" placeholder="Введите Ваш пароль"/>
             </Form.Group>
             <Button type="submit">
                 Вход

@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import {Outlet} from 'react-router-dom';
 import {UserPanel} from "../components/UserPanel";
 import {useEffect, useState} from "react";
 import {GetUser} from "../ApiMethods";
@@ -7,7 +7,7 @@ import Swal from "sweetalert2";
 
 export function LoginPanel() {
     const [redirectToLogin, setRedirect] = useState(false);
-    
+
     useEffect(() => {
         (async () => {
             async function fire() {
@@ -21,7 +21,7 @@ export function LoginPanel() {
                     backdrop: false
                 });
             }
-            
+
             try {
                 if (await GetUser() === null) {
                     setRedirect(true);
@@ -33,11 +33,11 @@ export function LoginPanel() {
             }
         })();
     }, []);
-    
+
     if (redirectToLogin) return <Navigate to="/login"/>
-    
+
     return <>
         <UserPanel/>
-        <Outlet />
+        <Outlet/>
     </>
 }

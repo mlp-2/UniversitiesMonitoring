@@ -16,7 +16,7 @@ public class ModeratorsProviderTests
 
         dataProviderMock.Setup(x => x.Moderators.FindAsync(It.IsAny<ulong>())).ReturnsAsync(modRef);
         var modProvider = new ModeratorsProvider(dataProviderMock.Object, servicesProviderMock.Object);
-        
+
         Assert.Equal(modRef, await modProvider.GetModeratorAsync(0x0));
     }
 }

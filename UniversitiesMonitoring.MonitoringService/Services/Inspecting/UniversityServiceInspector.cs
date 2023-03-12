@@ -1,5 +1,5 @@
-﻿using System.Net;
-using UniversityMonitoring.Data.Entities;
+﻿using UniversityMonitoring.Data.Entities;
+
 namespace UniversitiesMonitoring.MonitoringService.Services.Inspecting;
 
 internal class UniversityServiceInspector
@@ -20,7 +20,7 @@ internal class UniversityServiceInspector
     }
 
     private UniversityServiceEntity _service;
-    
+
     public UniversityServiceInspector(IServiceInspector inspector, UniversityServiceEntity serviceEntity)
     {
         _serviceInspector = inspector;

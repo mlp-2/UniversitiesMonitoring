@@ -8,7 +8,6 @@ public class UpdateEntity
     {
         Changes = changes;
     }
-    
-    [JsonPropertyName("changes")]
-    public ChangeStateEntity[] Changes { get; }
+
+    [JsonPropertyName("changes")] public ChangeStateEntity[] Changes { get; }
 }

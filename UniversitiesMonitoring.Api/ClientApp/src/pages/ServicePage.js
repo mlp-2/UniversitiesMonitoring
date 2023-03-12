@@ -71,7 +71,7 @@ const useStyles = createUseStyles({
         paddingRight: "5vw",
         paddingTop: "5vh",
         "& .university-name": {
-              fontSize: 32
+            fontSize: 32
         },
         "& .action-section": {
             display: "flex",
@@ -128,7 +128,7 @@ const useStyles = createUseStyles({
     comment: {
         background: "#FFF",
         width: "100%",
-        padding: 15 ,
+        padding: 15,
         position: "relative",
         borderRadius: "0 15px 15px 15px",
         "& .comment-author": {
@@ -238,28 +238,28 @@ const useStyles = createUseStyles({
                 flexDirection: "column !important"
             },
             "& .header": {
-                justifyContent: "center"  
+                justifyContent: "center"
             },
             "& .fa-tree-city": {
-                display: "none"    
+                display: "none"
             }
         }
     },
 });
 
 const monthNames = ["янв", "фев", "мар", "апр",
-                    "май", "июн", "июл", "авг", 
-                    "сен", "окт", "ноя", "дек"]
+    "май", "июн", "июл", "авг",
+    "сен", "окт", "ноя", "дек"]
 
 export function ServicePage() {
     const location = useLocation();
     const [service, setService] = useState(null);
     const [smthgWentWrong, setRedirect] = useState(false);
-    
-    function updateService(service) {  
+
+    function updateService(service) {
         setService(service);
     }
-    
+
     async function smthgFall() {
         await Swal.fire({
             title: "Что-то пошло не так",
@@ -268,24 +268,24 @@ export function ServicePage() {
             showConfirmButton: false,
             timer: 2000
         });
-        
+
         setRedirect(true);
     }
-    
+
     useEffect(() => {
         (async () => {
             try {
-                setService(await GetService(location.state?.serviceId ?? Query.serviceId));    
+                setService(await GetService(location.state?.serviceId ?? Query.serviceId));
             } catch {
-                await smthgFall();  
+                await smthgFall();
             }
         })();
     }, []);
-    
+
     if (smthgWentWrong) return <Navigate to="/universities-list"/>
     if (service === null) return <Loading/>
     if (service.changedStatusAt === null) return <ServiceDidntSetupped service={service}/>
-    
+
     return <div className="h-100" style={{background: "#f5f5f5"}}>
         <ServiceHeader service={service} updateService={updateService}/>
         <TestResultContainer service={service}/>
@@ -296,7 +296,8 @@ export function ServicePage() {
 function ServiceDidntSetupped({service}) {
     return <FullscreenFrame>
         <h1 className="text-center w-75">
-            О сервисе <a className="text-white" href={service.url}>"{service.serviceName}"</a> ВУЗа "{service.universityName}" еще нет никакой информации. 
+            О сервисе <a className="text-white" href={service.url}>"{service.serviceName}"</a> ВУЗа
+            "{service.universityName}" еще нет никакой информации.
             Возращайтесь сюда через 15-20 минут, когда она точно будет.
         </h1>
     </FullscreenFrame>
@@ -304,39 +305,39 @@ function ServiceDidntSetupped({service}) {
 
 function ServiceHeader({service, updateService}) {
     const [uptime, setUptime] = useState(null);
-    
+
     useEffect(() => {
         (async () => {
             try {
-                const result = await axios.get(`/api/services/${service.serviceId}/uptime`);    
-                
+                const result = await axios.get(`/api/services/${service.serviceId}/uptime`);
+
                 setUptime(result.data.uptime);
             } catch {
-                
+
             }
         })();
     }, [])
-    
+
     const style = useStyles();
-    
+
     const changedStatusAt = new Date(service.changedStatusAt + "Z");
-    
+
     async function handleClickOnSubscribeButton() {
         if (!service.isSubscribed) {
             await SubscribeToService(service.serviceId);
-            
+
         } else {
             await UnsubscribeToService(service.serviceId);
         }
-        
+
         updateService({
             ...service,
-            isSubscribed: !service.isSubscribed 
+            isSubscribed: !service.isSubscribed
         });
     }
-    
+
     async function handleClickOnReportButton() {
-         await Swal.fire({
+        await Swal.fire({
             title: `Сообщение о ${service.isOnline ? "не" : ""}доступности сервиса`,
             input: "textarea",
             inputPlaceholder: service.isOnline ? "Опишите. Что случилось? Желательно, подробно" :
@@ -349,17 +350,17 @@ function ServiceHeader({service, updateService}) {
             allowOutsideClick: () => !Swal.isLoading()
         }).then(result => {
             if (!result.isConfirmed) return;
-            
+
             return SendReportToService(service.serviceId, !service.isOnline, result.value)
         }).then(result => {
-            if(result) {
+            if (result) {
                 Swal.fire({
                     title: "Успешно. Ожидайте подтверждения Вашего обращения от администрации",
                     icon: "success",
                     showConfirmButton: false,
                     timer: 2000
                 });
-            } else if(result === false) {
+            } else if (result === false) {
                 Swal.fire({
                     title: "Что-то пошло не так...",
                     icon: "error",
@@ -386,14 +387,14 @@ function ServiceHeader({service, updateService}) {
 
             return SendReportToService(service.serviceId, false, result.value)
         }).then(result => {
-            if(result) {
+            if (result) {
                 Swal.fire({
                     title: `Спасибо большое за указание причины недоступности ${service.serviceName}!`,
                     icon: "success",
                     showConfirmButton: false,
                     timer: 2000
                 });
-            } else if(result === false) {
+            } else if (result === false) {
                 Swal.fire({
                     title: "Что-то пошло не так...",
                     icon: "error",
@@ -403,7 +404,7 @@ function ServiceHeader({service, updateService}) {
             }
         });
     }
-    
+
     return <div className={style.serviceHeader}>
         <div className="university-name">
             <span>{service.universityName}</span>
@@ -418,26 +419,26 @@ function ServiceHeader({service, updateService}) {
                     {
                         uptime !== null &&
                         <span title="Показывает сколько процентов времени сервис находится в сети. Больше - лучше"
-                                  className={style.status}
-                                  style={{"--status-color": `rgb(${250 * (1 - uptime)},${250 * uptime},80)`}}>
+                              className={style.status}
+                              style={{"--status-color": `rgb(${250 * (1 - uptime)},${250 * uptime},80)`}}>
                             Uptime: {uptime * 100}%
                         </span>
                     }
                 </Stack>
             </div>
             <Stack className="flex-grow-0 gap-2">
-                <Button onClick={handleClickOnReportButton} 
+                <Button onClick={handleClickOnReportButton}
                         style={{background: "#1FE03C"}}>
                     Сервис {service.isOnline ? "офлайн" : "онлайн"}?
                 </Button>
                 {
                     !service.isOnline &&
-                        <Button onClick={handleClickOnReportOfflineButton}
-                                style={{background: "#EDD715"}}>
-                            Вы знаете почему сервис не работает?
-                        </Button>
+                    <Button onClick={handleClickOnReportOfflineButton}
+                            style={{background: "#EDD715"}}>
+                        Вы знаете почему сервис не работает?
+                    </Button>
                 }
-                <Button onClick={handleClickOnSubscribeButton} 
+                <Button onClick={handleClickOnSubscribeButton}
                         style={{background: service.isSubscribed ? "#FF4D15" : "#9D9D9D"}}>
                     {service.isSubscribed ? "Отписаться" : "Подписаться"}
                 </Button>
@@ -449,27 +450,27 @@ function ServiceHeader({service, updateService}) {
 function ServiceBody({service, updateService}) {
     const [screenWidth, setWidth] = useState(window.innerWidth);
     const style = useStyles();
-    
+
     useEffect(() => {
         function handleResize(e) {
             setWidth(window.innerWidth);
         }
-        
+
         window.addEventListener("resize", handleResize);
-        
+
         return () => window.removeEventListener("resize", handleResize);
     }, []);
-    
+
     return <div className={style.serviceBody}>
         {
-            screenWidth == null || screenWidth > 1136 ? 
+            screenWidth == null || screenWidth > 1136 ?
                 <>
                     <CommentsColumn comments={service.comments}/>
                     {!service.isOnline && <ReportsColumn service={service}/>}
                 </> : <CommentsAndReportsCarousel service={service}/>
         }
         {
-            screenWidth == null || screenWidth > 1136 ? 
+            screenWidth == null || screenWidth > 1136 ?
                 <SendCommentForm service={service} updateService={updateService}/> :
                 <SendCommentFormMobile service={service} updateService={updateService}/>
         }
@@ -482,13 +483,13 @@ function CommentsAndReportsCarousel({service}) {
     const handleSelect = (selectedIndex, e) => {
         setIndex(selectedIndex);
     };
-    
+
     return <Carousel indicators={false} interval={null} variant="dark" activeIndex={index} onSelect={handleSelect}>
         <Carousel.Item>
             <CommentsColumn comments={service.comments}/>
         </Carousel.Item>
         {
-            !service.isOnline && 
+            !service.isOnline &&
             <Carousel.Item>
                 <ReportsColumn service={service}/>
             </Carousel.Item>
@@ -498,20 +499,20 @@ function CommentsAndReportsCarousel({service}) {
 
 function CommentsColumn({comments}) {
     const style = useStyles();
-    
+
     return <div className={style.commentsWrapper}>
         <span className="title">Комментарии</span>
-         <div className="comments-container">
+        <div className="comments-container">
             {
                 comments.length > 0 ? comments.map(comment =>
-                <Comment key={comment.id}
-                         from={comment.author.username}
-                         content={comment.content}
-                         stars={comment.rate}
-                         addedAt={comment.addedAt}/>) : 
-                <Comment key="information-message"
-                         from="Администрации сайта"
-                         content="Никто пока что не оценивал этот сервис. Вы можете стать первым"/>
+                        <Comment key={comment.id}
+                                 from={comment.author.username}
+                                 content={comment.content}
+                                 stars={comment.rate}
+                                 addedAt={comment.addedAt}/>) :
+                    <Comment key="information-message"
+                             from="Администрации сайта"
+                             content="Никто пока что не оценивал этот сервис. Вы можете стать первым"/>
             }
         </div>
     </div>
@@ -520,13 +521,13 @@ function CommentsColumn({comments}) {
 function ReportsColumn({service}) {
     const [reports, setReports] = useState(null);
     const style = useStyles();
-    
+
     useEffect(() => {
         (async () => {
             setReports(await GetReports(service.serviceId));
         })();
     }, []);
-    
+
     return <div className={style.commentsWrapper}>
         <span className="title">Сообщения о текущем сбое</span>
         {
@@ -534,9 +535,10 @@ function ReportsColumn({service}) {
                 {reports === null ?
                     <Comment key="information-message"
                              from="Системы"
-                             content='Загружаем жалобы...'/> : 
+                             content='Загружаем жалобы...'/> :
                     reports.length > 0 ? reports.map(report =>
-                        <Comment key={report.id} from="Пользователя сервиса" addedAt={report.addedAt} content={report.content}/>) :
+                            <Comment key={report.id} from="Пользователя сервиса" addedAt={report.addedAt}
+                                     content={report.content}/>) :
                         <Comment key="information-message"
                                  from="Администрации сайта"
                                  content='Никто еще сообщал о причинах этого сбоя. Если Вы что-нибудь знаете о нем, расскажите, пожалуйста, нажав на кнопку "Вы знаете почему сервис не работает?" 😁'/>}
@@ -548,10 +550,10 @@ function ReportsColumn({service}) {
 function SendCommentForm({reference, service, updateService, onEnded}) {
     const [rate, setRate] = useState(1);
     const style = useStyles();
-    
+
     async function handleSubmit(e) {
         e.preventDefault();
-        
+
         const form = e.target;
         const formData = new FormData(form);
         formData.append("rate", rate);
@@ -561,28 +563,28 @@ function SendCommentForm({reference, service, updateService, onEnded}) {
         if (apiData.content === "") {
             return;
         }
-        
+
         if (await SendComment(service.serviceId, apiData)) {
-            if(onEnded) onEnded();
-            
+            if (onEnded) onEnded();
+
             await Swal.fire({
                 title: "Комментарий добавлен",
                 icon: "success",
                 timer: 1000,
                 showConfirmButton: false
-            }); 
-            
+            });
+
             service.comments.push({
                 id: GenerateUUID(),
                 author: {
-                    username: "Вас"  
+                    username: "Вас"
                 },
                 ...apiData,
                 rate: Number.parseInt(apiData.rate)
             });
-            
+
             console.log(apiData)
-            
+
             updateService({
                 ...service,
                 comments: service.comments,
@@ -596,24 +598,24 @@ function SendCommentForm({reference, service, updateService, onEnded}) {
             });
         }
     }
-    
+
     return <form className={style.commentForm} method="post" onSubmit={handleSubmit} ref={reference}>
-            <div>
-                <StarsBar onChange={(count) => setRate(count)}/>
-                <textarea placeholder="Оставьте Ваше мнение о сервисе здесь" name="content" rows={10} cols={1}/>
-            </div>
-            <SubmitButton content="Отправить"/> 
-        </form>;
+        <div>
+            <StarsBar onChange={(count) => setRate(count)}/>
+            <textarea placeholder="Оставьте Ваше мнение о сервисе здесь" name="content" rows={10} cols={1}/>
+        </div>
+        <SubmitButton content="Отправить"/>
+    </form>;
 }
 
 function StarsBar({onChange}) {
     const style = useStyles();
     const [countOfStars, setCountOfStars] = useState(1);
-    
+
     useEffect(() => {
         onChange(countOfStars);
     }, [countOfStars])
-    
+
     return <div className={style.starsBar}>
         <RateStar index={1} rate={countOfStars} onClick={() => setCountOfStars(1)}/>
         <RateStar index={2} rate={countOfStars} onClick={() => setCountOfStars(2)}/>
@@ -624,21 +626,22 @@ function StarsBar({onChange}) {
 }
 
 function RateStar({index, rate, onClick}) {
-    return <FontAwesomeIcon onClick={onClick} icon={faStar} 
+    return <FontAwesomeIcon onClick={onClick} icon={faStar}
                             style={{"--star-color": index <= rate ? "#FDD64E" : "#046298"}}/>
 }
 
 function Comment({from, content, addedAt = null, stars = -1}) {
     const style = useStyles();
-    
-    return <div className={style.comment}>  
+
+    return <div className={style.comment}>
         <div className="comment-header">
             <span>
-                от <span className="comment-author">{from}</span> {addedAt !== null && <span className="text-muted">{formatDate(new Date(addedAt + "Z"))}</span>}
+                от <span className="comment-author">{from}</span> {addedAt !== null &&
+                <span className="text-muted">{formatDate(new Date(addedAt + "Z"))}</span>}
             </span>
             {
                 stars > 0 &&
-                    <div>{[...Array(stars).keys()].map(_ => <FontAwesomeIcon icon={faStar}/>)}</div> 
+                <div>{[...Array(stars).keys()].map(_ => <FontAwesomeIcon icon={faStar}/>)}</div>
             }
         </div>
         <div className="comment-content">
@@ -650,11 +653,11 @@ function Comment({from, content, addedAt = null, stars = -1}) {
 function SendCommentFormMobile({service, updateService}) {
     const style = useStyles();
     const [showPopup, setShowPopup] = useState(false);
-    
-    if (showPopup) return <SendCommentFormPopup service={service} 
-                                                updateService={updateService} 
+
+    if (showPopup) return <SendCommentFormPopup service={service}
+                                                updateService={updateService}
                                                 closePopup={() => setShowPopup(false)}/>
-    
+
     return <div className={style.commentFormMobile} onClick={() => setShowPopup(true)}>
         <span className="text-muted">Оставить комментарий</span>
     </div>
@@ -663,38 +666,39 @@ function SendCommentFormMobile({service, updateService}) {
 function SendCommentFormPopup({closePopup, service, updateService}) {
     const style = useStyles();
     const formElement = useRef();
-    
+
     function handleClick(e) {
         let context = e.target;
-        
+
         if (context === formElement.current) return
-        
+
         while (context.parentElement !== null) {
             context = context.parentElement;
-            
+
             if (context === formElement.current) return;
         }
 
         endDialog();
     }
-    
+
     function endDialog() {
         const htmlElement = document.querySelector("html");
 
         htmlElement.style.overflowY = null;
         closePopup()
     }
-    
+
     useEffect(() => {
         let a = document.documentElement.scrollTop !== undefined ? document.documentElement : document.body;
         a.scrollTop = 0;
         const htmlElement = document.querySelector("html");
-        
+
         htmlElement.style.overflowY = "hidden";
     }, [])
-    
+
     return <div onClick={handleClick} className={style.commentFormMobileWrapper}>
-        <SendCommentForm onEnded={() => endDialog()} service={service} reference={formElement} updateService={updateService}/>
+        <SendCommentForm onEnded={() => endDialog()} service={service} reference={formElement}
+                         updateService={updateService}/>
     </div>
 }
 
@@ -707,34 +711,38 @@ function LoadingContainer() {
 function TestResultContainer({service}) {
     const style = useStyles();
     const [testResult, setTestResult] = useState(null);
-    
+
     useEffect(() => {
         (async () => {
             setTestResult(await TestService(service.serviceId));
         })();
     }, []);
-    
+
     if (testResult === null) {
         return <Container className={style.testResultContainerWrapper}>
             <LoadingContainer/>
         </Container>;
     }
-    
+
     if (testResult.length === 0) return null;
-    
+
     return <Container className={style.testResultContainerWrapper}>
         <div className="test-result-container">
             <h1>Статистика доступа из разных городов</h1>
             <Stack className="results-list" gap={3}>
                 {
-                    testResult.map(result => <Stack className="result-container" style={{background: result.headTime !== null ? "rgb(175, 254, 159)" : "rgb(254, 159, 159)"}} direction="horizontal">
+                    testResult.map(result => <Stack className="result-container"
+                                                    style={{background: result.headTime !== null ? "rgb(175, 254, 159)" : "rgb(254, 159, 159)"}}
+                                                    direction="horizontal">
                         <Stack direction="horizontal" className="header" gap={3}>
                             <FontAwesomeIcon icon={faTreeCity} fontSize={64} color="#FFF"/>
                             <span className="fw-bold fs-4">{result.testFrom}</span>
                         </Stack>
                         <div>
-                            {result.headTime !== null && <div><span><b>Время ответа сайта:</b> {result.headTime} мс</span></div>}
-                            {result.pingTime !== null && <div><span><b>Время ответа сервера:</b> {result.pingTime} мс</span></div>}
+                            {result.headTime !== null &&
+                                <div><span><b>Время ответа сайта:</b> {result.headTime} мс</span></div>}
+                            {result.pingTime !== null &&
+                                <div><span><b>Время ответа сервера:</b> {result.pingTime} мс</span></div>}
                         </div>
                     </Stack>)
                 }
@@ -745,7 +753,7 @@ function TestResultContainer({service}) {
 
 function formatDate(date) {
     const month = date.getMonth();
-    
+
     return `${padTo2Digits(date.getHours())}:${padTo2Digits(date.getMinutes())} ${date.getDate()} ${monthNames[month]}`;
 }
 

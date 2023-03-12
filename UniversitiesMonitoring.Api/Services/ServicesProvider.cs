@@ -27,7 +27,7 @@ public class ServicesProvider : IServicesProvider
         {
             return Math.Round(uptimeData.OnlineTime / uptimeData.TotalTime, 2);
         }
-        
+
         var stateChanges = _dataProvider.UniversityServiceStateChange.GetlAll()
             .Where(x => x.ServiceId == serviceId).OrderBy(x => x.ChangedAt)
             .ToList();
@@ -39,16 +39,16 @@ public class ServicesProvider : IServicesProvider
             ChangedAt = DateTime.UtcNow,
             IsOnline = !stateChanges[0].IsOnline
         });
-        
+
         var onlineTime = 0d; // В секундах время онлайн
         var totalTime = 0d;
-        
+
         for (var i = 1; i < stateChanges.Count; i++)
         {
             var ctxChange = stateChanges[i];
             var prevChange = stateChanges[i - 1];
-            var deltaSec = (ctxChange.ChangedAt - prevChange.ChangedAt).TotalSeconds; 
-            
+            var deltaSec = (ctxChange.ChangedAt - prevChange.ChangedAt).TotalSeconds;
+
             if (prevChange.IsOnline) // Сервис был все это время онлайн, а сменил состояние сейчас на оффайн. Добавляем секунды к онлайну 
             {
                 onlineTime += deltaSec;
@@ -74,9 +74,10 @@ public class ServicesProvider : IServicesProvider
         return university.UniversityServices;
     }
 
-    public Task<University?> GetUniversityAsync(ulong universityId) => _dataProvider.Universities.FindAsync(universityId);
+    public Task<University?> GetUniversityAsync(ulong universityId) =>
+        _dataProvider.Universities.FindAsync(universityId);
 
-    public IQueryable<University> GetAllUniversities() => _dataProvider.Universities.GetlAll(); 
+    public IQueryable<University> GetAllUniversities() => _dataProvider.Universities.GetlAll();
 
     public async Task SubscribeUserAsync(User user, UniversityService service)
     {
@@ -93,13 +94,14 @@ public class ServicesProvider : IServicesProvider
     public async Task UnsubscribeUserAsync(User user, UniversityService service)
     {
         var subscribe = _dataProvider.Subscribes.ExecuteSql(
-            $"SELECT * FROM universities_monitoring.UserSubscribeToService WHERE UserId={user.Id} AND ServiceId={service.Id}").FirstOrDefault();
+                $"SELECT * FROM universities_monitoring.UserSubscribeToService WHERE UserId={user.Id} AND ServiceId={service.Id}")
+            .FirstOrDefault();
 
         if (subscribe == null)
         {
             throw new InvalidOperationException($"Can't find user({user.Id})'s subscribe to the service({service.Id})");
         }
-        
+
         _dataProvider.Subscribes.Remove(subscribe);
         await SaveChangesAsync();
     }
@@ -116,27 +118,28 @@ public class ServicesProvider : IServicesProvider
             ChangedAt = updateTime ?? DateTime.UtcNow
         };
 
-        var lastUpdate = await _dataProvider.UniversityServiceStateChange.GetlAll().Where(x => x.ServiceId == service.Id)
+        var lastUpdate = await _dataProvider.UniversityServiceStateChange.GetlAll()
+            .Where(x => x.ServiceId == service.Id)
             .OrderByDescending(x => x.ChangedAt)
             .FirstOrDefaultAsync();
 
         if (lastUpdate != null && lastUpdate.IsOnline == isOnline)
         {
             throw new InvalidOperationException("New state mustn't has same value as previous state");
-        } 
-        
+        }
+
         await _dataProvider.UniversityServiceStateChange.AddAsync(updateState);
 
         if (forceSafe) await SaveChangesAsync();
-        
+
         _cache.Remove(GenerateCacheKeyForReports(service));
-        
+
         if (_cache.TryGetValue<UptimeData>(GenerateCacheKeyForUptimeData(service.Id), out var uptimeData))
         {
             var delta = (updateState.ChangedAt - lastUpdate!.ChangedAt).TotalSeconds;
 
             uptimeData.TotalTime += delta;
-            
+
             if (lastUpdate.IsOnline)
             {
                 uptimeData.OnlineTime += delta;
@@ -160,8 +163,9 @@ public class ServicesProvider : IServicesProvider
 
     public async Task CreateReportAsync(UniversityService service, User issuer, Report report)
     {
-        var solvedDueOffline = (service.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false) == report.IsOnline; 
-        
+        var solvedDueOffline = (service.UniversityServiceStateChanges.LastOrDefault()?.IsOnline ?? false) ==
+                               report.IsOnline;
+
         var reportEntity = new UniversityServiceReport()
         {
             Content = report.Content,
@@ -170,7 +174,7 @@ public class ServicesProvider : IServicesProvider
             Service = service,
             IsSolved = solvedDueOffline
         };
-        
+
         if (solvedDueOffline &&
             _cache.TryGetValue<List<UniversityServiceReport>>(
                 GenerateCacheKeyForReports(service),
@@ -178,7 +182,7 @@ public class ServicesProvider : IServicesProvider
         {
             cachedReports.Add(reportEntity);
         }
-        
+
         await _dataProvider.Reports.AddAsync(reportEntity);
         await SaveChangesAsync();
     }
@@ -188,7 +192,7 @@ public class ServicesProvider : IServicesProvider
         report.IsSolved = true;
         await SaveChangesAsync();
     }
-    
+
     public Task<UniversityServiceReport?> GetReportAsync(ulong reportId) => _dataProvider.Reports.FindAsync(reportId);
 
     public IEnumerable<UniversityServiceReport> GetAllReports() => _dataProvider.Reports.GetlAll()
@@ -196,19 +200,13 @@ public class ServicesProvider : IServicesProvider
         .Include(x => x.Issuer)
         .Where(x => !x.IsSolved).ToList();
 
-    public Task DeleteReportAsync(UniversityServiceReport report)
-    {
-        _dataProvider.Reports.Remove(report);
-        return SaveChangesAsync();
-    }
-
     public IEnumerable<UniversityServiceReport> GetReportsByOffline(UniversityService service)
     {
         var cacheKey = GenerateCacheKeyForReports(service);
         var contains = _cache.TryGetValue<List<UniversityServiceReport>>(cacheKey, out var cachedReports);
 
         if (contains) return cachedReports;
-        
+
         var lastStatus = service.UniversityServiceStateChanges.LastOrDefault();
         if (lastStatus == null || lastStatus.IsOnline) return Array.Empty<UniversityServiceReport>();
 
@@ -224,9 +222,9 @@ public class ServicesProvider : IServicesProvider
     }
 
 
-    private string GetSqlTime(DateTime dateTime) => 
+    private string GetSqlTime(DateTime dateTime) =>
         $"STR_TO_DATE('{dateTime.Year}-{dateTime.Month}-{dateTime.Day} {dateTime.Hour}:{dateTime.Minute}:{dateTime.Second}', '%Y-%m-%d %H:%i:%s')";
-    
+
     private async Task SaveChangesAsync() => await _dataProvider.SaveChangesAsync();
 
     private string GenerateCacheKeyForReports(UniversityService service) => $"REPORTS_{service.Id}";

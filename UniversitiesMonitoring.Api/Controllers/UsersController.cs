@@ -18,7 +18,7 @@ public class UsersController : ControllerBase
         _usersProvider = usersProvider;
         _jwtGenerator = jwtGenerator;
     }
-    
+
     [HttpPost("auth")]
     public IActionResult UserAuth([FromBody] AuthEntity auth)
     {
@@ -28,18 +28,18 @@ public class UsersController : ControllerBase
         {
             return BadRequest("Некорректное имя пользователя или пароль");
         }
-        
+
         var passwordHash = Sha256Computing.ComputeSha256(auth.Password);
-        
+
         if (!user.PasswordSha256hash.IsSequenceEquals(passwordHash))
         {
             return BadRequest("Некорректное имя пользователя или пароль");
         }
-        
+
         var token = _jwtGenerator.GenerateTokenForUser(user.Id, true);
 
         Response.Cookies.Append("auth", token);
-        
+
         return Ok(new
         {
             jwt = token
@@ -56,14 +56,15 @@ public class UsersController : ControllerBase
             return BadRequest("Пользователь с таким именем уже существует");
         }
 
-        var result = await _usersProvider.CreateUserAsync(auth.Username, auth.Password); 
-        
+        var result = await _usersProvider.CreateUserAsync(auth.Username, auth.Password);
+
         if (result == null)
         {
             return BadRequest("Пользователь с таким именем уже существует");
         }
 
-        return Ok(new {
+        return Ok(new
+        {
             jwt = _jwtGenerator.GenerateTokenForUser(result.Id, true)
         });
     }
@@ -75,10 +76,10 @@ public class UsersController : ControllerBase
         var user = await _usersProvider.GetUserAsync(User.Identity!.Name!);
 
         if (user == null) return BadRequest();
-        
+
         return Ok(new UserEntity(user));
     }
-    
+
     [Authorize(Roles = JwtGenerator.UserRole)]
     [HttpPut("email/update")]
     public async Task<IActionResult> EmailUpdate([FromBody] EmailUpdateEntity update)
@@ -88,7 +89,8 @@ public class UsersController : ControllerBase
             return BadRequest();
         }
 
-        var isSuccess = await _usersProvider.ModifyUserAsync(ulong.Parse(User.Identity!.Name!), CreateModifyEmailAction(update));
+        var isSuccess =
+            await _usersProvider.ModifyUserAsync(ulong.Parse(User.Identity!.Name!), CreateModifyEmailAction(update));
 
         if (!isSuccess)
         {

@@ -53,7 +53,7 @@ export function UniversitiesModerationPanel() {
         </Button>
         <Stack gap={3}>
             {
-                universities.map(university => <UniversityContainer 
+                universities.map(university => <UniversityContainer
                     removeUniversity={handleDelete} university={university}
                     updateUniversityName={(universityName) => {
                         university.name = universityName;

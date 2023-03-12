@@ -22,6 +22,6 @@ const useStyles = createUseStyles({
 
 export function SubmitButton(props) {
     const style = useStyles();
-    
+
     return <input type="submit" className={style.defaultButton} {...props}/>
 }

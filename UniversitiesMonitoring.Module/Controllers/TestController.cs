@@ -13,7 +13,7 @@ public class TestController : ControllerBase
     private readonly TestProvider _testProvider;
     private readonly LocationProvider _locationProvider;
 
-    public TestController(TestProvider testProvider, 
+    public TestController(TestProvider testProvider,
         LocationProvider locationProvider)
     {
         _testProvider = testProvider;
@@ -21,11 +21,11 @@ public class TestController : ControllerBase
     }
 
     [HttpGet("/location")]
-    public IActionResult Location() => Ok(new 
+    public IActionResult Location() => Ok(new
     {
         location = _locationProvider.Location
     });
-    
+
     [HttpGet("/test")]
     public async Task<IActionResult> Test(
         [FromQuery] Uri url) => Ok(await _testProvider.TestAsync(url));

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
+using UniversitiesMonitoring.Api.WebSocket;
 using UniversityMonitoring.Data.Models;
 using UniversityMonitoring.Data.Repositories;
 
@@ -15,17 +16,21 @@ public class ModeratorController : ControllerBase
     private readonly IDataProvider _dataProvider;
     private readonly JwtGenerator _jwtGenerator;
     private readonly IModulesProvider _modulesProvider;
+    private readonly IWebSocketUpdateStateNotifier _webSocketUpdateStateNotifier;
 
     public ModeratorController(IModeratorsProvider moderatorsProvider,
         IServicesProvider servicesProvider,
         IDataProvider dataProvider,
-        JwtGenerator jwtGenerator, IModulesProvider modulesProvider)
+        JwtGenerator jwtGenerator, 
+        IModulesProvider modulesProvider,
+        IWebSocketUpdateStateNotifier webSocketUpdateStateNotifier)
     {
         _moderatorsProvider = moderatorsProvider;
         _servicesProvider = servicesProvider;
         _dataProvider = dataProvider;
         _jwtGenerator = jwtGenerator;
         _modulesProvider = modulesProvider;
+        _webSocketUpdateStateNotifier = webSocketUpdateStateNotifier;
     }
 
     [Authorize(Roles = JwtGenerator.AdminRole)]
@@ -74,9 +79,12 @@ public class ModeratorController : ControllerBase
         {
             return BadRequest("Репорт не найден");
         }
-
+        
         await _moderatorsProvider.AcceptReportAsync(report);
         await _servicesProvider.SolveReportAsync(report);
+        
+        await _webSocketUpdateStateNotifier.NotifyAsync(new [] {report.ServiceId});
+        
         return Ok();
     }
 

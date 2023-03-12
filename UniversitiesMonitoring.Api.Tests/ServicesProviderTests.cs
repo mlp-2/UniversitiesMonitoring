@@ -133,21 +133,6 @@ public class ServicesProviderTests
         Assert.NotNull(await servicesProvider.GetReportAsync(0x0)); 
     }
 
-    [Fact]
-    public async Task Delete_Report()
-    {
-        var dataProvider = CreateProviderMock();
-
-        dataProvider.Setup(x => x.Reports.Remove(It.IsAny<UniversityServiceReport>()));
-        dataProvider.Setup(x => x.SaveChangesAsync());
-        
-        var servicesProvider = CreateServicesProvider(dataProvider);
-
-        await servicesProvider.DeleteReportAsync(It.IsAny<UniversityServiceReport>());
-        
-        dataProvider.Verify(x => x.SaveChangesAsync(), Times.Once);
-    }
-    
     private Mock<IDataProvider> CreateProviderMock() => new();
 
     private ServicesProvider CreateServicesProvider(Mock<IDataProvider> dataProviderMock) => new(dataProviderMock.Object, new Mock<IMemoryCache>().Object);

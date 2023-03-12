@@ -196,12 +196,6 @@ public class ServicesProvider : IServicesProvider
         .Include(x => x.Issuer)
         .Where(x => !x.IsSolved).ToList();
 
-    public Task DeleteReportAsync(UniversityServiceReport report)
-    {
-        _dataProvider.Reports.Remove(report);
-        return SaveChangesAsync();
-    }
-
     public IEnumerable<UniversityServiceReport> GetReportsByOffline(UniversityService service)
     {
         var cacheKey = GenerateCacheKeyForReports(service);

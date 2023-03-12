@@ -17,7 +17,6 @@ public interface IServicesProvider
     Task CreateReportAsync(UniversityService service, User issuer, Report report);        
     Task<UniversityServiceReport?> GetReportAsync(ulong reportId);
     IEnumerable<UniversityServiceReport> GetAllReports();
-    Task DeleteReportAsync(UniversityServiceReport report);
     IEnumerable<UniversityServiceReport> GetReportsByOffline(UniversityService service);
     Task SolveReportAsync(UniversityServiceReport report);
 }

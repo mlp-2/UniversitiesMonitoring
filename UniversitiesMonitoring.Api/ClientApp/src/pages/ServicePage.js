@@ -421,7 +421,7 @@ function ServiceHeader({service, updateService}) {
                         <span title="Показывает сколько процентов времени сервис находится в сети. Больше - лучше"
                               className={style.status}
                               style={{"--status-color": `rgb(${250 * (1 - uptime)},${250 * uptime},80)`}}>
-                            Uptime: {uptime * 100}%
+                            Uptime: {Math.round(uptime * 100)}%
                         </span>
                     }
                 </Stack>

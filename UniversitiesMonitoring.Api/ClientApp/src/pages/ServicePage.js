@@ -537,6 +537,7 @@ function ReportsColumn({service}) {
                              from="Системы"
                              content='Загружаем жалобы...'/> :
                     reports.length > 0 ? reports.map(report =>
+                        report.content !== "" &&
                             <Comment key={report.id} from="Пользователя сервиса" addedAt={report.addedAt}
                                      content={report.content}/>) :
                         <Comment key="information-message"

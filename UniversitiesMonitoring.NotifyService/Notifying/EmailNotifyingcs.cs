@@ -15,8 +15,8 @@ internal class EmailNotifier
         _mailAddress = new MailAddress(address);
         _emailClient = new SmtpClient()
         {
-            Host = "mail.hosting.reg.ru",
-            Port = 587,
+            Host = Environment.GetEnvironmentVariable("SMTP_HOST")!,
+            Port = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT")!),
             Credentials = new NetworkCredential(address, Environment.GetEnvironmentVariable("EMAIL_PASSWORD") ?? configuration["Email:Password"]),
             EnableSsl = false
         };

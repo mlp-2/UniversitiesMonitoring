@@ -7,7 +7,7 @@ using UniversityMonitoring.Data.Entities;
 namespace UniversitiesMonitoring.NotifyService.Notifying;
 
 internal class GlobalTelegramNotifying
-{
+{   
     private readonly TelegramBotClient _botClient;
     private readonly ChatId _globalChatId;
 
@@ -36,7 +36,7 @@ internal class GlobalTelegramNotifying
     }
 
     private string GenerateStatus(UniversityServiceEntity serviceEntity) =>
-        $"- Сервис [\"{serviceEntity.ServiceName}\"]({CreateServiceHref(serviceEntity)}) ВУЗа *\"{serviceEntity.UniversityName}\"* сменил свое состояние на {(serviceEntity.IsOnline ? "онлайн 🟢" : "оффлайн 🔴")}";
+        $"- Сервис [\"{serviceEntity.ServiceName}\"]({CreateServiceHref(serviceEntity)}) ВУЗа [\"{serviceEntity.UniversityName}\"]({serviceEntity.Url}) сменил свое состояние на {(serviceEntity.IsOnline ? "онлайн 🟢" : "оффлайн 🔴")}";
 
     private string CreateServiceHref(UniversityServiceEntity service) =>
         $"http://univermonitoring.gym1551.ru/service?serviceId={service.ServiceId}";

@@ -3,7 +3,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faUser} from "@fortawesome/free-solid-svg-icons";
 import {createUseStyles} from "react-jss";
 import FireBall from "../assets/images/fireball.svg"
-import Swal from "sweetalert2";
+import Swal from "sweetalert2-neutral";
 import axios from "axios";
 import {Button, Form} from "react-bootstrap";
 import {GetUser} from "../ApiMethods";

@@ -1,7 +1,7 @@
 import {Button, Card, Container, Stack} from "react-bootstrap";
 import {useEffect, useState} from "react";
 import axios from "axios";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2-neutral";
 import DefaultConstants from "../Constants";
 
 export function ModulesModeration() {

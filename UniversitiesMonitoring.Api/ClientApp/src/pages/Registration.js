@@ -2,7 +2,7 @@ import {WelcomePage} from "./WelcomePage";
 import {Link, Navigate} from "react-router-dom";
 import {createUseStyles} from "react-jss";
 import Constants from "../Constants";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2-neutral";
 import axios from "axios";
 import {useState} from "react";
 import {Button, Form} from "react-bootstrap";

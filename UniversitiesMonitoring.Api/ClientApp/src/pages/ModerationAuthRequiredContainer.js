@@ -1,4 +1,4 @@
-import Swal from "sweetalert2";
+import Swal from "sweetalert2-neutral";
 import {Navigate, Outlet} from "react-router-dom";
 import axios from "axios";
 import {useEffect, useState} from "react";

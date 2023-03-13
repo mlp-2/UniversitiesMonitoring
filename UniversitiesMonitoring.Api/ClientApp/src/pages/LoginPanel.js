@@ -2,7 +2,7 @@ import {Navigate, Outlet} from 'react-router-dom';
 import {UserPanel} from "../components/UserPanel";
 import {useEffect, useState} from "react";
 import {GetUser} from "../ApiMethods";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2-neutral";
 
 export function LoginPanel() {
     const [redirectToLogin, setRedirect] = useState(false);

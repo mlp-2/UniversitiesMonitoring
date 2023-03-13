@@ -16,7 +16,7 @@ import {
     TestService,
     UnsubscribeToService
 } from "../ApiMethods";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2-neutral";
 import {Carousel, Container, Stack} from "react-bootstrap";
 import {GenerateUUID} from "../Utils";
 import {FullscreenFrame} from "../components/FullScreenFrame";

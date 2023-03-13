@@ -5,7 +5,7 @@ import Constants from "../Constants";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import useGlobalStyles from "../GlobalStyle";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2-neutral";
 import {GetUser} from "../ApiMethods";
 import {Button, Container, Form} from "react-bootstrap";
 

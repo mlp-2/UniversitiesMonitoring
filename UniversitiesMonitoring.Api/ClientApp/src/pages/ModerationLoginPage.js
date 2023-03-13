@@ -1,7 +1,7 @@
 import React, {useState} from "react";
 import {Button, Container, Form} from "react-bootstrap";
 import axios from "axios";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2-neutral";
 import {Navigate} from "react-router-dom";
 
 export function ModerationLoginPage() {

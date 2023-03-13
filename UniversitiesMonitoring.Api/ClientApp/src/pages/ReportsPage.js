@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {Link, Navigate} from "react-router-dom";
-import Swal from "sweetalert2";
+import Swal from "sweetalert2-neutral";
 import {Button, Card, Container, Stack} from "react-bootstrap";
 import {createUseStyles} from "react-jss";
 

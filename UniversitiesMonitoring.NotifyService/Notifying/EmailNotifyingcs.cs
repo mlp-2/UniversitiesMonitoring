@@ -38,7 +38,7 @@ internal class EmailNotifier
             From = _mailAddress,
             Subject = "Изменение состояния сервиса",
             Body =
-                $"<b>📢 Сервис <a href=\"{CreateServiceHref(service)}\">{service.ServiceName}</a> ВУЗа {service.UniversityName} изменил свое состояние на {(service.IsOnline ? "онлайн 🟢" : "офлайн 🔴")}</b><br/>",
+                $"<b>📢 Сервис <a href=\"{CreateServiceHref(service)}\">{service.ServiceName}</a> ВУЗа <a href=\"{service.Url}\">{service.UniversityName}</a> изменил свое состояние на {(service.IsOnline ? "онлайн 🟢" : "офлайн 🔴")}</b><br/>",
             IsBodyHtml = true
         };
 

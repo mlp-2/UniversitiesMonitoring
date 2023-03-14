@@ -9,7 +9,7 @@ public static class ServiceExcelReportBuilder
 {
     public static byte[] BuildExcel(UniversityService service)
     {
-        var package = new ExcelPackage();
+        using var package = new ExcelPackage();
         var sheet = package.Workbook.Worksheets.Add("Отчет");
 
         #region Настройка базовых данных и стилей
@@ -73,6 +73,8 @@ public static class ServiceExcelReportBuilder
         
         sheet.Cells["D:D"].AutoFitColumns();
 
+        GC.Collect(0);
+        
         return package.GetAsByteArray();
     }
     

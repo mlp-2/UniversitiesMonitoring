@@ -16,7 +16,7 @@ public interface IServicesProvider
     Task LeaveCommentAsync(UniversityService service, User author, Comment comment);
     Task CreateReportAsync(UniversityService service, User issuer, Report report);
     Task<UniversityServiceReport?> GetReportAsync(ulong reportId);
-    Task<byte[]> CreateExcelReportAsync(ulong serviceId);
+    Task<byte[]> CreateExcelReportAsync(ulong serviceId, int offset);
     IEnumerable<UniversityServiceReport> GetAllReports();
     IEnumerable<UniversityServiceReport> GetReportsByOffline(UniversityService service);
     Task SolveReportAsync(UniversityServiceReport report);

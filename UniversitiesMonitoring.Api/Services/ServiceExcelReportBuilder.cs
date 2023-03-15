@@ -7,72 +7,72 @@ namespace UniversitiesMonitoring.Api.Services;
 
 public static class ServiceExcelReportBuilder
 {
-    public static byte[] BuildExcel(UniversityService service)
+    public static byte[] BuildExcel(UniversityService service, double? serviceUptime)
     {
         using var package = new ExcelPackage();
         var sheet = package.Workbook.Worksheets.Add("Отчет");
-
-        #region Настройка базовых данных и стилей
-
-        sheet.Cells["A1:A4"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-        sheet.Cells["D1"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-        sheet.Cells["F2:F3"].Style.Fill.PatternType = ExcelFillStyle.Solid;
-
-        // Устанавливаем базовый текст, который одинаковый для всех отчетов
-        sheet.Cells["A1"].Value = "Название сервиса:";
-        sheet.Cells["A2"].Value = "Название ВУЗа:";
-        
-        sheet.Cells["A3"].Value = "Ссылка страницу сервиса";
-        sheet.Cells["A3"].Hyperlink = new Uri(service.GenerateUrl());
-        sheet.Cells["A3"].Style.Font.UnderLine = true;
-        
-        sheet.Cells["A4"].Value = "Ссылка на сервис";
-        sheet.Cells["A4"].Hyperlink = new Uri(service.Url);
-        sheet.Cells["A4"].Style.Font.UnderLine = true;
-        
-        sheet.Cells["D1"].Value = "Изменения состояний";
-        // Индикаторы офлайн и онлайн, чтобы пользователю было понятно
-        sheet.Cells["F3"].Value = "Онлайн";
-        sheet.Cells["F2"].Value = "Офлайн";
-        
-        sheet.Cells["A1:A4"].Style.Fill.BackgroundColor.SetColor(1, 7, 152, 234);
-        sheet.Cells["A1:A4"].Style.Font.Color.SetColor(1, 255, 255, 255);
-        sheet.Cells["A1:A4"].Style.Font.Bold = true;
-        
-        sheet.Cells["D1"].Style.Fill.BackgroundColor.SetColor(1, 7, 152, 234);
-        sheet.Cells["D1"].Style.Font.Color.SetColor(1, 255, 255, 255);
-        sheet.Cells["D1"].Style.Font.Bold = true;
-        
-        sheet.Cells["A:A"].AutoFitColumns();
-        // Офлайн
-        SetOfflineStyle(sheet.Cells["F2"]);
-        SetOnlineStyle(sheet.Cells["F3"]);
-
-        #endregion
-
-        sheet.Cells["B1"].Value = service.Name;
-        sheet.Cells["B2"].Value = service.University.Name;
-
-        sheet.Cells["B:B"].AutoFitColumns();
-        
         var first20StateChanges = service.UniversityServiceStateChanges.Take(20)
             .OrderByDescending(x => x.ChangedAt).ToArray();
 
-        sheet.Cells[$"D2:D{first20StateChanges.Length + 1}"].Style.Fill.PatternType = ExcelFillStyle.Solid;
+        var yEnd = first20StateChanges.Length >= 3 ? first20StateChanges.Length + 3 : 6;
+        
+        // Общая заливка
+        var table = sheet.Cells[$"B2:C{yEnd}"];
+        table.Style.Fill.PatternType = ExcelFillStyle.Solid;
+        table.Style.Fill.BackgroundColor.SetColor(1, 255, 255, 255);
+        
+        // Обводка
+        sheet.Cells["B2:C2"].Style.Border.Top.Style = ExcelBorderStyle.Medium;
+        sheet.Cells[$"B2:B{yEnd}"].Style.Border.Left.Style = ExcelBorderStyle.Medium;
+        sheet.Cells[$"B{yEnd}:C{yEnd}"].Style.Border.Bottom.Style = ExcelBorderStyle.Medium;
+        sheet.Cells[$"C2:C{yEnd}"].Style.Border.Right.Style = ExcelBorderStyle.Medium;
+        sheet.Cells["B3:C3"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
+        sheet.Cells[$"B4:B{yEnd}"].Style.Border.Right.Style = ExcelBorderStyle.Thick;
+
+            sheet.Cells["B2:C2"].Merge = true;
+
+        sheet.Cells["B2:C3"].Value = $"Изменения {service.University.Name}"; // Название ВУЗа
+        sheet.Cells["B3"].Value = "Состояния"; // Заголовок для состояний
+        sheet.Cells["C3"].Value = service.Name; // Имя сервиса
+        sheet.Cells["C4"].Value = "Офлайн"; // Пример офлайна
+        sheet.Cells["C5"].Value = "Онлайн"; // Пример онлайна
+        
+        sheet.Cells["C3"].Hyperlink = new Uri(service.GenerateUrl()); // Ссылка на сервис
+        sheet.Cells["C3"].Style.Font.UnderLine = true; // Подчеркивание ссылки
+        
+        var head = sheet.Cells["B2:C3"];
+        head.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+        head.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
+        head.Style.Fill.BackgroundColor.SetColor(1, 7, 152, 234); // Цвет шапки таблицы
+        head.Style.Font.Bold = true; // Делаем жирной таблицу
+        head.Style.Font.Color.SetColor(1, 255, 255, 255);
+        
+        SetOnlineStyle(sheet.Cells["C4"]);
+        SetOfflineStyle(sheet.Cells["C5"]);
+
+        if (serviceUptime != null)
+        {
+            sheet.Cells["C6"].Value = $"Uptime: {Math.Round(serviceUptime.Value * 100, 0)}%";
+            var r = (int)Math.Round(100 + 155 * (1 - serviceUptime.Value), 0);
+            var g = (int)Math.Round(100 + 155 * serviceUptime.Value, 0);
+            
+            sheet.Cells["C6"].Style.Fill.BackgroundColor.SetColor(1, r, g, 100);
+            sheet.Cells["C6"].Style.Font.Color.SetColor(1, (int) (r * .3), (int) (g * .3), 50);
+        }
         
         for (var i = 0; i < first20StateChanges.Length; i++)
         {
-            var ctxCell = sheet.Cells[$"D{i + 2}"];
+            var ctxCell = sheet.Cells[$"B{i + 4}"];
             var ctxChange = first20StateChanges[i];
             
             ctxCell.Value = ctxChange.ChangedAt.ToString("dd.MM.yyyy hh:mm");
-            
             if (ctxChange.IsOnline) SetOnlineStyle(ctxCell);
             else SetOfflineStyle(ctxCell);
         }
         
-        sheet.Cells["D:D"].AutoFitColumns();
-
+        sheet.Cells["B:C"].AutoFitColumns();
+        sheet.Columns[3].Width = sheet.Columns[2].Width;
+        
         GC.Collect(0);
         
         return package.GetAsByteArray();

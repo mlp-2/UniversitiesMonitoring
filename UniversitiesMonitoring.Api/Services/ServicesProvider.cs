@@ -206,7 +206,7 @@ public class ServicesProvider : IServicesProvider
             throw new InvalidOperationException("Service not found");
         }
         
-        return ServiceExcelReportBuilder.BuildExcel(service);
+        return ServiceExcelReportBuilder.BuildExcel(service, GetServiceUptime(serviceId));
     }
 
     public IEnumerable<UniversityServiceReport>GetAllReports() => _dataProvider.Reports.GetlAll()

@@ -272,8 +272,8 @@ public class ServicesController : ControllerBase
     }
 
     [HttpGet("{id:long}/excel")]
-    public async Task<IActionResult> ExcelExport([FromRoute] ulong id) =>
-        File(await _servicesProvider.CreateExcelReportAsync(id), "application/vnd.ms-excel", $"{id}.xlsx");
+    public async Task<IActionResult> ExcelExport([FromRoute] ulong id, [FromQuery] int offset = 0) =>
+        File(await _servicesProvider.CreateExcelReportAsync(id, offset), "application/vnd.ms-excel", $"{id}.xlsx");
 
     private static bool CheckIfUserSubscribed(UniversityService service, ulong userId) =>
         service.UserSubscribeToServices.Any(x => x.UserId == userId);

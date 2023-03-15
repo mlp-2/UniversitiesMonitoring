@@ -274,6 +274,7 @@ const monthNames = ["янв", "фев", "мар", "апр",
 
 export function ServicePage() {
     const style = useStyles();
+    const timeOffset = -new Date().getTimezoneOffset();
     const location = useLocation();
     const [service, setService] = useState(null);
     const [smthgWentWrong, setRedirect] = useState(false);
@@ -310,7 +311,7 @@ export function ServicePage() {
 
     return <div className="h-100" style={{background: "#f5f5f5"}}>
         <div className={style.excelExport}>
-            <a download href={`/api/services/${service.serviceId}/excel`}><FontAwesomeIcon icon={faFileExcel}/></a>
+            <a download href={`/api/services/${service.serviceId}/excel?offset=${timeOffset}`}><FontAwesomeIcon icon={faFileExcel}/></a>
         </div>
         <ServiceHeader service={service} updateService={updateService}/>
         <TestResultContainer service={service}/>

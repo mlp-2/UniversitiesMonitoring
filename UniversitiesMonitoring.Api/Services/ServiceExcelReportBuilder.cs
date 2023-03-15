@@ -7,7 +7,7 @@ namespace UniversitiesMonitoring.Api.Services;
 
 public static class ServiceExcelReportBuilder
 {
-    public static byte[] BuildExcel(UniversityService service, double? serviceUptime)
+    public static byte[] BuildExcel(UniversityService service, double? serviceUptime, int offset)
     {
         using var package = new ExcelPackage();
         var sheet = package.Workbook.Worksheets.Add("Отчет");
@@ -64,8 +64,8 @@ public static class ServiceExcelReportBuilder
         {
             var ctxCell = sheet.Cells[$"B{i + 4}"];
             var ctxChange = first20StateChanges[i];
-            
-            ctxCell.Value = ctxChange.ChangedAt.ToString("dd.MM.yyyy hh:mm");
+
+            ctxCell.Value = ctxChange.ChangedAt.AddMinutes(offset).ToString("dd.MM.yyyy HH:mm");
             if (ctxChange.IsOnline) SetOnlineStyle(ctxCell);
             else SetOfflineStyle(ctxCell);
         }

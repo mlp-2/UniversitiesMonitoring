@@ -11,8 +11,8 @@ public static class ServiceExcelReportBuilder
     {
         using var package = new ExcelPackage();
         var sheet = package.Workbook.Worksheets.Add("Отчет");
-        var first20StateChanges = service.UniversityServiceStateChanges.Take(20)
-            .OrderByDescending(x => x.ChangedAt).ToArray();
+        var first20StateChanges = service.UniversityServiceStateChanges.OrderByDescending(x => x.ChangedAt)
+            .Take(20).ToArray();
 
         var yEnd = first20StateChanges.Length >= 3 ? first20StateChanges.Length + 3 : 6;
         
@@ -29,7 +29,7 @@ public static class ServiceExcelReportBuilder
         sheet.Cells["B3:C3"].Style.Border.Bottom.Style = ExcelBorderStyle.Thick;
         sheet.Cells[$"B4:B{yEnd}"].Style.Border.Right.Style = ExcelBorderStyle.Thick;
 
-            sheet.Cells["B2:C2"].Merge = true;
+        sheet.Cells["B2:C2"].Merge = true;
 
         sheet.Cells["B2:C3"].Value = $"Изменения {service.University.Name}"; // Название ВУЗа
         sheet.Cells["B3"].Value = "Состояния"; // Заголовок для состояний

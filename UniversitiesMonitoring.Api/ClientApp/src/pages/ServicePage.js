@@ -2,7 +2,7 @@ import {Navigate, useLocation} from "react-router-dom";
 import {Button} from "../components/Button";
 import {createUseStyles} from "react-jss";
 import Constants from "../Constants";
-import {faStar, faTreeCity, faFileExcel, faComment} from "@fortawesome/free-solid-svg-icons";
+import {faStar, faTreeCity, faFileExcel, faComment, faTriangleExclamation} from "@fortawesome/free-solid-svg-icons";
 import MessagePart from "../assets/images/message-part.svg";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useEffect, useRef, useState} from "react";
@@ -47,11 +47,12 @@ const useStyles = createUseStyles({
             color: "#FFF",
             fontSize: 32
         },
-        borderRadius: "50%"
+        borderRadius: "50%",
+        zIndex: 1000
     },
     testResultContainerWrapper: {
         background: "#f5f5f5",
-        padding: 30,
+        padding: 0,
         "& .test-result-container": {
             background: "#FFF",
             padding: 30,
@@ -69,6 +70,48 @@ const useStyles = createUseStyles({
             maxHeight: "30vh",
             overflowY: "auto"
         }
+    },
+    underAttackContainer: {
+        background: "#ff9365",
+        padding: 30,
+        position: "relative",
+        borderRadius: 20,
+        zIndex: 10,
+        "& *": {
+            color: "#6a1a17", 
+            fontSize: "1.25rem"
+        },
+        "&::after": {
+            position: "absolute",
+            content: '""',
+            width: "100%",
+            height: "100%",
+            borderRadius: 20,
+            background: "#ff9365",
+            left: 0,
+            top: 0,
+            zIndex: -1,
+            animation: "$under-attack-animation 2s infinite"
+        },
+        "&::before": {
+            position: "absolute",
+            content: '""',
+            width: "100%",
+            height: "100%",
+            borderRadius: 20,
+            background: "#ff9365",
+            left: 0,
+            top: 0,
+            zIndex: -1,
+            animation: "$under-attack-animation 2s infinite",
+            animationDelay: 500
+        }
+    },
+    "@keyframes under-attack-animation": {
+        "to": {
+           transform: "scaleX(1.05) scaleY(1.3)",
+           opacity: 0 
+        }  
     },
     status: {
         background: "var(--status-color)",
@@ -314,7 +357,10 @@ export function ServicePage() {
             <a download href={`/api/services/${service.serviceId}/excel?offset=${timeOffset}`}><FontAwesomeIcon icon={faFileExcel}/></a>
         </div>
         <ServiceHeader service={service} updateService={updateService}/>
-        <TestResultContainer service={service}/>
+        <Stack gap={3} className="mt-2 mb-2 p-1">
+            {service.isUnderAttack && <UnderAttackContainer/>}
+            <TestResultContainer service={service}/>    
+        </Stack>
         <ServiceBody service={service} updateService={updateService}/>
     </div>
 }
@@ -327,6 +373,14 @@ function ServiceDidntSetupped({service}) {
             Возращайтесь сюда через 15-20 минут, когда она точно будет.
         </h1>
     </FullscreenFrame>
+}
+
+function UnderAttackContainer() {
+    const style = useStyles();
+    
+    return <Container className={style.underAttackContainer}>
+        <FontAwesomeIcon icon={faTriangleExclamation}/> <span className="display-6 fw-bold"> Ресурс, возможно, находится под атакой</span>
+    </Container>
 }
 
 function ServiceHeader({service, updateService}) {

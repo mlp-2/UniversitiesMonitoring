@@ -6,6 +6,7 @@ namespace UniversityMonitoring.Data.Entities;
 public class UniversityServiceEntity
 {
     public UniversityServiceEntity(UniversityService universityServiceModel,
+        bool? isUnderAttack,
         bool loadUsers = true,
         bool loadComments = true,
         bool? isSubscribed = null)
@@ -13,7 +14,8 @@ public class UniversityServiceEntity
         ServiceId = universityServiceModel.Id;
         ServiceName = universityServiceModel.Name;
         UniversityName = universityServiceModel.University.Name;
-
+        IsUnderAttack = isUnderAttack;
+        
         var lastChange = universityServiceModel.UniversityServiceStateChanges.LastOrDefault();
 
         IsOnline = lastChange?.IsOnline ?? false;
@@ -56,6 +58,7 @@ public class UniversityServiceEntity
     public DateTime? ChangedStatusAt { get; }
     public string Url { get; }
     public bool? IsSubscribed { get; }
+    public bool? IsUnderAttack { get; }
     public IEnumerable<UserEntity> Subscribers { get; }
     public IEnumerable<CommentEntity> Comments { get; }
 }

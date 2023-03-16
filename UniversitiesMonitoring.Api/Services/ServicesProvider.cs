@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using UniversitiesMonitoring.Api.Entities;
+using UniversityMonitoring.Data.Entities;
 using UniversityMonitoring.Data.Models;
 using UniversityMonitoring.Data.Repositories;
 
@@ -16,6 +17,19 @@ public class ServicesProvider : IServicesProvider
         _dataProvider = dataProvider;
         _cache = cache;
     }
+
+    /// <inheritdoc />
+    public ResponseStatistics GetResponseStatistic(UniversityService service) => _cache.GetOrCreate(
+        GenerateCacheKeyForResponsesData(service.Id),
+        (entry) =>
+        {
+            var respData = service.ServiceResponseTimes.TakeLast(20);
+            var stats = new ResponseStatistics(respData.Select(x => x.ResponseTime));
+
+            entry.Value = stats;
+            
+            return stats;
+        });
 
     public Task<UniversityService?> GetServiceAsync(ulong serviceId) =>
         _dataProvider.UniversityServices.FindAsync(serviceId);
@@ -147,6 +161,36 @@ public class ServicesProvider : IServicesProvider
         }
     }
 
+    /// <inheritdoc />
+    public async Task AddServiceStatisticsAsync(UniversityService service,
+        ServiceStatisticsEntity serviceStats,
+        bool forceSave = false)
+    {
+        if (serviceStats.ResponseTime == null) return;
+
+        var countOfStats = service.ServiceResponseTimes.Count; 
+        
+        if (countOfStats > 19)
+        {
+            var statsAsArray = service.ServiceResponseTimes.ToArray();
+
+            for (var i = 0; i < countOfStats - 19; i++)
+            {
+                _dataProvider.ResponseTimes.Remove(statsAsArray[i]);
+            }
+
+            await SaveChangesAsync();
+        }
+        
+        await _dataProvider.ResponseTimes.AddAsync(new ServiceResponseTime()
+        {
+            ResponseTime = serviceStats.ResponseTime.Value,
+            Service = service
+        });
+
+        if (forceSave) await SaveChangesAsync();
+    }
+
     public async Task LeaveCommentAsync(UniversityService service, User author, Comment comment)
     {
         var rate = new UserRateOfService()
@@ -209,7 +253,7 @@ public class ServicesProvider : IServicesProvider
         return ServiceExcelReportBuilder.BuildExcel(service, GetServiceUptime(serviceId), offset);
     }
 
-    public IEnumerable<UniversityServiceReport>GetAllReports() => _dataProvider.Reports.GetlAll()
+    public IEnumerable<UniversityServiceReport> GetAllReports() => _dataProvider.Reports.GetlAll()
         .Include(x => x.Service)
         .Include(x => x.Issuer)
         .Where(x => !x.IsSolved).ToList();
@@ -240,7 +284,8 @@ public class ServicesProvider : IServicesProvider
         $"STR_TO_DATE('{dateTime.Year}-{dateTime.Month}-{dateTime.Day} {dateTime.Hour}:{dateTime.Minute}:{dateTime.Second}', '%Y-%m-%d %H:%i:%s')";
 
     private async Task SaveChangesAsync() => await _dataProvider.SaveChangesAsync();
-
+    
     private string GenerateCacheKeyForReports(UniversityService service) => $"REPORTS_{service.Id}";
     private string GenerateCacheKeyForUptimeData(ulong serviceId) => $"UPTIME_{serviceId}";
+    private string GenerateCacheKeyForResponsesData(ulong serviceId) => $"RESPONSES_{serviceId}";
 }

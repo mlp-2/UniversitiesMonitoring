@@ -40,13 +40,14 @@ public class ServicesController : ControllerBase
     public async Task<IActionResult> GetService([FromRoute] ulong id)
     {
         var service = await _servicesProvider.GetServiceAsync(id);
-
+        
         if (service == null)
         {
             return BadRequest("Сервис не найден");
         }
 
         var serviceEntity = new UniversityServiceEntity(service,
+            _servicesProvider.GetResponseStatistic(service).IsPotentialAttack(),
             isSubscribed: CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!)));
 
         return Ok(serviceEntity);
@@ -268,6 +269,31 @@ public class ServicesController : ControllerBase
         await _webSocketUpdateStateNotifier.NotifyAsync(servicesId);
 
         if (updateSuccess) return Ok();
+        return BadRequest("Часть сервисов не найдены");
+    }
+
+    [HttpPost("send-statistics")]
+    public async Task<IActionResult> SendStatistics([FromBody] ServiceStatisticsEntity[] stats)
+    {
+        if (!IsTrustedRequest) return Ok();
+
+        var creatingStatsSuccess = true;
+
+        for (var i = 0; i < stats.Length; i++)
+        {
+            var stat = stats[i];
+            var service = await _servicesProvider.GetServiceAsync(stat.ServiceId);
+
+            if (service == null)
+            {
+                creatingStatsSuccess = creatingStatsSuccess && false;
+                continue;
+            }
+
+            await _servicesProvider.AddServiceStatisticsAsync(service, stat, i == stats.Length - 1);
+        }
+
+        if (creatingStatsSuccess) return Ok();
         return BadRequest("Часть сервисов не найдены");
     }
 

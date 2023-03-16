@@ -7,6 +7,7 @@ namespace UniversityMonitoring.Data.Models
     {
         public UniversityService()
         {
+            ServiceResponseTimes = new HashSet<ServiceResponseTime>();
             UniversityServiceReports = new HashSet<UniversityServiceReport>();
             UniversityServiceStateChanges = new HashSet<UniversityServiceStateChange>();
             UserRateOfServices = new HashSet<UserRateOfService>();
@@ -19,6 +20,7 @@ namespace UniversityMonitoring.Data.Models
         public string Url { get; set; } = null!;
 
         public virtual University University { get; set; } = null!;
+        public virtual ICollection<ServiceResponseTime> ServiceResponseTimes { get; set; }
         public virtual ICollection<UniversityServiceReport> UniversityServiceReports { get; set; }
         public virtual ICollection<UniversityServiceStateChange> UniversityServiceStateChanges { get; set; }
         public virtual ICollection<UserRateOfService> UserRateOfServices { get; set; }

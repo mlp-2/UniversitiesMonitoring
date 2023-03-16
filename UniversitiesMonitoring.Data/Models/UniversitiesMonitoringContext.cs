@@ -18,6 +18,7 @@ namespace UniversityMonitoring.Data.Models
 
         public virtual DbSet<Moderator> Moderators { get; set; } = null!;
         public virtual DbSet<MonitoringModule> MonitoringModules { get; set; } = null!;
+        public virtual DbSet<ServiceResponseTime> ServiceResponseTimes { get; set; } = null!;
         public virtual DbSet<University> Universities { get; set; } = null!;
         public virtual DbSet<UniversityService> UniversityServices { get; set; } = null!;
         public virtual DbSet<UniversityServiceReport> UniversityServiceReports { get; set; } = null!;
@@ -49,6 +50,16 @@ namespace UniversityMonitoring.Data.Models
                     .HasMaxLength(1024)
                     .UseCollation("utf8mb3_general_ci")
                     .HasCharSet("utf8mb3");
+            });
+
+            modelBuilder.Entity<ServiceResponseTime>(entity =>
+            {
+                entity.HasIndex(e => e.ServiceId, "ServiceResponseTimes_UniversityService_Id_fk");
+
+                entity.HasOne(d => d.Service)
+                    .WithMany(p => p.ServiceResponseTimes)
+                    .HasForeignKey(d => d.ServiceId)
+                    .HasConstraintName("ServiceResponseTimes_UniversityService_Id_fk");
             });
 
             modelBuilder.Entity<University>(entity =>

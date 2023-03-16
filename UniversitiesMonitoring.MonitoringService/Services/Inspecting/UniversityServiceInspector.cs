@@ -1,4 +1,5 @@
-﻿using UniversityMonitoring.Data.Entities;
+﻿using System.Diagnostics;
+using UniversityMonitoring.Data.Entities;
 
 namespace UniversitiesMonitoring.MonitoringService.Services.Inspecting;
 
@@ -28,10 +29,16 @@ internal class UniversityServiceInspector
         _isOnline = Service.IsOnline;
     }
 
-    public async Task UpdateStateAsync(UpdateBuilder reportBuilder)
+    public async Task UpdateStateAsync(UpdateBuilder reportBuilder, StatsBuilder statsBuilder)
     {
+        var timer = new Stopwatch();
+        
+        timer.Start();
         var nowStatus = await _serviceInspector.InspectServiceAsync(new Uri(Service.Url));
+        timer.Stop();
 
+        statsBuilder.AddStats(ServiceId, timer.ElapsedMilliseconds);
+        
         if (nowStatus != _isOnline)
         {
             reportBuilder.AddChangeState(ServiceId, nowStatus);

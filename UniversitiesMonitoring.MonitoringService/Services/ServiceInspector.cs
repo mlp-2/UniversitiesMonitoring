@@ -1,5 +1,4 @@
-﻿using System.Net;
-using UniversitiesMonitoring.MonitoringService.Services.InspectingStrategies;
+﻿using UniversitiesMonitoring.MonitoringService.Services.InspectingStrategies;
 
 namespace UniversitiesMonitoring.MonitoringService.Services;
 

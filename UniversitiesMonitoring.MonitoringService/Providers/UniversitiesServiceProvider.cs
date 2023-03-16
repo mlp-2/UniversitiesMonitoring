@@ -54,6 +54,23 @@ internal class UniversitiesServiceProvider : IUniversitiesServiceProvider
         }
     }
 
+    /// <inheritdoc />
+    public async Task SendStatsAsync(ServiceStatisticsEntity[] stats, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var response = await _client.PostAsJsonAsync("/api/services/send-statistics", stats, cancellationToken);
+            response.EnsureSuccessStatusCode();
+
+            _logger.LogTrace("Stats sent. Status: {HttpStatus}", response.StatusCode);
+        }
+        catch
+        {
+            await WaitUntilApiUnavailable(cancellationToken);
+            await SendStatsAsync(stats, cancellationToken);
+        }
+    }
+
     private async Task WaitUntilApiUnavailable(CancellationToken cancellationToken)
     {
         _logger.LogWarning("API is unavailable. Waiting changing state of API");

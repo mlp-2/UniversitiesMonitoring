@@ -22,7 +22,7 @@ internal class Worker : BackgroundService
     {
         var inspectors = Array.Empty<UniversityServiceInspector>();
 
-        while (true)
+        while (!stoppingToken.IsCancellationRequested)
         {
             inspectors = await RefreshServicesInspectorsList(inspectors, stoppingToken);
 

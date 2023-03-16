@@ -5,7 +5,7 @@ namespace UniversityMonitoring.Data.Entities;
 public class ServiceStatisticsEntity
 {
    [JsonConstructor]
-   public ServiceStatisticsEntity(ulong serviceId, long responseTime)
+   public ServiceStatisticsEntity(ulong serviceId, long? responseTime)
    {
       ServiceId = serviceId;
       ResponseTime = responseTime;
@@ -13,4 +13,4 @@ public class ServiceStatisticsEntity
 
    public ulong ServiceId { get; }
    public long? ResponseTime { get; }
-}
+} 

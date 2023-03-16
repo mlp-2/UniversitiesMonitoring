@@ -279,8 +279,9 @@ public class ServicesController : ControllerBase
 
         var creatingStatsSuccess = true;
 
-        foreach (var stat in stats)
+        for (var i = 0; i < stats.Length; i++)
         {
+            var stat = stats[i];
             var service = await _servicesProvider.GetServiceAsync(stat.ServiceId);
 
             if (service == null)
@@ -289,7 +290,7 @@ public class ServicesController : ControllerBase
                 continue;
             }
 
-            await _servicesProvider.AddServiceStatisticsAsync(service, stat);
+            await _servicesProvider.AddServiceStatisticsAsync(service, stat, i == stats.Length - 1);
         }
 
         if (creatingStatsSuccess) return Ok();

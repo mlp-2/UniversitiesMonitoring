@@ -80,6 +80,31 @@ const useStyles = createUseStyles({
         "& *": {
             color: "#6a1a17", 
             fontSize: "1.25rem"
+        },
+        "&::after": {
+            position: "absolute",
+            content: '""',
+            width: "100%",
+            height: "100%",
+            borderRadius: 20,
+            background: "#ff9365",
+            left: 0,
+            top: 0,
+            zIndex: -1,
+            animation: "$under-attack-animation 2s infinite"
+        },
+        "&::before": {
+            position: "absolute",
+            content: '""',
+            width: "100%",
+            height: "100%",
+            borderRadius: 20,
+            background: "#ff9365",
+            left: 0,
+            top: 0,
+            zIndex: -1,
+            animation: "$under-attack-animation 2s infinite",
+            animationDelay: 500
         }
     },
     "@keyframes under-attack-animation": {

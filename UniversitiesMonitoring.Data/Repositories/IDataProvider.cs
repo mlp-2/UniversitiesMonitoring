@@ -13,6 +13,7 @@ public interface IDataProvider : IDisposable
     IRepository<UniversityServiceReport, ulong> Reports { get; }
     IRepository<UserRateOfService, ulong> Rates { get; }
     IRepository<MonitoringModule, ulong> MonitoringModules { get; }
+    IRepository<ServiceResponseTime, ulong> ResponseTimes { get; }
 
     /// <summary>
     /// Сохраняет все изменения

@@ -21,7 +21,7 @@ internal class ModeratorsProvider : IModeratorsProvider
             .ToList()
             .ForEach(x => x.IsSolved = true);
 
-        await _serviceProvider.UpdateServiceStateAsync(report.Service, report.IsOnline, true, report.AddedAt);
+        await _serviceProvider.UpdateServiceStateAsync(report.Service, report.IsOnline, true, null, report.AddedAt);
 
         await _dataProvider.SaveChangesAsync();
     }

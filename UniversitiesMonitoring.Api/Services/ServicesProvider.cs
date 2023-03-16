@@ -122,6 +122,7 @@ public class ServicesProvider : IServicesProvider
     public async Task UpdateServiceStateAsync(UniversityService service,
         bool isOnline,
         bool forceSafe,
+        long? responseTime,
         DateTime? updateTime = null)
     {
         var updateState = new UniversityServiceStateChange()
@@ -143,6 +144,17 @@ public class ServicesProvider : IServicesProvider
 
         await _dataProvider.UniversityServiceStateChange.AddAsync(updateState);
 
+        if (responseTime != null)
+        {
+            await _dataProvider.ResponseTimes.AddAsync(new ServiceResponseTime()
+            {
+                ResponseTime = responseTime.Value 
+            });
+
+            var stats = GetResponseStatistic(service);
+            stats.AddResponseData(responseTime.Value);
+        }
+        
         if (forceSafe) await SaveChangesAsync();
 
         _cache.Remove(GenerateCacheKeyForReports(service));
@@ -222,7 +234,7 @@ public class ServicesProvider : IServicesProvider
         return ServiceExcelReportBuilder.BuildExcel(service, GetServiceUptime(serviceId), offset);
     }
 
-    public IEnumerable<UniversityServiceReport>GetAllReports() => _dataProvider.Reports.GetlAll()
+    public IEnumerable<UniversityServiceReport> GetAllReports() => _dataProvider.Reports.GetlAll()
         .Include(x => x.Service)
         .Include(x => x.Issuer)
         .Where(x => !x.IsSolved).ToList();

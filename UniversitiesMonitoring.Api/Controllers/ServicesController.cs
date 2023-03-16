@@ -263,7 +263,7 @@ public class ServicesController : ControllerBase
                 continue;
             }
 
-            await _servicesProvider.UpdateServiceStateAsync(service, update.IsOnline, i == updates.Length - 1);
+            await _servicesProvider.UpdateServiceStateAsync(service, update.IsOnline, i == updates.Length - 1, update.ResponseTime);
         }
 
         await _webSocketUpdateStateNotifier.NotifyAsync(servicesId);

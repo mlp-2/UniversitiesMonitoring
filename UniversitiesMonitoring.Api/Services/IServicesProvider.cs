@@ -57,15 +57,20 @@ public interface IServicesProvider
     /// Получает все университеты в коллекции, позволяющей выполнять SQL запросы
     /// </summary>
     IQueryable<University> GetAllUniversities();
-    
+
     /// <summary>
     /// Обновляет состояние сервиса 
     /// </summary>
     /// <param name="service">Инстанс сервиса</param>
     /// <param name="isOnline">True, если онлайн</param>
     /// <param name="forceSafe">True, если надо сохранить изменения</param>
+    /// <param name="responseTime">Время ответа</param>
     /// <param name="updateTime">Время обноавления опционально</param>
-    Task UpdateServiceStateAsync(UniversityService service, bool isOnline, bool forceSafe, DateTime? updateTime = null);
+    Task UpdateServiceStateAsync(UniversityService service,
+        bool isOnline,
+        bool forceSafe,
+        long? responseTime,
+        DateTime? updateTime = null);
     
     /// <summary>
     /// Создает комментарий для сервиса

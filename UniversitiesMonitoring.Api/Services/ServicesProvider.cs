@@ -168,6 +168,20 @@ public class ServicesProvider : IServicesProvider
     {
         if (serviceStats.ResponseTime == null) return;
 
+        var countOfStats = service.ServiceResponseTimes.Count; 
+        
+        if (countOfStats > 19)
+        {
+            var statsAsArray = service.ServiceResponseTimes.ToArray();
+
+            for (var i = 0; i < countOfStats - 19; i++)
+            {
+                _dataProvider.ResponseTimes.Remove(statsAsArray[i]);
+            }
+
+            await SaveChangesAsync();
+        }
+        
         await _dataProvider.ResponseTimes.AddAsync(new ServiceResponseTime()
         {
             ResponseTime = serviceStats.ResponseTime.Value,
@@ -270,7 +284,7 @@ public class ServicesProvider : IServicesProvider
         $"STR_TO_DATE('{dateTime.Year}-{dateTime.Month}-{dateTime.Day} {dateTime.Hour}:{dateTime.Minute}:{dateTime.Second}', '%Y-%m-%d %H:%i:%s')";
 
     private async Task SaveChangesAsync() => await _dataProvider.SaveChangesAsync();
-
+    
     private string GenerateCacheKeyForReports(UniversityService service) => $"REPORTS_{service.Id}";
     private string GenerateCacheKeyForUptimeData(ulong serviceId) => $"UPTIME_{serviceId}";
     private string GenerateCacheKeyForResponsesData(ulong serviceId) => $"RESPONSES_{serviceId}";

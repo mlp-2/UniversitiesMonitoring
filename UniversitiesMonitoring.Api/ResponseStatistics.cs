@@ -9,6 +9,11 @@ public class ResponseStatistics
 
    private readonly List<long> _responsesTime = new(QueueCapacity);
 
+   public ResponseStatistics(IEnumerable<long> initData)
+   { 
+      _responsesTime.AddRange(initData);
+   }
+   
    public void AddResponseData(long responseTime) => _responsesTime.Add(responseTime);
 
    /// <summary>

@@ -17,6 +17,19 @@ public class ServicesProvider : IServicesProvider
         _cache = cache;
     }
 
+    /// <inheritdoc />
+    public ResponseStatistics GetResponseStatistic(UniversityService service) => _cache.GetOrCreate(
+        GenerateCacheKeyForResponsesData(service.Id),
+        (entry) =>
+        {
+            var respData = service.ServiceResponseTimes.TakeLast(20);
+            var stats = new ResponseStatistics(respData.Select(x => x.ResponseTime));
+
+            entry.Value = stats;
+            
+            return stats;
+        });
+
     public Task<UniversityService?> GetServiceAsync(ulong serviceId) =>
         _dataProvider.UniversityServices.FindAsync(serviceId);
 
@@ -243,4 +256,5 @@ public class ServicesProvider : IServicesProvider
 
     private string GenerateCacheKeyForReports(UniversityService service) => $"REPORTS_{service.Id}";
     private string GenerateCacheKeyForUptimeData(ulong serviceId) => $"UPTIME_{serviceId}";
+    private string GenerateCacheKeyForResponsesData(ulong serviceId) => $"RESPONSES_{serviceId}";
 }

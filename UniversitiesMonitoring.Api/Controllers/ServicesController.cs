@@ -46,10 +46,8 @@ public class ServicesController : ControllerBase
             return BadRequest("Сервис не найден");
         }
 
-        var responseStatistics = await _servicesProvider.GetResponseStatistic(service);
-        
         var serviceEntity = new UniversityServiceEntity(service,
-            responseStatistics.IsPotentialAttack(),
+            _servicesProvider.GetResponseStatistic(service).IsPotentialAttack(),
             isSubscribed: CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!)));
 
         return Ok(serviceEntity);

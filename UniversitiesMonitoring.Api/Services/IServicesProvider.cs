@@ -9,7 +9,7 @@ public interface IServicesProvider
     /// Получает статистику ответов
     /// </summary>
     /// <returns>Статистика ответов</returns>
-    Task<ResponseStatistics> GetResponseStatistic(UniversityService service);
+    ResponseStatistics GetResponseStatistic(UniversityService service);
     
     /// <summary>
     /// Получает сервис по ID

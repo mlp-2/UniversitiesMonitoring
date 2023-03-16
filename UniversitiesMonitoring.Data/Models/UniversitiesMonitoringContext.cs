@@ -18,6 +18,7 @@ namespace UniversityMonitoring.Data.Models
 
         public virtual DbSet<Moderator> Moderators { get; set; } = null!;
         public virtual DbSet<MonitoringModule> MonitoringModules { get; set; } = null!;
+        public virtual DbSet<ServiceResponseTime> ServiceResponseTimes { get; set; } = null!;
         public virtual DbSet<University> Universities { get; set; } = null!;
         public virtual DbSet<UniversityService> UniversityServices { get; set; } = null!;
         public virtual DbSet<UniversityServiceReport> UniversityServiceReports { get; set; } = null!;
@@ -25,6 +26,15 @@ namespace UniversityMonitoring.Data.Models
         public virtual DbSet<User> Users { get; set; } = null!;
         public virtual DbSet<UserRateOfService> UserRateOfServices { get; set; } = null!;
         public virtual DbSet<UserSubscribeToService> UserSubscribeToServices { get; set; } = null!;
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
+                optionsBuilder.UseMySql("server=localhost;user=root;password=denvot;database=universities_monitoring", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.32-mysql"));
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -49,6 +59,16 @@ namespace UniversityMonitoring.Data.Models
                     .HasMaxLength(1024)
                     .UseCollation("utf8mb3_general_ci")
                     .HasCharSet("utf8mb3");
+            });
+
+            modelBuilder.Entity<ServiceResponseTime>(entity =>
+            {
+                entity.HasIndex(e => e.ServiceId, "ServiceResponseTimes_UniversityService_Id_fk");
+
+                entity.HasOne(d => d.Service)
+                    .WithMany(p => p.ServiceResponseTimes)
+                    .HasForeignKey(d => d.ServiceId)
+                    .HasConstraintName("ServiceResponseTimes_UniversityService_Id_fk");
             });
 
             modelBuilder.Entity<University>(entity =>

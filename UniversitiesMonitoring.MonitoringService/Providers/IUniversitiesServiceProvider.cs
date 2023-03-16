@@ -14,4 +14,10 @@ internal interface IUniversitiesServiceProvider
     /// </summary>
     /// <param name="update">Сущность, описывающая изменения</param>
     Task SendUpdateAsync(ChangeStateEntity[] update, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Отправляет статистику
+    /// </summary>
+    /// <param name="stats">Статистика</param>
+    Task SendStatsAsync(ServiceStatisticsEntity[] stats, CancellationToken cancellationToken);
 }

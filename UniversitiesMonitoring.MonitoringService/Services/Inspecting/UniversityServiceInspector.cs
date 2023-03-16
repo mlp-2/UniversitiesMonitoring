@@ -6,13 +6,18 @@ namespace UniversitiesMonitoring.MonitoringService.Services.Inspecting;
 internal class UniversityServiceInspector
 {
     private readonly IServiceInspector _serviceInspector;
+    private bool _isOnline;
 
     public ulong ServiceId => Service.ServiceId;
 
     public UniversityServiceEntity Service
     {
         get => _service;
-        set => _service = value;
+        set
+        {
+            _isOnline = value.IsOnline;
+            _service = value;
+        }
     }
 
     private UniversityServiceEntity _service;
@@ -21,15 +26,23 @@ internal class UniversityServiceInspector
     {
         _serviceInspector = inspector;
         _service = serviceEntity;
+        _isOnline = Service.IsOnline;
     }
 
-    public async Task UpdateStateAsync(UpdateBuilder reportBuilder)
+    public async Task UpdateStateAsync(UpdateBuilder reportBuilder, StatsBuilder statsBuilder)
     {
         var timer = new Stopwatch();
         
         timer.Start();
         var nowStatus = await _serviceInspector.InspectServiceAsync(new Uri(Service.Url));
         timer.Stop();
-        reportBuilder.AddChangeState(ServiceId, nowStatus, nowStatus ? timer.ElapsedMilliseconds : null);
+
+        statsBuilder.AddStats(ServiceId, timer.ElapsedMilliseconds);
+        
+        if (nowStatus != _isOnline)
+        {
+            reportBuilder.AddChangeState(ServiceId, nowStatus);
+            _isOnline = nowStatus;
+        }
     }
 }

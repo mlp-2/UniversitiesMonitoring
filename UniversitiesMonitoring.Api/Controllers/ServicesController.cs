@@ -272,6 +272,30 @@ public class ServicesController : ControllerBase
         return BadRequest("Часть сервисов не найдены");
     }
 
+    [HttpPost("send-statistics")]
+    public async Task<IActionResult> SendStatistics([FromBody] ServiceStatisticsEntity[] stats)
+    {
+        if (!IsTrustedRequest) return Ok();
+
+        var creatingStatsSuccess = true;
+
+        foreach (var stat in stats)
+        {
+            var service = await _servicesProvider.GetServiceAsync(stat.ServiceId);
+
+            if (service == null)
+            {
+                creatingStatsSuccess = creatingStatsSuccess && false;
+                continue;
+            }
+
+            await _servicesProvider.AddServiceStatisticsAsync(service, stat);
+        }
+
+        if (creatingStatsSuccess) return Ok();
+        return BadRequest("Часть сервисов не найдены");
+    }
+
     [HttpGet("{id:long}/excel")]
     public async Task<IActionResult> ExcelExport([FromRoute] ulong id, [FromQuery] int offset = 0) =>
         File(await _servicesProvider.CreateExcelReportAsync(id, offset), "application/vnd.ms-excel", $"{id}.xlsx");

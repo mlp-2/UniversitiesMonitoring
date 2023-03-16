@@ -12,5 +12,5 @@ public class ServiceStatisticsEntity
    }
 
    public ulong ServiceId { get; }
-   public long ResponseTime { get; }
+   public long? ResponseTime { get; }
 }

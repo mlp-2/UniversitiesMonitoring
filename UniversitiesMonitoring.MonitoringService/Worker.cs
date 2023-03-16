@@ -34,9 +34,12 @@ internal class Worker : BackgroundService
             }
 
             var updateBuilder = new UpdateBuilder();
-            await Task.WhenAll(inspectors.Select(inspector => inspector.UpdateStateAsync(updateBuilder)));
+            var statsBuilder = new StatsBuilder();
+            await Task.WhenAll(inspectors.Select(inspector => inspector.UpdateStateAsync(updateBuilder, statsBuilder)));
 
             var update = updateBuilder.BuildUpdate();
+            var stats = statsBuilder.BuildStats();
+            _logger.LogTrace("{ServiceCount} changed state", update.Changes.Length);
 
             if (update.Changes.Length == 0)
             {
@@ -46,8 +49,10 @@ internal class Worker : BackgroundService
             }
 
             await _universitiesServiceProvider.SendUpdateAsync(update.Changes, stoppingToken);
-
             _logger.LogTrace("Update sent");
+
+            await _universitiesServiceProvider.SendStatsAsync(stats, stoppingToken);
+            _logger.LogTrace("Stats sent");
 
             await Wait5Minutes(stoppingToken);
         }

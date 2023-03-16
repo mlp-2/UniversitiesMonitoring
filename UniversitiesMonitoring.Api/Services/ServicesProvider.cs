@@ -166,9 +166,11 @@ public class ServicesProvider : IServicesProvider
         ServiceStatisticsEntity serviceStats,
         bool forceSave = false)
     {
+        if (serviceStats.ResponseTime == null) return;
+
         await _dataProvider.ResponseTimes.AddAsync(new ServiceResponseTime()
         {
-            ResponseTime = serviceStats.ResponseTime,
+            ResponseTime = serviceStats.ResponseTime.Value,
             Service = service
         });
 

@@ -37,7 +37,6 @@ internal class Worker : BackgroundService
             await Task.WhenAll(inspectors.Select(inspector => inspector.UpdateStateAsync(updateBuilder)));
 
             var update = updateBuilder.BuildUpdate();
-            _logger.LogTrace("{ServiceCount} changed state", update.Changes.Length);
 
             if (update.Changes.Length == 0)
             {

@@ -249,12 +249,11 @@ public class ServicesController : ControllerBase
 
         var updateSuccess = true;
 
-        var servicesId = new ulong[updates.Length];
+        var servicesId = new List<ulong>();
 
         for (var i = 0; i < updates.Length; i++)
         {
             var update = updates[i];
-            servicesId[i] = updates[i].ServiceId;
             var service = await _servicesProvider.GetServiceAsync(update.ServiceId);
 
             if (service == null)
@@ -263,10 +262,12 @@ public class ServicesController : ControllerBase
                 continue;
             }
 
-            await _servicesProvider.UpdateServiceStateAsync(service, update.IsOnline, i == updates.Length - 1, update.ResponseTime);
+            var serviceChanged = await _servicesProvider.UpdateServiceStateAsync(service, update.IsOnline, i == updates.Length - 1, update.ResponseTime);
+            
+            if (serviceChanged) servicesId.Add(updates[i].ServiceId);
         }
 
-        await _webSocketUpdateStateNotifier.NotifyAsync(servicesId);
+        await _webSocketUpdateStateNotifier.NotifyAsync(servicesId.ToArray());
 
         if (updateSuccess) return Ok();
         return BadRequest("Часть сервисов не найдены");

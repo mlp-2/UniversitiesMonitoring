@@ -13,8 +13,6 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
     private readonly ILogger<WebSocketUpdateStateNotifier> _logger;
     private readonly List<Tuple<WS, TaskCompletionSource<object>>> _webSockets = new();
 
-    private static readonly object CloseObject = new();
-
     public WebSocketUpdateStateNotifier(IServiceProvider serviceProvider,
         ILogger<WebSocketUpdateStateNotifier> logger)
     {
@@ -30,6 +28,8 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
 
     public async Task NotifyAsync(ulong[] servicesIds)
     {
+        if (_webSockets.Count == 0 || servicesIds.Length == 0) return;
+        
         await using var changesDataStream = new MemoryStream();
         var badSockets = new List<Tuple<WS, TaskCompletionSource<object>>>();
 
@@ -73,6 +73,7 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
         for (var serviceIndex = 0; serviceIndex < servicesIds.Length; serviceIndex++)
         {
             var serviceId = servicesIds[serviceIndex];
+
             var service = await universitiesServices.FindAsync(serviceId);
 
             if (service == null)
@@ -80,8 +81,7 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
                 throw new InvalidOperationException($"Service with {service} hasn't found");
             }
 
-            var serviceStatus = service.UniversityServiceStateChanges.OrderByDescending(x => x.ChangedAt)
-                .FirstOrDefault()?.IsOnline ?? false;
+            var serviceStatus = service.UniversityServiceStateChanges.MaxBy(x => x.ChangedAt)?.IsOnline ?? false;
             changes[serviceIndex] = new UniversityServiceChangeStateEntity(serviceId, service.UniversityId,
                 service.Name, service.University.Name, serviceStatus);
         }

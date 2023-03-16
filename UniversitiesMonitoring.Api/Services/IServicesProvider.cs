@@ -66,7 +66,8 @@ public interface IServicesProvider
     /// <param name="forceSafe">True, если надо сохранить изменения</param>
     /// <param name="responseTime">Время ответа</param>
     /// <param name="updateTime">Время обноавления опционально</param>
-    Task UpdateServiceStateAsync(UniversityService service,
+    /// <returns>true, если сервис изменил свое состояние</returns>
+    Task<bool> UpdateServiceStateAsync(UniversityService service,
         bool isOnline,
         bool forceSafe,
         long? responseTime,

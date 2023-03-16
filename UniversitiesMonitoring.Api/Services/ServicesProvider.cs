@@ -119,12 +119,13 @@ public class ServicesProvider : IServicesProvider
         await SaveChangesAsync();
     }
 
-    public async Task UpdateServiceStateAsync(UniversityService service,
+    public async Task<bool> UpdateServiceStateAsync(UniversityService service,
         bool isOnline,
         bool forceSafe,
         long? responseTime,
         DateTime? updateTime = null)
     {
+        
         var updateState = new UniversityServiceStateChange()
         {
             Service = service,
@@ -136,19 +137,20 @@ public class ServicesProvider : IServicesProvider
             .Where(x => x.ServiceId == service.Id)
             .OrderByDescending(x => x.ChangedAt)
             .FirstOrDefaultAsync();
+        var isResponseTimeOperation = lastUpdate != null && lastUpdate.IsOnline == isOnline;
 
-        if (lastUpdate != null && lastUpdate.IsOnline == isOnline)
+        if (!isResponseTimeOperation)
         {
-            throw new InvalidOperationException("New state mustn't has same value as previous state");
+            await _dataProvider.UniversityServiceStateChange.AddAsync(updateState);
+            _cache.Remove(GenerateCacheKeyForReports(service));
         }
-
-        await _dataProvider.UniversityServiceStateChange.AddAsync(updateState);
-
+        
         if (responseTime != null)
         {
             await _dataProvider.ResponseTimes.AddAsync(new ServiceResponseTime()
             {
-                ResponseTime = responseTime.Value 
+                ResponseTime = responseTime.Value,
+                Service = service
             });
 
             var stats = GetResponseStatistic(service);
@@ -157,9 +159,7 @@ public class ServicesProvider : IServicesProvider
         
         if (forceSafe) await SaveChangesAsync();
 
-        _cache.Remove(GenerateCacheKeyForReports(service));
-
-        if (_cache.TryGetValue<UptimeData>(GenerateCacheKeyForUptimeData(service.Id), out var uptimeData))
+        if (!isResponseTimeOperation && _cache.TryGetValue<UptimeData>(GenerateCacheKeyForUptimeData(service.Id), out var uptimeData))
         {
             var delta = (updateState.ChangedAt - lastUpdate!.ChangedAt).TotalSeconds;
 
@@ -170,6 +170,8 @@ public class ServicesProvider : IServicesProvider
                 uptimeData.OnlineTime += delta;
             }
         }
+
+        return !isResponseTimeOperation;
     }
 
     public async Task LeaveCommentAsync(UniversityService service, User author, Comment comment)

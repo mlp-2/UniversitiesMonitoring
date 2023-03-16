@@ -39,7 +39,7 @@ internal class UniversityServiceInspector
 
         if (nowStatus != _isOnline)
         {
-            reportBuilder.AddChangeState(ServiceId, nowStatus, timer.ElapsedMilliseconds);
+            reportBuilder.AddChangeState(ServiceId, nowStatus, nowStatus ? timer.ElapsedMilliseconds : null);
             _isOnline = nowStatus;
         }
     }

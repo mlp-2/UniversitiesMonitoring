@@ -19,16 +19,19 @@ public class ResponseStatistics
    /// <summary>
    /// Проверяет по времени ответа потенциальную атаку
    /// </summary>
-   /// <param name="responseTime">Время ответа</param>
    /// <returns>true, если сервис атакован</returns>
    public bool? IsPotentialAttack()
    {
       if (_responsesTime.Count < 6) return null;
 
-      var doubleAvg = _responsesTime.ToArray()[2..].Average() * 2;
+      var responseTimesForAvg = _responsesTime.ToArray()[..^3];
+      var doubleAvg = responseTimesForAvg.Average() * 2;
       var isUnderAttack = true;
 
-      for (var i = 0; i < 3; i++) isUnderAttack &= _responsesTime[i] > doubleAvg;
+      for (var i = _responsesTime.Count - 1; i > _responsesTime.Count - 4; i--)
+      {
+         isUnderAttack &= _responsesTime[i] > doubleAvg;
+      }
 
       return isUnderAttack;
    }

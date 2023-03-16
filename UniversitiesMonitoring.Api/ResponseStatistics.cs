@@ -16,5 +16,6 @@ public class ResponseStatistics
    /// </summary>
    /// <param name="responseTime">Время ответа</param>
    /// <returns>true, если сервис атакован</returns>
-   public bool IsPotentialAttack(long responseTime) => responseTime >= _responsesTime.Average() * 2;
+   public bool? IsPotentialAttack(long responseTime) =>
+      _responsesTime.Count > 4 ? responseTime >= _responsesTime.Average() * 2 : null;
 }

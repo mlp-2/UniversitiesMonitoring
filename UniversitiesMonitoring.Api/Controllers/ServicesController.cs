@@ -40,13 +40,16 @@ public class ServicesController : ControllerBase
     public async Task<IActionResult> GetService([FromRoute] ulong id)
     {
         var service = await _servicesProvider.GetServiceAsync(id);
-
+        
         if (service == null)
         {
             return BadRequest("Сервис не найден");
         }
 
+        var responseStatistics = await _servicesProvider.GetResponseStatistic(service);
+        
         var serviceEntity = new UniversityServiceEntity(service,
+            responseStatistics.IsPotentialAttack(),
             isSubscribed: CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!)));
 
         return Ok(serviceEntity);

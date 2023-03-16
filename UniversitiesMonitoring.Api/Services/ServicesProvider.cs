@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using UniversitiesMonitoring.Api.Entities;
+using UniversityMonitoring.Data.Entities;
 using UniversityMonitoring.Data.Models;
 using UniversityMonitoring.Data.Repositories;
 
@@ -122,7 +123,6 @@ public class ServicesProvider : IServicesProvider
     public async Task UpdateServiceStateAsync(UniversityService service,
         bool isOnline,
         bool forceSafe,
-        long? responseTime,
         DateTime? updateTime = null)
     {
         var updateState = new UniversityServiceStateChange()
@@ -144,17 +144,6 @@ public class ServicesProvider : IServicesProvider
 
         await _dataProvider.UniversityServiceStateChange.AddAsync(updateState);
 
-        if (responseTime != null)
-        {
-            await _dataProvider.ResponseTimes.AddAsync(new ServiceResponseTime()
-            {
-                ResponseTime = responseTime.Value 
-            });
-
-            var stats = GetResponseStatistic(service);
-            stats.AddResponseData(responseTime.Value);
-        }
-        
         if (forceSafe) await SaveChangesAsync();
 
         _cache.Remove(GenerateCacheKeyForReports(service));
@@ -170,6 +159,20 @@ public class ServicesProvider : IServicesProvider
                 uptimeData.OnlineTime += delta;
             }
         }
+    }
+
+    /// <inheritdoc />
+    public async Task AddServiceStatisticsAsync(UniversityService service,
+        ServiceStatisticsEntity serviceStats,
+        bool forceSave = false)
+    {
+        await _dataProvider.ResponseTimes.AddAsync(new ServiceResponseTime()
+        {
+            ResponseTime = serviceStats.ResponseTime,
+            Service = service
+        });
+
+        if (forceSave) await SaveChangesAsync();
     }
 
     public async Task LeaveCommentAsync(UniversityService service, User author, Comment comment)

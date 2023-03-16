@@ -1,4 +1,5 @@
 using UniversitiesMonitoring.Api.Entities;
+using UniversityMonitoring.Data.Entities;
 using UniversityMonitoring.Data.Models;
 
 namespace UniversitiesMonitoring.Api.Services;
@@ -64,14 +65,21 @@ public interface IServicesProvider
     /// <param name="service">Инстанс сервиса</param>
     /// <param name="isOnline">True, если онлайн</param>
     /// <param name="forceSafe">True, если надо сохранить изменения</param>
-    /// <param name="responseTime">Время ответа</param>
     /// <param name="updateTime">Время обноавления опционально</param>
     Task UpdateServiceStateAsync(UniversityService service,
         bool isOnline,
         bool forceSafe,
-        long? responseTime,
         DateTime? updateTime = null);
-    
+
+    /// <summary>
+    /// Добавляет статистику сервиса 
+    /// </summary>
+    /// <param name="service">Инстанс сервиса</param>
+    /// <param name="serviceStats">Его статистика</param>
+    Task AddServiceStatisticsAsync(UniversityService service,
+        ServiceStatisticsEntity serviceStats,
+        bool forceSave = false);
+
     /// <summary>
     /// Создает комментарий для сервиса
     /// </summary>

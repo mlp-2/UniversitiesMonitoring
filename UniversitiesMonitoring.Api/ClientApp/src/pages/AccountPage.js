@@ -8,7 +8,6 @@ import axios from "axios";
 import {Button, Form} from "react-bootstrap";
 import {GetUser} from "../ApiMethods";
 
-const emailRegex = /[\w\d.]+@[a-z]+\.[a-z]{2,3}/
 const useStyles = createUseStyles({
     editEmailForm: {
         display: "flex",
@@ -76,14 +75,7 @@ export function AccountPage() {
     const style = useStyles();
 
     async function updateEmailSettings(data) {
-        if (data.email !== null && emailRegex.exec(data.email)[0] !== data.email) {
-            await Swal.fire({
-                title: "Email должен соответствовать формату name@domain.ru",
-                icon: "error",
-                showConfirmButton: false,
-                timer: 2000
-            });
-
+        if (data.email === null || data.email === "") {
             return;
         }
 
@@ -121,8 +113,6 @@ export function AccountPage() {
 
         data.canSend = checkboxRef.current.checked;
 
-        console.log(data);
-
         if (data.email === "") {
             await updateEmailSettings({
                 email: null,
@@ -152,7 +142,7 @@ export function AccountPage() {
                 <Form method="put" className={style.editEmailForm} onSubmit={handleEditEmailSettingsFormSubmit}>
                     <div>
                         <label htmlFor="email">Email для рассылки:</label>
-                        <Form.Control defaultValue={user.email} type="text" ref={emailRef} placeholder="name@domain.ru"
+                        <Form.Control defaultValue={user.email} type="email" ref={emailRef} placeholder="name@domain.ru"
                                       name="email" id="email"/>
                     </div>
                     <div className="checkbox-combo">

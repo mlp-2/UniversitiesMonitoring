@@ -2,7 +2,7 @@ import {Navigate, useLocation} from "react-router-dom";
 import {Button} from "../components/Button";
 import {createUseStyles} from "react-jss";
 import Constants from "../Constants";
-import {faStar, faTreeCity, faFileExcel, faComment, faTriangleExclamation} from "@fortawesome/free-solid-svg-icons";
+import {faComment, faFileExcel, faStar, faTreeCity, faTriangleExclamation} from "@fortawesome/free-solid-svg-icons";
 import MessagePart from "../assets/images/message-part.svg";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useEffect, useRef, useState} from "react";
@@ -78,7 +78,7 @@ const useStyles = createUseStyles({
         borderRadius: 20,
         zIndex: 10,
         "& *": {
-            color: "#6a1a17", 
+            color: "#6a1a17",
             fontSize: "1.25rem"
         },
         "&::after": {
@@ -109,9 +109,9 @@ const useStyles = createUseStyles({
     },
     "@keyframes under-attack-animation": {
         "to": {
-           transform: "scaleX(1.05) scaleY(1.3)",
-           opacity: 0 
-        }  
+            transform: "scaleX(1.05) scaleY(1.3)",
+            opacity: 0
+        }
     },
     status: {
         background: "var(--status-color)",
@@ -354,12 +354,13 @@ export function ServicePage() {
 
     return <div className="h-100" style={{background: "#f5f5f5"}}>
         <div className={style.excelExport}>
-            <a download href={`/api/services/${service.serviceId}/excel?offset=${timeOffset}`}><FontAwesomeIcon icon={faFileExcel}/></a>
+            <a download href={`/api/services/${service.serviceId}/excel?offset=${timeOffset}`}><FontAwesomeIcon
+                icon={faFileExcel}/></a>
         </div>
         <ServiceHeader service={service} updateService={updateService}/>
         <Stack gap={3} className="mt-2 mb-2 p-1">
             {service.isUnderAttack && <UnderAttackContainer/>}
-            <TestResultContainer service={service}/>    
+            <TestResultContainer service={service}/>
         </Stack>
         <ServiceBody service={service} updateService={updateService}/>
     </div>
@@ -377,7 +378,7 @@ function ServiceDidntSetupped({service}) {
 
 function UnderAttackContainer() {
     const style = useStyles();
-    
+
     return <Container className={style.underAttackContainer}>
         <FontAwesomeIcon icon={faTriangleExclamation}/> <span className="display-6 fw-bold"> Ресурс, возможно, находится под атакой</span>
     </Container>

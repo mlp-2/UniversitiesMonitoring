@@ -40,7 +40,7 @@ public class ServicesController : ControllerBase
     public async Task<IActionResult> GetService([FromRoute] ulong id)
     {
         var service = await _servicesProvider.GetServiceAsync(id);
-        
+
         if (service == null)
         {
             return BadRequest("Сервис не найден");
@@ -247,7 +247,7 @@ public class ServicesController : ControllerBase
     public async Task<IActionResult> UpdateService([FromBody] ChangeStateEntity[] updates)
     {
         if (!IsTrustedRequest) return Ok();
-        
+
 
         var servicesId = new ulong[updates.Length];
 
@@ -258,7 +258,7 @@ public class ServicesController : ControllerBase
             var service = await _servicesProvider.GetServiceAsync(update.ServiceId);
 
             if (service == null) continue;
-            
+
             await _servicesProvider.UpdateServiceStateAsync(service, update.IsOnline, i == updates.Length - 1);
         }
 

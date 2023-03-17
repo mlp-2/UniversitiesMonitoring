@@ -29,7 +29,7 @@ public class WebSocketUpdateStateNotifier : IWebSocketUpdateStateNotifier
     public async Task NotifyAsync(ulong[] servicesIds)
     {
         if (_webSockets.Count == 0 || servicesIds.Length == 0) return;
-        
+
         await using var changesDataStream = new MemoryStream();
         var badSockets = new List<Tuple<WS, TaskCompletionSource<object>>>();
 

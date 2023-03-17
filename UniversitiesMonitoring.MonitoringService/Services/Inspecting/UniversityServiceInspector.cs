@@ -32,13 +32,13 @@ internal class UniversityServiceInspector
     public async Task UpdateStateAsync(UpdateBuilder reportBuilder, StatsBuilder statsBuilder)
     {
         var timer = new Stopwatch();
-        
+
         timer.Start();
         var nowStatus = await _serviceInspector.InspectServiceAsync(new Uri(Service.Url));
         timer.Stop();
 
         statsBuilder.AddStats(ServiceId, timer.ElapsedMilliseconds);
-        
+
         if (nowStatus != _isOnline)
         {
             reportBuilder.AddChangeState(ServiceId, nowStatus);

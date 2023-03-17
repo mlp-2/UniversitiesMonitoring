@@ -58,6 +58,12 @@ export function Login() {
     const style = useStyles();
     const [user, setUser] = useState(null);
 
+    function throwNotThisUser() {
+        setUser(null);
+        sessionStorage.removeItem("user");
+        localStorage.removeItem("user");
+    }
+
     useEffect(() => {
         async function getLogin() {
             try {
@@ -80,7 +86,7 @@ export function Login() {
         <div className={style.frameStyle}>
             {
                 user !== null ? <DefaultAuth user={user}
-                                             throwNotThisUser={() => setUser(null)}/> :
+                                             throwNotThisUser={throwNotThisUser}/> :
                     <FormAuth/>
             }
             <div>

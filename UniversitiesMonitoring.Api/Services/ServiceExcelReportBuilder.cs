@@ -15,12 +15,12 @@ public static class ServiceExcelReportBuilder
             .Take(20).ToArray();
 
         var yEnd = first20StateChanges.Length >= 3 ? first20StateChanges.Length + 3 : 6;
-        
+
         // Общая заливка
         var table = sheet.Cells[$"B2:C{yEnd}"];
         table.Style.Fill.PatternType = ExcelFillStyle.Solid;
         table.Style.Fill.BackgroundColor.SetColor(1, 255, 255, 255);
-        
+
         // Обводка
         sheet.Cells["B2:C2"].Style.Border.Top.Style = ExcelBorderStyle.Medium;
         sheet.Cells[$"B2:B{yEnd}"].Style.Border.Left.Style = ExcelBorderStyle.Medium;
@@ -36,30 +36,30 @@ public static class ServiceExcelReportBuilder
         sheet.Cells["C3"].Value = service.Name; // Имя сервиса
         sheet.Cells["C4"].Value = "Офлайн"; // Пример офлайна
         sheet.Cells["C5"].Value = "Онлайн"; // Пример онлайна
-        
+
         sheet.Cells["C3"].Hyperlink = new Uri(service.GenerateUrl()); // Ссылка на сервис
         sheet.Cells["C3"].Style.Font.UnderLine = true; // Подчеркивание ссылки
-        
+
         var head = sheet.Cells["B2:C3"];
         head.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
         head.Style.VerticalAlignment = ExcelVerticalAlignment.Center;
         head.Style.Fill.BackgroundColor.SetColor(1, 7, 152, 234); // Цвет шапки таблицы
         head.Style.Font.Bold = true; // Делаем жирной таблицу
         head.Style.Font.Color.SetColor(1, 255, 255, 255);
-        
+
         SetOnlineStyle(sheet.Cells["C4"]);
         SetOfflineStyle(sheet.Cells["C5"]);
 
         if (serviceUptime != null)
         {
             sheet.Cells["C6"].Value = $"Uptime: {Math.Round(serviceUptime.Value * 100, 0)}%";
-            var r = (int)Math.Round(100 + 155 * (1 - serviceUptime.Value), 0);
-            var g = (int)Math.Round(100 + 155 * serviceUptime.Value, 0);
-            
+            var r = (int) Math.Round(100 + 155 * (1 - serviceUptime.Value), 0);
+            var g = (int) Math.Round(100 + 155 * serviceUptime.Value, 0);
+
             sheet.Cells["C6"].Style.Fill.BackgroundColor.SetColor(1, r, g, 100);
             sheet.Cells["C6"].Style.Font.Color.SetColor(1, (int) (r * .3), (int) (g * .3), 50);
         }
-        
+
         for (var i = 0; i < first20StateChanges.Length; i++)
         {
             var ctxCell = sheet.Cells[$"B{i + 4}"];
@@ -69,15 +69,15 @@ public static class ServiceExcelReportBuilder
             if (ctxChange.IsOnline) SetOnlineStyle(ctxCell);
             else SetOfflineStyle(ctxCell);
         }
-        
+
         sheet.Cells["B:C"].AutoFitColumns();
         sheet.Columns[3].Width = sheet.Columns[2].Width;
-        
+
         GC.Collect(0);
-        
+
         return package.GetAsByteArray();
     }
-    
+
     private static void SetOfflineStyle(ExcelRange range)
     {
         range.Style.Font.Color.SetColor(1, 153, 0, 0);

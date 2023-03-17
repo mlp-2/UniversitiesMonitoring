@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace UniversitiesMonitoring.MonitoringService.Services;
+﻿namespace UniversitiesMonitoring.MonitoringService.Services;
 
 internal interface IServiceInspector
 {

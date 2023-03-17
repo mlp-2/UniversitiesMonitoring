@@ -14,6 +14,4 @@ public class ChangeStateEntity
     [JsonPropertyName("serviceId")] public ulong ServiceId { get; }
 
     [JsonPropertyName("isOnline")] public bool IsOnline { get; }
-    
-   
 }

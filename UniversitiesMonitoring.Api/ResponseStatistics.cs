@@ -5,34 +5,34 @@ namespace UniversitiesMonitoring.Api;
 /// </summary>
 public class ResponseStatistics
 {
-   private const int QueueCapacity = 20;
+    private const int QueueCapacity = 20;
 
-   private readonly List<long> _responsesTime = new(QueueCapacity);
+    private readonly List<long> _responsesTime = new(QueueCapacity);
 
-   public ResponseStatistics(IEnumerable<long> initData)
-   { 
-      _responsesTime.AddRange(initData);
-   }
-   
-   public void AddResponseData(long responseTime) => _responsesTime.Add(responseTime);
+    public ResponseStatistics(IEnumerable<long> initData)
+    {
+        _responsesTime.AddRange(initData);
+    }
 
-   /// <summary>
-   /// Проверяет по времени ответа потенциальную атаку
-   /// </summary>
-   /// <returns>true, если сервис атакован</returns>
-   public bool? IsPotentialAttack()
-   {
-      if (_responsesTime.Count < 6) return null;
+    public void AddResponseData(long responseTime) => _responsesTime.Add(responseTime);
 
-      var responseTimesForAvg = _responsesTime.ToArray()[..^3];
-      var doubleAvg = responseTimesForAvg.Average() * 2;
-      var isUnderAttack = true;
+    /// <summary>
+    /// Проверяет по времени ответа потенциальную атаку
+    /// </summary>
+    /// <returns>true, если сервис атакован</returns>
+    public bool? IsPotentialAttack()
+    {
+        if (_responsesTime.Count < 6) return null;
 
-      for (var i = _responsesTime.Count - 1; i > _responsesTime.Count - 4; i--)
-      {
-         isUnderAttack &= _responsesTime[i] > doubleAvg;
-      }
+        var responseTimesForAvg = _responsesTime.ToArray()[..^3];
+        var doubleAvg = responseTimesForAvg.Average() * 2;
+        var isUnderAttack = true;
 
-      return isUnderAttack;
-   }
+        for (var i = _responsesTime.Count - 1; i > _responsesTime.Count - 4; i--)
+        {
+            isUnderAttack &= _responsesTime[i] > doubleAvg;
+        }
+
+        return isUnderAttack;
+    }
 }

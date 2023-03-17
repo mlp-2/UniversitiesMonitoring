@@ -217,7 +217,7 @@ function ServiceContainer({service, updateServices}) {
 }
 
 async function getUniversityServices(universityId) {
-    const requestResult = await axios.get(`/api/services?loadComments=true&universityId=${universityId}`);
+    const requestResult = await axios.get(`/api/services?loadComments=true&universityId=${universityId}&loadUsers=false`);
 
     return requestResult.data;
 }

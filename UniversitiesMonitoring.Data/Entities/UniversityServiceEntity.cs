@@ -21,6 +21,9 @@ public class UniversityServiceEntity
         IsOnline = lastChange?.IsOnline ?? false;
         ChangedStatusAt = lastChange?.ChangedAt;
 
+        SubscribersCount = universityServiceModel.UserSubscribeToServices.Count;
+        CommentsCount = universityServiceModel.UserRateOfServices.Count;
+        
         Subscribers = loadUsers
             ? universityServiceModel.UserSubscribeToServices.Select(x => new UserEntity(x.User))
             : Array.Empty<UserEntity>();
@@ -59,6 +62,8 @@ public class UniversityServiceEntity
     public string Url { get; }
     public bool? IsSubscribed { get; }
     public bool? IsUnderAttack { get; }
+    public int SubscribersCount { get; }
+    public int CommentsCount { get; }
     public IEnumerable<UserEntity> Subscribers { get; }
     public IEnumerable<CommentEntity> Comments { get; }
 }

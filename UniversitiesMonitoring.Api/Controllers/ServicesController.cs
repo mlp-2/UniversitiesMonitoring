@@ -193,9 +193,10 @@ public class ServicesController : ControllerBase
             ? from service in services
             select new UniversityServiceEntity(
                 service,
-                loadUsers,
-                loadComments,
-                CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!)))
+                null,
+                loadUsers: loadUsers,
+                loadComments: loadComments,
+                isSubscribed: CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!)))
             : from service in services
             select new UniversityServiceEntity(service, loadUsers, loadComments);
 

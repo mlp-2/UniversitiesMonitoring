@@ -95,9 +95,10 @@ export function AccountPage() {
 
                 sessionStorage.setItem("user", JSON.stringify(user));
             }
-        } catch {
+        } catch (e) {
+            console.log(e)
             await Swal.fire({
-                title: "Что-то пошло не так",
+                title: e.response.status === 400 ? "Такой email уже занят" : "Что-то пошло не так",
                 icon: "error",
                 showConfirmButton: false,
                 timer: 2000

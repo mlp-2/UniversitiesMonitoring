@@ -247,8 +247,7 @@ public class ServicesController : ControllerBase
     public async Task<IActionResult> UpdateService([FromBody] ChangeStateEntity[] updates)
     {
         if (!IsTrustedRequest) return Ok();
-
-        var updateSuccess = true;
+        
 
         var servicesId = new ulong[updates.Length];
 
@@ -258,19 +257,14 @@ public class ServicesController : ControllerBase
             servicesId[i] = updates[i].ServiceId;
             var service = await _servicesProvider.GetServiceAsync(update.ServiceId);
 
-            if (service == null)
-            {
-                updateSuccess = updateSuccess && false;
-                continue;
-            }
-
+            if (service == null) continue;
+            
             await _servicesProvider.UpdateServiceStateAsync(service, update.IsOnline, i == updates.Length - 1);
         }
 
         await _webSocketUpdateStateNotifier.NotifyAsync(servicesId);
 
-        if (updateSuccess) return Ok();
-        return BadRequest("Часть сервисов не найдены");
+        return Ok();
     }
 
     [HttpPost("send-statistics")]
@@ -278,24 +272,17 @@ public class ServicesController : ControllerBase
     {
         if (!IsTrustedRequest) return Ok();
 
-        var creatingStatsSuccess = true;
-
         for (var i = 0; i < stats.Length; i++)
         {
             var stat = stats[i];
             var service = await _servicesProvider.GetServiceAsync(stat.ServiceId);
 
-            if (service == null)
-            {
-                creatingStatsSuccess = creatingStatsSuccess && false;
-                continue;
-            }
+            if (service == null) continue;
 
             await _servicesProvider.AddServiceStatisticsAsync(service, stat, i == stats.Length - 1);
         }
 
-        if (creatingStatsSuccess) return Ok();
-        return BadRequest("Часть сервисов не найдены");
+        return Ok();
     }
 
     [HttpGet("{id:long}/excel")]

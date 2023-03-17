@@ -47,7 +47,19 @@ export function Registration() {
         const form = e.target;
         const formData = new FormData(form);
         const apiEntity = Object.fromEntries(formData.entries());
-
+        
+        function throwError(text) {
+            Swal.fire({
+                title: text,
+                icon: "error",
+                position: "top-end",
+                showConfirmButton: false,
+                timer: 1000,
+                backdrop: false
+            });
+            setLoading(false);
+        }
+        
         if (apiEntity.username === "" ||
             apiEntity.password === "" ||
             apiEntity.retryPassword === "") {
@@ -161,15 +173,4 @@ async function EmailDialog(user) {
             timer: 2000
         });
     }
-}
-
-function throwError(text) {
-    Swal.fire({
-        title: text,
-        icon: "error",
-        position: "top-end",
-        showConfirmButton: false,
-        timer: 1000,
-        backdrop: false
-    });
 }

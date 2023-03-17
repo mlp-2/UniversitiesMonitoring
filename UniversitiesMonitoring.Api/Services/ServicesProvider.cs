@@ -274,8 +274,6 @@ public class ServicesProvider : IServicesProvider
             $"SELECT * FROM universities_monitoring.UniversityServiceReport WHERE ServiceId = {service.Id} AND " +
             $"AddedAt >= {lastSeenOffline}").ToList();
 
-        _cache.Set(cacheKey, result);
-
         return result;
     }
 

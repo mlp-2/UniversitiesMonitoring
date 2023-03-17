@@ -519,7 +519,7 @@ function ServiceHeader({service, updateService}) {
                     </Button>
                 }
                 <Button onClick={handleClickOnSubscribeButton}
-                        style={{background: service.isSubscribed ? "#FF4D15" : "#9D9D9D"}}>
+                        style={{background: !service.isSubscribed ? "#FF4D15" : "#9D9D9D"}}>
                     {service.isSubscribed ? "Отписаться" : "Подписаться"}
                 </Button>
             </Stack>

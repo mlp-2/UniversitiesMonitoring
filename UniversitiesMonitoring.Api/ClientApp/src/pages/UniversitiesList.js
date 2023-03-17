@@ -201,7 +201,7 @@ function SearchBar({updateSearch, updateShowSub}) {
             <input onKeyUp={handleChangingOfText} type="text" placeholder="Название ВУЗа"/>
         </div>
         <Stack className={style.subsOptions} direction="horizontal" gap={2}>
-            <FormCheckLabel htmlFor="subscribed">Показывать ВУЗ, на которые Вы подписаны</FormCheckLabel>
+            <FormCheckLabel htmlFor="subscribed">Показывать ВУЗы, на которые Вы подписаны</FormCheckLabel>
             <FormCheckInput id="subscribed" onChange={(e) => updateShowSub(e.target.checked)}/>
         </Stack>
     </Stack>

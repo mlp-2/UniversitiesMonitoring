@@ -168,20 +168,6 @@ public class ServicesProvider : IServicesProvider
     {
         if (serviceStats.ResponseTime == null) return;
 
-        var countOfStats = service.ServiceResponseTimes.Count; 
-        
-        if (countOfStats > 19)
-        {
-            var statsAsArray = service.ServiceResponseTimes.ToArray();
-
-            for (var i = 0; i < countOfStats - 19; i++)
-            {
-                _dataProvider.ResponseTimes.Remove(statsAsArray[i]);
-            }
-
-            await SaveChangesAsync();
-        }
-        
         await _dataProvider.ResponseTimes.AddAsync(new ServiceResponseTime()
         {
             ResponseTime = serviceStats.ResponseTime.Value,

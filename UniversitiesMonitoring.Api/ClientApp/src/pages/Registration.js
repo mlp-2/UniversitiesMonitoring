@@ -47,7 +47,7 @@ export function Registration() {
         const form = e.target;
         const formData = new FormData(form);
         const apiEntity = Object.fromEntries(formData.entries());
-        
+
         function throwError(text) {
             Swal.fire({
                 title: text,
@@ -59,7 +59,7 @@ export function Registration() {
             });
             setLoading(false);
         }
-        
+
         if (apiEntity.username === "" ||
             apiEntity.password === "" ||
             apiEntity.retryPassword === "") {

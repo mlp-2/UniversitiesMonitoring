@@ -48,9 +48,9 @@ internal class Worker : BackgroundService
             else
             {
                 await _universitiesServiceProvider.SendUpdateAsync(update.Changes, stoppingToken);
-                _logger.LogTrace("Update sent");    
+                _logger.LogTrace("Update sent");
             }
-            
+
             await _universitiesServiceProvider.SendStatsAsync(stats, stoppingToken);
             _logger.LogTrace("Stats sent");
 

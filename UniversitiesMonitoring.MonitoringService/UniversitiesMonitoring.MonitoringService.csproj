@@ -9,10 +9,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\UniversitiesMonitoring.Data\UniversitiesMonitoring.Data.csproj" />
+        <ProjectReference Include="..\UniversitiesMonitoring.Data\UniversitiesMonitoring.Data.csproj"/>
     </ItemGroup>
 </Project>

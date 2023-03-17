@@ -15,7 +15,7 @@ public class UniversityServiceEntity
         ServiceName = universityServiceModel.Name;
         UniversityName = universityServiceModel.University.Name;
         IsUnderAttack = isUnderAttack;
-        
+
         var lastChange = universityServiceModel.UniversityServiceStateChanges.LastOrDefault();
 
         IsOnline = lastChange?.IsOnline ?? false;
@@ -23,7 +23,7 @@ public class UniversityServiceEntity
 
         SubscribersCount = universityServiceModel.UserSubscribeToServices.Count;
         CommentsCount = universityServiceModel.UserRateOfServices.Count;
-        
+
         Subscribers = loadUsers
             ? universityServiceModel.UserSubscribeToServices.Select(x => new UserEntity(x.User))
             : Array.Empty<UserEntity>();

@@ -27,7 +27,7 @@ public class ServicesProvider : IServicesProvider
             var stats = new ResponseStatistics(respData.Select(x => x.ResponseTime));
 
             entry.Value = stats;
-            
+
             return stats;
         });
 
@@ -235,7 +235,7 @@ public class ServicesProvider : IServicesProvider
         {
             throw new InvalidOperationException("Service not found");
         }
-        
+
         return ServiceExcelReportBuilder.BuildExcel(service, GetServiceUptime(serviceId), offset);
     }
 
@@ -268,7 +268,7 @@ public class ServicesProvider : IServicesProvider
         $"STR_TO_DATE('{dateTime.Year}-{dateTime.Month}-{dateTime.Day} {dateTime.Hour}:{dateTime.Minute}:{dateTime.Second}', '%Y-%m-%d %H:%i:%s')";
 
     private async Task SaveChangesAsync() => await _dataProvider.SaveChangesAsync();
-    
+
     private string GenerateCacheKeyForReports(UniversityService service) => $"REPORTS_{service.Id}";
     private string GenerateCacheKeyForUptimeData(ulong serviceId) => $"UPTIME_{serviceId}";
     private string GenerateCacheKeyForResponsesData(ulong serviceId) => $"RESPONSES_{serviceId}";

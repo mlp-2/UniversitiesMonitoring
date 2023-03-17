@@ -190,7 +190,7 @@ function Listing({universities}) {
 
 function SearchBar({updateSearch, updateShowSub}) {
     const style = useStyles();
-    
+
     function handleChangingOfText(e) {
         updateSearch(e.target.value);
     }

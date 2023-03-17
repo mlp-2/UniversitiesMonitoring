@@ -93,7 +93,8 @@ public class UsersController : ControllerBase
             }
 
             var isSuccess =
-                await _usersProvider.ModifyUserAsync(ulong.Parse(User.Identity!.Name!), CreateModifyEmailAction(update));
+                await _usersProvider.ModifyUserAsync(ulong.Parse(User.Identity!.Name!),
+                    CreateModifyEmailAction(update));
 
             if (!isSuccess)
             {

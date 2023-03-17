@@ -1,5 +1,4 @@
 ﻿using UniversityMonitoring.Data.Entities;
-using UniversityMonitoring.Data.Models;
 
 namespace UniversitiesMonitoring.MonitoringService.Services.Inspecting;
 

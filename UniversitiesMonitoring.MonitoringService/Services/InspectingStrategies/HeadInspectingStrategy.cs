@@ -1,6 +1,4 @@
-﻿using System.Net;
-
-namespace UniversitiesMonitoring.MonitoringService.Services.InspectingStrategies;
+﻿namespace UniversitiesMonitoring.MonitoringService.Services.InspectingStrategies;
 
 internal class HeadInspectingStrategy : IInspectingStrategy
 {

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace UniversityMonitoring.Data.Models
+﻿namespace UniversityMonitoring.Data.Models
 {
     public partial class UserSubscribeToService
     {

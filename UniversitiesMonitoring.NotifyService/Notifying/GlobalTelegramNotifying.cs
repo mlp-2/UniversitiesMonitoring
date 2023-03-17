@@ -8,7 +8,7 @@ using UniversityMonitoring.Data.Entities;
 namespace UniversitiesMonitoring.NotifyService.Notifying;
 
 internal class GlobalTelegramNotifying
-{   
+{
     private readonly TelegramBotClient _botClient;
     private readonly ChatId _globalChatId;
 

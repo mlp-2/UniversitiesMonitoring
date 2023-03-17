@@ -19,9 +19,10 @@ public class HandlingExceptionsMiddleware
         {
             await _next(context);
         }
-        catch (InvalidOperationException)
+        catch (Exception e)
         {
             context.Response.StatusCode = 400;
+            Console.WriteLine(e.ToString());
             await context.Response.WriteAsync("Некорректные данные");
         }
     }

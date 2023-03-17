@@ -15,6 +15,12 @@ const useStyles = createUseStyles({
     layout: {
         display: "block"
     },
+    subsOptions: {
+        background: "rgba(245,245,245,0.68)",
+        backdropFilter: "blur(10px)",
+        borderRadius: 10,
+        padding: 1
+    },
     header: {
         flex: 1,
         background: `url(${HeaderBackground})`,
@@ -183,6 +189,8 @@ function Listing({universities}) {
 }
 
 function SearchBar({updateSearch, updateShowSub}) {
+    const style = useStyles();
+    
     function handleChangingOfText(e) {
         updateSearch(e.target.value);
     }
@@ -192,8 +200,8 @@ function SearchBar({updateSearch, updateShowSub}) {
             <FontAwesomeIcon icon={faMagnifyingGlass}/>
             <input onKeyUp={handleChangingOfText} type="text" placeholder="Название ВУЗа"/>
         </div>
-        <Stack direction="horizontal" gap={2}>
-            <FormCheckLabel htmlFor="subscribed">Показывать ВУЗ, на которые Вы подписаны</FormCheckLabel>
+        <Stack className={style.subsOptions} direction="horizontal" gap={2}>
+            <FormCheckLabel htmlFor="subscribed">Показывать ВУЗы, на которые Вы подписаны</FormCheckLabel>
             <FormCheckInput id="subscribed" onChange={(e) => updateShowSub(e.target.checked)}/>
         </Stack>
     </Stack>

@@ -37,8 +37,8 @@ public class UniversityServiceEntity
         string universityName,
         bool isOnline,
         string url,
+        bool? isUnderAttack,
         IEnumerable<UserEntity> subscribers,
-        IEnumerable<CommentEntity> comments,
         bool? isSubscribed)
     {
         ServiceId = serviceId;
@@ -47,8 +47,8 @@ public class UniversityServiceEntity
         IsOnline = isOnline;
         Url = url;
         Subscribers = subscribers;
-        Comments = comments;
         IsSubscribed = isSubscribed;
+        IsUnderAttack = isUnderAttack;
     }
 
     public ulong ServiceId { get; }

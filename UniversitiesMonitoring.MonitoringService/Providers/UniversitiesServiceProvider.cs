@@ -34,7 +34,7 @@ internal class UniversitiesServiceProvider : IUniversitiesServiceProvider
         catch (Exception e)
         {
             await WaitUntilApiUnavailable(cancellationToken);
-            _logger.LogError(e.ToString());
+            Console.WriteLine(e.ToString());
             return await GetAllUniversitiesServicesAsync(cancellationToken);
         }
     }
@@ -51,7 +51,7 @@ internal class UniversitiesServiceProvider : IUniversitiesServiceProvider
         catch (Exception e)
         {
             await WaitUntilApiUnavailable(cancellationToken);
-            _logger.LogError(e.ToString());
+            Console.WriteLine(e.ToString());
             await SendUpdateAsync(update, cancellationToken);
         }
     }
@@ -69,7 +69,7 @@ internal class UniversitiesServiceProvider : IUniversitiesServiceProvider
         catch (Exception e)
         {
             await WaitUntilApiUnavailable(cancellationToken);
-            _logger.LogError(e.ToString());
+            Console.WriteLine(e.ToString());
             await SendStatsAsync(stats, cancellationToken);
         }
     }

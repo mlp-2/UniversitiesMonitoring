@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using UniversitiesMonitoring.Api.Entities;
 using UniversitiesMonitoring.Api.Services;
 using UniversityMonitoring.Data.Entities;
@@ -84,20 +85,27 @@ public class UsersController : ControllerBase
     [HttpPut("email/update")]
     public async Task<IActionResult> EmailUpdate([FromBody] EmailUpdateEntity update)
     {
-        if (!User.Identity?.IsAuthenticated ?? true)
+        try
         {
-            return BadRequest();
+            if (!User.Identity?.IsAuthenticated ?? true)
+            {
+                return BadRequest();
+            }
+
+            var isSuccess =
+                await _usersProvider.ModifyUserAsync(ulong.Parse(User.Identity!.Name!), CreateModifyEmailAction(update));
+
+            if (!isSuccess)
+            {
+                return BadRequest("Некорректные данные");
+            }
+
+            return Ok();
         }
-
-        var isSuccess =
-            await _usersProvider.ModifyUserAsync(ulong.Parse(User.Identity!.Name!), CreateModifyEmailAction(update));
-
-        if (!isSuccess)
+        catch (DbUpdateException)
         {
-            return BadRequest("Некорректные данные");
+            return BadRequest("Email уже занят");
         }
-
-        return Ok();
     }
 
     private Action<User> CreateModifyEmailAction(EmailUpdateEntity update) => user =>

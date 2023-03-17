@@ -31,9 +31,10 @@ internal class UniversitiesServiceProvider : IUniversitiesServiceProvider
             return await response.Content.ReadFromJsonAsync<UniversityServiceEntity[]>(
                 cancellationToken: cancellationToken) ?? Array.Empty<UniversityServiceEntity>();
         }
-        catch
+        catch (Exception e)
         {
             await WaitUntilApiUnavailable(cancellationToken);
+            _logger.LogError(e.ToString());
             return await GetAllUniversitiesServicesAsync(cancellationToken);
         }
     }
@@ -47,9 +48,10 @@ internal class UniversitiesServiceProvider : IUniversitiesServiceProvider
 
             _logger.LogTrace("Changes sent. Status: {HttpStatus}", response.StatusCode);
         }
-        catch
+        catch (Exception e)
         {
             await WaitUntilApiUnavailable(cancellationToken);
+            _logger.LogError(e.ToString());
             await SendUpdateAsync(update, cancellationToken);
         }
     }
@@ -64,9 +66,10 @@ internal class UniversitiesServiceProvider : IUniversitiesServiceProvider
 
             _logger.LogTrace("Stats sent. Status: {HttpStatus}", response.StatusCode);
         }
-        catch
+        catch (Exception e)
         {
             await WaitUntilApiUnavailable(cancellationToken);
+            _logger.LogError(e.ToString());
             await SendStatsAsync(stats, cancellationToken);
         }
     }

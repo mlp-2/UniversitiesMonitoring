@@ -198,7 +198,7 @@ public class ServicesController : ControllerBase
                 loadComments: loadComments,
                 isSubscribed: CheckIfUserSubscribed(service, ulong.Parse(User.Identity!.Name!)))
             : from service in services
-            select new UniversityServiceEntity(service, loadUsers, loadComments);
+            select new UniversityServiceEntity(service, null, loadUsers, loadComments);
 
         if (!ids.IsNullOrEmpty())
         {

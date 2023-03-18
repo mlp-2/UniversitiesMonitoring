@@ -62,6 +62,7 @@ export function Login() {
         setUser(null);
         sessionStorage.removeItem("user");
         localStorage.removeItem("user");
+        localStorage.removeItem("token");
     }
 
     useEffect(() => {

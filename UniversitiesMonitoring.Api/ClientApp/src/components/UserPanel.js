@@ -58,8 +58,9 @@ export function UserPanel() {
             <Link to="/universities-list" id="home-link"><FontAwesomeIcon icon={faHome}/></Link>
             <Link to="https://t.me/ummonitoring"><FontAwesomeIcon icon={faTelegram}/></Link>
             <Link to="/login" id="quit-link" onClick={() => {
-                localStorage.removeItem("token");
                 sessionStorage.removeItem("user");
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
             }}>
                 <FontAwesomeIcon icon={faDoorClosed}/>
             </Link>
